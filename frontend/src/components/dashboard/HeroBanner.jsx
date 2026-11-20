@@ -1,4 +1,5 @@
 import React from 'react';
+import { Animated3DTruck } from './Animated3DTruck';
 
 export const HeroBanner = () => {
   return (
@@ -6,24 +7,18 @@ export const HeroBanner = () => {
       {/* Left Column: Heading and Subtitle */}
       <div className="hero-content-left">
         <div className="hero-heading-wrap">
-          <h1 className="hero-welcome-title">Welcome Back,</h1>
-          <h2 className="hero-manager-title">Fleet Manager!</h2>
+          <h1 className="hero-welcome-title">Welcome back,</h1>
+          <h2 className="hero-manager-title">Admin!</h2>
         </div>
         <p className="hero-description">
-          Drive smarter. Manage your fleet.<br />
-          Optimize every journey.
+          Drive smarter. Manage better with TTC Fleet360.<br />
+          Real-time telemetry and 360° global logistics control.
         </p>
       </div>
 
-      {/* Right Column: Supplied Blue Truck & Tablet Image */}
-      <div className="hero-image-wrap">
-        <img
-          src="/assets/fleet-manager-trucks.jpg"
-          alt="Fleet Manager with Trucks"
-          className="hero-banner-img"
-        />
-        {/* Navy gradient overlay on the left to seamlessly blend with hero background */}
-        <div className="hero-gradient-overlay" />
+      {/* Right Column: Realistic Animated 3D Logistics Truck Cruising Engine */}
+      <div className="hero-image-wrap hero-animated-truck-wrap">
+        <Animated3DTruck />
       </div>
 
       {/* Decorative ambient orange glowing curve at bottom */}
