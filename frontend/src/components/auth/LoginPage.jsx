@@ -9,17 +9,35 @@ import {
   ShieldCheck,
   MapPin,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  UserCheck,
+  Navigation,
+  ClipboardCheck
 } from 'lucide-react';
 
-export const LoginPage = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('alex.mercer@fleet360.ttc.com');
+export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
+  const [selectedPortal, setSelectedPortal] = useState(initialPortal); // 'driver' or 'manager'
+  const [email, setEmail] = useState(
+    initialPortal === 'driver' ? 'm.vance@fleet360.ttc.com' : 'alex.mercer@fleet360.ttc.com'
+  );
   const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [forgotPasswordNotice, setForgotPasswordNotice] = useState(false);
+
+  const handlePortalSwitch = (portal) => {
+    setSelectedPortal(portal);
+    setErrorMessage('');
+    if (portal === 'driver') {
+      setEmail('m.vance@fleet360.ttc.com');
+      setPassword('password123');
+    } else {
+      setEmail('alex.mercer@fleet360.ttc.com');
+      setPassword('password123');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,22 +51,31 @@ export const LoginPage = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      // Optional: try backend API first if server is running
-      let loginSuccessful = false;
-      let userData = {
-        username: 'fleetmanager',
-        email: email,
-        fullName: 'Alexandre Mercer',
-        role: 'ROLE_FLEET_MANAGER',
-        token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_token_fleet360'
-      };
+      let isDriver = selectedPortal === 'driver' || email.includes('vance') || email.includes('driver');
+      let userData = isDriver
+        ? {
+            username: 'driver01',
+            email: email,
+            fullName: 'Marcus Vance',
+            role: 'ROLE_DRIVER',
+            driverId: 'D-01',
+            vehicleReg: 'TTC-8492-HD',
+            token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_driver_fleet360'
+          }
+        : {
+            username: 'fleetmanager',
+            email: email,
+            fullName: 'Alexandre Mercer',
+            role: 'ROLE_FLEET_MANAGER',
+            token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_token_fleet360'
+          };
 
       try {
         const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            username: email.includes('@') ? 'fleetmanager' : email,
+            username: email.includes('@') ? (isDriver ? 'driver01' : 'fleetmanager') : email,
             password: password
           })
         });
@@ -57,23 +84,13 @@ export const LoginPage = ({ onLoginSuccess }) => {
           const resData = await response.json();
           if (resData.success && resData.data) {
             userData = resData.data;
-            loginSuccessful = true;
           }
         }
       } catch (networkErr) {
-        // Fallback to local authentication validation
-        console.info('Backend API offline, using enterprise client verification:', networkErr);
+        console.info('Backend authentication fallback:', networkErr);
       }
 
-      // Check standard credentials
-      if (
-        (email === 'alex.mercer@fleet360.ttc.com' || email === 'fleetmanager' || email.includes('admin')) &&
-        password.length >= 6
-      ) {
-        loginSuccessful = true;
-      }
-
-      if (loginSuccessful) {
+      if (password.length >= 6) {
         if (rememberMe) {
           localStorage.setItem('ttc_fleet360_user', JSON.stringify(userData));
         } else {
@@ -84,10 +101,10 @@ export const LoginPage = ({ onLoginSuccess }) => {
         setTimeout(() => {
           setIsLoading(false);
           onLoginSuccess(userData);
-        }, 600);
+        }, 500);
       } else {
         setIsLoading(false);
-        setErrorMessage('Invalid company email or password. Please try again.');
+        setErrorMessage('Invalid credentials. Password must be at least 6 characters.');
       }
     } catch (err) {
       setIsLoading(false);
@@ -95,18 +112,12 @@ export const LoginPage = ({ onLoginSuccess }) => {
     }
   };
 
-  const handleAutofillDemo = () => {
-    setEmail('alex.mercer@fleet360.ttc.com');
-    setPassword('password123');
-    setErrorMessage('');
-  };
-
   return (
     <div className="login-page-container">
       {/* LEFT SECTION - LOGIN FORM (45%) */}
       <div className="login-form-section">
         <div className="login-form-wrapper">
-          {/* 3. Logo and Branding */}
+          {/* Logo and Branding Header */}
           <div className="login-brand-header">
             <div className="login-logo-box">
               <Truck size={24} color="#FF7A1A" strokeWidth={2.4} />
@@ -119,11 +130,31 @@ export const LoginPage = ({ onLoginSuccess }) => {
             </div>
           </div>
 
+          {/* Role Portal Switcher */}
+          <div className="login-portal-switcher">
+            <button
+              type="button"
+              className={`portal-switch-btn ${selectedPortal === 'driver' ? 'active' : ''}`}
+              onClick={() => handlePortalSwitch('driver')}
+            >
+              <UserCheck size={16} /> Driver Portal
+            </button>
+            <button
+              type="button"
+              className={`portal-switch-btn ${selectedPortal === 'manager' ? 'active' : ''}`}
+              onClick={() => handlePortalSwitch('manager')}
+            >
+              <Truck size={16} /> Fleet Manager
+            </button>
+          </div>
+
           {/* Welcome Heading */}
           <div className="login-welcome-wrap">
             <h1 className="login-welcome-title">Welcome Back!</h1>
             <p className="login-welcome-subtitle">
-              Sign in to manage your fleet operations.
+              {selectedPortal === 'driver'
+                ? 'Sign in to your Driver Portal & active routes.'
+                : 'Sign in to manage your fleet operations.'}
             </p>
           </div>
 
@@ -135,7 +166,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
             </div>
           )}
 
-          {/* Forgot Password Modal / Alert */}
+          {/* Forgot Password Alert */}
           {forgotPasswordNotice && (
             <div className="login-info-alert">
               <CheckCircle2 size={16} color="#16A36A" />
@@ -196,7 +227,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password Row */}
+            {/* Options Row */}
             <div className="login-options-row">
               <label className="remember-me-label">
                 <input
@@ -227,7 +258,11 @@ export const LoginPage = ({ onLoginSuccess }) => {
                 <span className="btn-loading-state">Authenticating...</span>
               ) : (
                 <>
-                  <span>Sign In to Dashboard</span>
+                  <span>
+                    {selectedPortal === 'driver'
+                      ? 'Sign In to Driver Portal'
+                      : 'Sign In to Dashboard'}
+                  </span>
                   <ArrowRight size={18} />
                 </>
               )}
@@ -236,13 +271,25 @@ export const LoginPage = ({ onLoginSuccess }) => {
 
           {/* Quick autofill helper */}
           <div className="demo-credentials-pill">
-            <span className="demo-pill-label">Demo Lead Account:</span>
+            <span className="demo-pill-label">
+              {selectedPortal === 'driver' ? 'Lead Driver Account:' : 'Fleet Manager Account:'}
+            </span>
             <button
               type="button"
               className="demo-autofill-btn"
-              onClick={handleAutofillDemo}
+              onClick={() => {
+                if (selectedPortal === 'driver') {
+                  setEmail('m.vance@fleet360.ttc.com');
+                  setPassword('password123');
+                } else {
+                  setEmail('alex.mercer@fleet360.ttc.com');
+                  setPassword('password123');
+                }
+              }}
             >
-              alex.mercer@fleet360.ttc.com (Autofill)
+              {selectedPortal === 'driver'
+                ? 'm.vance@fleet360.ttc.com (Autofill)'
+                : 'alex.mercer@fleet360.ttc.com (Autofill)'}
             </button>
           </div>
 
@@ -258,7 +305,7 @@ export const LoginPage = ({ onLoginSuccess }) => {
 
       {/* RIGHT SECTION - HERO IMAGE (55%) */}
       <div className="login-hero-section">
-        {/* Supplied Blue Truck & Employee with Tablet Image */}
+        {/* Logistics Truck Image */}
         <img
           src="/assets/fleet-manager-trucks.jpg"
           alt="TTC Fleet Commercial Operations"
@@ -275,40 +322,80 @@ export const LoginPage = ({ onLoginSuccess }) => {
         <div className="login-hero-content">
           <div className="login-hero-badge">
             <Truck size={14} color="#FF7A1A" />
-            <span>ENTERPRISE LOGISTICS SYSTEM</span>
+            <span>
+              {selectedPortal === 'driver' ? 'DRIVER DISPATCH SYSTEM' : 'ENTERPRISE LOGISTICS SYSTEM'}
+            </span>
           </div>
 
           <h2 className="login-hero-title">
-            Manage Your Fleet.<br />
-            Drive Your Business Forward.
+            {selectedPortal === 'driver' ? (
+              <>
+                Your Journey. Your Fleet.<br />
+                Your Success.
+              </>
+            ) : (
+              <>
+                Manage Your Fleet.<br />
+                Drive Your Business Forward.
+              </>
+            )}
           </h2>
 
           <p className="login-hero-subtitle">
-            Smart fleet management, real-time vehicle tracking and seamless logistics operations — all in one platform.
+            {selectedPortal === 'driver'
+              ? 'Manage trips, track deliveries and stay connected with your logistics operations in real-time.'
+              : 'Smart fleet management, real-time vehicle tracking and seamless logistics operations — all in one platform.'}
           </p>
 
-          {/* 3 Small Feature Highlights */}
+          {/* Feature Highlights */}
           <div className="login-feature-highlights">
-            <div className="feature-pill-item">
-              <div className="feature-icon-circle">
-                <MapPin size={16} color="#FF7A1A" />
-              </div>
-              <span>Real-Time Fleet Tracking</span>
-            </div>
+            {selectedPortal === 'driver' ? (
+              <>
+                <div className="feature-pill-item">
+                  <div className="feature-icon-circle">
+                    <Navigation size={16} color="#FF7A1A" />
+                  </div>
+                  <span>Real-Time Trip Assignments</span>
+                </div>
 
-            <div className="feature-pill-item">
-              <div className="feature-icon-circle">
-                <Truck size={16} color="#FF7A1A" />
-              </div>
-              <span>Smart Vehicle Management</span>
-            </div>
+                <div className="feature-pill-item">
+                  <div className="feature-icon-circle">
+                    <ClipboardCheck size={16} color="#FF7A1A" />
+                  </div>
+                  <span>Instant Pickup & Delivery Confirmation</span>
+                </div>
 
-            <div className="feature-pill-item">
-              <div className="feature-icon-circle">
-                <CheckCircle2 size={16} color="#FF7A1A" />
-              </div>
-              <span>Complete Operational Visibility</span>
-            </div>
+                <div className="feature-pill-item">
+                  <div className="feature-icon-circle">
+                    <MapPin size={16} color="#FF7A1A" />
+                  </div>
+                  <span>Live GPS Route Navigation</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="feature-pill-item">
+                  <div className="feature-icon-circle">
+                    <MapPin size={16} color="#FF7A1A" />
+                  </div>
+                  <span>Real-Time Fleet Tracking</span>
+                </div>
+
+                <div className="feature-pill-item">
+                  <div className="feature-icon-circle">
+                    <Truck size={16} color="#FF7A1A" />
+                  </div>
+                  <span>Smart Vehicle Management</span>
+                </div>
+
+                <div className="feature-pill-item">
+                  <div className="feature-icon-circle">
+                    <CheckCircle2 size={16} color="#FF7A1A" />
+                  </div>
+                  <span>Complete Operational Visibility</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

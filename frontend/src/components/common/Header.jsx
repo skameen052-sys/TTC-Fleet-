@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Calendar, ChevronDown, CheckCheck, Settings, LogOut } from 'lucide-react';
+import { Search, Bell, Calendar, ChevronDown, CheckCheck, Settings, LogOut, Truck } from 'lucide-react';
 
 export const Header = ({
   pageTitle = 'Fleet Manager Dashboard',
@@ -9,7 +9,8 @@ export const Header = ({
   onMarkNotificationRead,
   onMarkAllNotificationsRead,
   onSelectTab,
-  onLogout
+  onLogout,
+  onSwitchToDriver
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState('');
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
@@ -176,6 +177,18 @@ export const Header = ({
                 <span className="profile-tag">ROLE_FLEET_MANAGER</span>
               </div>
               <div className="dropdown-menu-list">
+                {onSwitchToDriver && (
+                  <button
+                    className="dropdown-menu-btn"
+                    style={{ color: '#FF7A1A', fontWeight: 600 }}
+                    onClick={() => {
+                      setShowProfileDropdown(false);
+                      onSwitchToDriver();
+                    }}
+                  >
+                    <Truck size={15} color="#FF7A1A" /> Switch to Driver Portal
+                  </button>
+                )}
                 <button
                   className="dropdown-menu-btn"
                   onClick={() => {

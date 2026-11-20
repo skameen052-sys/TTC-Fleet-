@@ -50,6 +50,16 @@ public class DataInitializer implements CommandLineRunner {
                     Role.ROLE_FLEET_MANAGER
             );
             userRepository.save(manager);
+
+            // Seed Driver user
+            User driver = new User(
+                    "driver01",
+                    "m.vance@fleet360.ttc.com",
+                    passwordEncoder.encode("password123"),
+                    "Marcus Vance",
+                    Role.ROLE_DRIVER
+            );
+            userRepository.save(driver);
         }
 
         if (vehicleRepository.count() == 0) {

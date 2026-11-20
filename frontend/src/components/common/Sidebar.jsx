@@ -35,7 +35,7 @@ export const navigationItems = [
   { id: 'profile', label: 'My Profile', icon: User }
 ];
 
-export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCount, onLogout }) => {
+export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCount, onLogout, onSwitchToDriver }) => {
   const getBadgeValue = (item) => {
     if (item.badgeKey === 'vehicles') return metrics?.totalVehicles || 16;
     if (item.badgeKey === 'available') return metrics?.availableVehicles || 4;
@@ -101,6 +101,18 @@ export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCo
         </div>
         <Radio size={16} color="#16A36A" />
       </div>
+
+      {/* Portal Switcher Button */}
+      {onSwitchToDriver && (
+        <button
+          className="sidebar-switcher-btn"
+          onClick={onSwitchToDriver}
+          title="Switch to Driver Portal"
+        >
+          <Truck size={15} color="#FF7A1A" />
+          <span>Switch to Driver Portal</span>
+        </button>
+      )}
 
       {/* Logout Action */}
       <button
