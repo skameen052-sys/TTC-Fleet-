@@ -266,14 +266,16 @@ export const Login = () => {
         </div>
 
         {/* Right Side: Professional Truck Photograph Panel */}
-        <div
-          className="login-image-panel"
-          style={{
-            backgroundImage: `url(${loginTruckImg})`,
-          }}
-        >
-          <div className="login-image-quote">
-            Drive your fleet with clarity, control, and confidence.
+        <div className="login-image-panel">
+          <img
+            src={loginTruckImg}
+            alt="TTC Fleet360 Logistics Red Truck"
+            className="login-truck-img"
+          />
+          <div className="login-image-overlay">
+            <h2 className="login-image-quote">
+              Drive your fleet with clarity, control, and confidence.
+            </h2>
           </div>
         </div>
       </div>
