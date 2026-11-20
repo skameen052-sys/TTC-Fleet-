@@ -163,8 +163,8 @@ export const Header = ({
               <span>{currentUser?.fullName?.[0]?.toUpperCase() || 'A'}</span>
             </div>
             <div className="user-text-info">
-              <span className="user-display-name">{currentUser?.fullName || 'Admin'}</span>
-              <span className="user-role-text">{currentUser?.role === 'ROLE_ADMIN' ? 'Super Admin' : 'Admin'}</span>
+              <span className="user-display-name">{currentUser?.fullName || 'Alexandre Mercer'}</span>
+              <span className="user-role-text">{currentUser?.role === 'ROLE_FLEET_MANAGER' ? 'Fleet Manager (Lead)' : (currentUser?.role || 'Fleet Manager')}</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>
@@ -173,9 +173,9 @@ export const Header = ({
           {showProfileDropdown && (
             <div className="header-dropdown profile-dropdown">
               <div className="profile-dropdown-header">
-                <div className="profile-name">{currentUser?.fullName || 'Admin'}</div>
-                <div className="profile-email">{currentUser?.email || 'admin@ttcfleet360.com'}</div>
-                <span className="profile-tag">{currentUser?.role || 'ROLE_ADMIN'}</span>
+                <div className="profile-name">{currentUser?.fullName || 'Alexandre Mercer'}</div>
+                <div className="profile-email">{currentUser?.email || 'alex.mercer@fleet360.ttc.com'}</div>
+                <span className="profile-tag">{currentUser?.role || 'ROLE_FLEET_MANAGER'}</span>
               </div>
               <div className="dropdown-menu-list">
                 {onSwitchToDriver && (

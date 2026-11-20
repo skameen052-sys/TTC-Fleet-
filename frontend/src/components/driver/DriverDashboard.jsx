@@ -23,7 +23,8 @@ import {
   Sparkles,
   Calendar,
   Compass,
-  AlertCircle
+  AlertCircle,
+  Bell
 } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -843,7 +844,7 @@ export const DriverDashboard = ({
                     <td>{fl.date}</td>
                     <td>{fl.station}</td>
                     <td>{fl.liters} L</td>
-                    <td>${fl.cost.toFixed(2)}</td>
+                    <td>${Number(fl?.cost || 0).toFixed(2)}</td>
                     <td>
                       <span className="status-pill status-available" style={{ fontSize: '11px', padding: '2px 6px' }}>
                         {fl.receiptStatus}

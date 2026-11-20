@@ -403,7 +403,7 @@ export const FuelRecordsView = ({ fuelLogs = [], onOpenFuelModal }) => {
                 <td>{f.date}</td>
                 <td>{f.station}</td>
                 <td>{f.liters} L</td>
-                <td>${f.cost.toFixed(2)}</td>
+                <td>${Number(f?.cost || 0).toFixed(2)}</td>
                 <td>{f.odometer?.toLocaleString()} km</td>
                 <td><span className="status-pill status-available">{f.receiptStatus}</span></td>
               </tr>

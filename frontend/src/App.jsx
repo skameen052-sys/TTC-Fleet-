@@ -165,26 +165,26 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const u = localStorage.getItem('ttc_fleet360_user') || sessionStorage.getItem('ttc_fleet360_user');
-      return u ? JSON.parse(u) : { fullName: 'Admin', role: 'ROLE_ADMIN', email: 'admin@ttcfleet360.com' };
+      return u ? JSON.parse(u) : { fullName: 'Alexandre Mercer', role: 'ROLE_FLEET_MANAGER', email: 'alex.mercer@fleet360.ttc.com' };
     } catch {
-      return { fullName: 'Admin', role: 'ROLE_ADMIN', email: 'admin@ttcfleet360.com' };
+      return { fullName: 'Alexandre Mercer', role: 'ROLE_FLEET_MANAGER', email: 'alex.mercer@fleet360.ttc.com' };
     }
   });
 
-  // Portal State: 'manager' (Admin Dashboard) vs 'driver'
+  // Portal State: 'manager' (Fleet Manager Portal) vs 'driver' (Driver Portal)
   const [portal, setPortal] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('portal') === 'driver') return 'driver';
-      if (params.get('portal') === 'admin' || params.get('portal') === 'manager') return 'manager';
+      if (params.get('portal') === 'manager') return 'manager';
 
       const u = localStorage.getItem('ttc_fleet360_user') || sessionStorage.getItem('ttc_fleet360_user');
       const parsed = u ? JSON.parse(u) : null;
-      if (parsed?.role === 'ROLE_DRIVER' && !parsed?.email?.toLowerCase().includes('admin')) {
+      if (parsed?.role === 'ROLE_DRIVER') {
         return 'driver';
       }
     } catch {}
-    return 'manager'; // Default to Admin Dashboard
+    return 'manager'; // Default to Fleet Manager Portal
   });
 
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -228,14 +228,14 @@ export default function App() {
   const handleLoginSuccess = (userData) => {
     setCurrentUser(userData);
     setIsAuthenticated(true);
-    if (userData.role === 'ROLE_DRIVER' && !userData.email?.toLowerCase().includes('admin')) {
+    if (userData.role === 'ROLE_DRIVER') {
       setPortal('driver');
       setDriverActiveTab('dashboard');
     } else {
       setPortal('manager');
       setActiveTab('dashboard');
     }
-    showToast(`Welcome back, ${userData.fullName || 'Admin'}!`);
+    showToast(`Welcome back, ${userData.fullName || 'User'}!`);
   };
 
   const handleLogout = () => {
@@ -385,46 +385,6 @@ export default function App() {
     return (
       <ErrorBoundary>
         <div className="app-container driver-portal-theme">
-          {/* Quick Portal Switcher Banner */}
-          <div style={{
-            backgroundColor: '#0F172A',
-            color: '#E2E8F0',
-            padding: '10px 24px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            fontSize: '13px',
-            borderBottom: '1px solid #334155',
-            zIndex: 100
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
-              <strong style={{ color: '#F97316' }}>Driver Portal</strong>
-              <span style={{ color: '#94A3B8' }}>(Marcus Vance - CDL Lead Driver)</span>
-            </div>
-            <button
-              onClick={() => {
-                setPortal('manager');
-                setActiveTab('dashboard');
-              }}
-              style={{
-                backgroundColor: '#F97316',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '6px 16px',
-                borderRadius: '6px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                fontSize: '12.5px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              ← Open Admin Dashboard
-            </button>
-          </div>
-
           {/* Left Sidebar Navigation (Driver) */}
           <DriverSidebar
             activeTab={driverActiveTab}
@@ -447,7 +407,10 @@ export default function App() {
               notifications={safeNotifications}
               onSelectTab={setDriverActiveTab}
               onLogout={handleLogout}
-              onSwitchToManager={() => setPortal('manager')}
+              onSwitchToManager={() => {
+                setPortal('manager');
+                setActiveTab('dashboard');
+              }}
             />
 
             {/* Dynamic Driver Page Views */}

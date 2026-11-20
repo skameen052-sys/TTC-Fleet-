@@ -16,8 +16,10 @@ import {
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
-  const [selectedPortal, setSelectedPortal] = useState('manager'); // Default to Admin / Fleet Manager
-  const [email, setEmail] = useState('admin@ttcfleet360.com');
+  const [selectedPortal, setSelectedPortal] = useState(initialPortal);
+  const [email, setEmail] = useState(
+    initialPortal === 'driver' ? 'm.vance@fleet360.ttc.com' : 'alex.mercer@fleet360.ttc.com'
+  );
   const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -34,7 +36,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
       setEmail('m.vance@fleet360.ttc.com');
       setPassword('password123');
     } else {
-      setEmail('admin@ttcfleet360.com');
+      setEmail('alex.mercer@fleet360.ttc.com');
       setPassword('password123');
     }
   };
@@ -51,7 +53,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
     setIsLoading(true);
 
     try {
-      let driverUser = (selectedPortal === 'driver' || email.includes('vance') || email.includes('driver')) && !email.toLowerCase().includes('admin');
+      let driverUser = selectedPortal === 'driver' || email.includes('vance') || email.includes('driver');
       let userData = driverUser
         ? {
             username: 'driver01',
@@ -63,10 +65,10 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
             token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_driver_fleet360'
           }
         : {
-            username: 'admin',
-            email: email || 'admin@ttcfleet360.com',
-            fullName: 'Admin',
-            role: 'ROLE_ADMIN',
+            username: 'fleetmanager',
+            email: email || 'alex.mercer@fleet360.ttc.com',
+            fullName: 'Alexandre Mercer',
+            role: 'ROLE_FLEET_MANAGER',
             token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_token_fleet360'
           };
 
@@ -75,7 +77,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            username: email.includes('@') ? (driverUser ? 'driver01' : 'admin') : email,
+            username: email.includes('@') ? (driverUser ? 'driver01' : 'fleetmanager') : email,
             password: password
           })
         });
@@ -137,7 +139,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
             </div>
           </div>
 
-          {/* Role Portal Switcher Pills (Matching Screenshots 3 & 4) */}
+          {/* Role Portal Switcher Pills */}
           <div className={`portal-switcher-pill-box ${isDriver ? 'box-light' : 'box-dark'}`}>
             <button
               type="button"
@@ -145,7 +147,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
               onClick={() => handlePortalSwitch('manager')}
             >
               <Truck size={14} />
-              <span>Admin Dashboard</span>
+              <span>Fleet Manager</span>
             </button>
             <button
               type="button"
@@ -167,7 +169,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
             <p className={`login-welcome-subtitle ${isDriver ? 'sub-light' : 'sub-dark'}`}>
               {isDriver
                 ? 'Sign in to access your Driver Portal & route dispatch.'
-                : 'Sign in to access your TTC Fleet360 Admin Dashboard.'}
+                : 'Sign in to manage vehicles, drivers and fleet operations.'}
             </p>
           </div>
 
@@ -206,7 +208,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
                 <input
                   type="email"
                   className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
-                  placeholder={isDriver ? 'Enter driver email' : 'admin@ttcfleet360.com'}
+                  placeholder={isDriver ? 'Enter driver email' : 'alex.mercer@fleet360.ttc.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -275,7 +277,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
                 <span>Authenticating Credentials...</span>
               ) : (
                 <>
-                  <span>{isDriver ? 'Sign In to Driver Portal' : 'Sign In to Admin Dashboard'}</span>
+                  <span>{isDriver ? 'Sign In to Driver Portal' : 'Sign In to Dashboard'}</span>
                   <ArrowRight size={17} strokeWidth={2.4} />
                 </>
               )}
@@ -285,7 +287,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
           {/* Quick autofill helper */}
           <div className="demo-credentials-pill" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '11.5px' }}>
             <span style={{ color: isDriver ? '#718096' : '#94A3B8' }}>
-              {isDriver ? 'Driver Account:' : 'Admin Account:'}
+              {isDriver ? 'Driver Account:' : 'Fleet Manager:'}
             </span>
             <button
               type="button"
@@ -303,14 +305,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
                   setEmail('m.vance@fleet360.ttc.com');
                   setPassword('password123');
                 } else {
-                  setEmail('admin@ttcfleet360.com');
+                  setEmail('alex.mercer@fleet360.ttc.com');
                   setPassword('password123');
                 }
               }}
             >
               {isDriver
                 ? 'm.vance@fleet360.ttc.com (Autofill)'
-                : 'admin@ttcfleet360.com (Autofill)'}
+                : 'alex.mercer@fleet360.ttc.com (Autofill)'}
             </button>
           </div>
 

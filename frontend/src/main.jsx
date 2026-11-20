@@ -58,7 +58,7 @@ class ErrorBoundary extends React.Component {
               TTC Fleet360 Session Restored
             </h2>
             <p style={{ color: '#94A3B8', fontSize: '14px', lineHeight: '1.6', margin: '0 0 24px' }}>
-              A temporary client state issue was encountered. Click below to load the clean Admin Dashboard.
+              A temporary client state issue was encountered. Click below to load the clean Fleet Manager Dashboard.
             </p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button
@@ -68,7 +68,7 @@ class ErrorBoundary extends React.Component {
                     localStorage.removeItem('ttc_fleet360_user');
                     sessionStorage.clear();
                   } catch (e) {}
-                  window.location.href = '/?portal=admin';
+                  window.location.href = '/?portal=manager';
                 }}
                 style={{
                   background: 'linear-gradient(135deg, #FF7A1A 0%, #FF5500 100%)',
@@ -81,7 +81,7 @@ class ErrorBoundary extends React.Component {
                   cursor: 'pointer'
                 }}
               >
-                Open Admin Dashboard
+                Open Fleet Manager Dashboard
               </button>
               <button
                 onClick={() => window.location.reload()}

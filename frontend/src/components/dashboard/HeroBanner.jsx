@@ -8,10 +8,10 @@ export const HeroBanner = () => {
       <div className="hero-content-left">
         <div className="hero-heading-wrap">
           <h1 className="hero-welcome-title">Welcome back,</h1>
-          <h2 className="hero-manager-title">Admin!</h2>
+          <h2 className="hero-manager-title">Fleet Manager!</h2>
         </div>
         <p className="hero-description">
-          Drive smarter. Manage better with TTC Fleet360.<br />
+          Drive smarter. Manage your fleet. Optimize every journey.<br />
           Real-time telemetry and 360° global logistics control.
         </p>
       </div>
