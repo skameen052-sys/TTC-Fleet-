@@ -1294,7 +1294,7 @@ body {
 
 
 /* ==========================================================================
-   10. PREMIUM LOGIN PAGE - VIEWPORT-PERFECT DUAL PORTAL (SCREENSHOT 3 & 4)
+   10. PREMIUM LOGIN PAGE - VIEWPORT-PERFECT DUAL PORTAL (4K RESOLUTION)
    ========================================================================== */
 .login-page-container {
   display: flex;
@@ -1309,26 +1309,32 @@ body {
   bottom: 0;
   z-index: 1000;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #0A192F;
+  background-color: #081730;
 }
 
-/* LEFT SECTION: LOGIN FORM (40% Viewport width) */
+/* LEFT SECTION: LOGIN FORM (36% - 38% Viewport width) */
 .login-form-section {
-  width: 40%;
-  min-width: 400px;
-  max-width: 480px;
+  width: 36%;
+  min-width: 370px;
+  max-width: 440px;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 44px;
+  padding: 16px 36px;
   position: relative;
   z-index: 10;
   box-sizing: border-box;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  border-top-right-radius: 28px;
-  border-bottom-right-radius: 28px;
+  border-top-right-radius: 36px;
+  border-bottom-right-radius: 36px;
+}
+
+.login-form-section::-webkit-scrollbar {
+  display: none;
 }
 
 /* Light Theme Form (Driver Portal - Screenshot 3) */
@@ -1339,8 +1345,8 @@ body {
 
 /* Dark Theme Form (Fleet Manager - Screenshot 4) */
 .login-form-section.form-dark {
-  background-color: #0A192F;
-  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.4);
+  background-color: #081730;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.45);
 }
 
 /* Ambient Orange Wave Glow at bottom left of Dark Theme (Screenshot 4) */
@@ -1357,10 +1363,10 @@ body {
 
 .login-form-inner {
   width: 100%;
-  max-width: 370px;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   position: relative;
   z-index: 2;
 }
@@ -1376,14 +1382,23 @@ body {
 .login-logo-box {
   width: 44px;
   height: 44px;
-  border: 2px solid #FF7A1A;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #FFF0E5;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.logo-box-light {
+  border: 2px solid #FF7A1A;
+  background-color: #FFF0E5;
   box-shadow: 0 4px 12px rgba(255, 122, 26, 0.18);
+}
+
+.logo-box-dark {
+  background-color: #FF7A1A;
+  box-shadow: 0 4px 14px rgba(255, 122, 26, 0.4);
 }
 
 .login-brand-text {
@@ -1413,13 +1428,20 @@ body {
 .login-app-subtitle {
   font-size: 10px;
   font-weight: 800;
-  color: #3478F6;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-top: 2px;
 }
 
-/* Sleek Portal Switcher Pills (Fixing Screenshot 2 with pill styling) */
+.sub-blue {
+  color: #3478F6;
+}
+
+.sub-light-blue {
+  color: #60A5FA;
+}
+
+/* Sleek Portal Switcher Pills (Matching Screenshots 3 & 4) */
 .portal-switcher-pill-box {
   display: inline-flex;
   align-items: center;
@@ -1458,40 +1480,39 @@ body {
 
 /* Driver Active Pill (Screenshot 3) */
 .portal-pill-btn.active-driver {
-  background-color: #FFF0E5;
+  background-color: #FFEFE5;
   color: #FF7A1A;
   border-color: #FFD8BA;
   box-shadow: 0 2px 8px rgba(255, 122, 26, 0.16);
 }
 
-/* Fleet Manager Active Pill (Screenshot 4) */
-.portal-pill-btn.active-manager {
-  background-color: rgba(255, 122, 26, 0.22);
-  color: #FF9E50;
-  border-color: rgba(255, 122, 26, 0.5);
-  box-shadow: 0 2px 10px rgba(255, 122, 26, 0.25);
-}
-
-/* Inactive states */
-.portal-pill-btn.inactive {
-  background: transparent;
+.portal-pill-btn.inactive-driver {
+  background-color: #F1F5F9;
+  color: #334155;
   border-color: transparent;
 }
 
-.box-light .portal-pill-btn.inactive {
-  color: #4A5568;
+.portal-pill-btn.inactive-driver:hover {
+  background-color: #E2E8F0;
+  color: #0F172A;
 }
 
-.box-light .portal-pill-btn.inactive:hover {
-  color: #1A202C;
-  background-color: rgba(0, 0, 0, 0.05);
+/* Fleet Manager Active Pill (Screenshot 4) */
+.portal-pill-btn.active-manager {
+  background-color: #FF7A1A;
+  color: #FFFFFF;
+  font-weight: 800;
+  border-color: #FF7A1A;
+  box-shadow: 0 4px 14px rgba(255, 122, 26, 0.45);
 }
 
-.box-dark .portal-pill-btn.inactive {
+.portal-pill-btn.inactive-manager {
+  background: transparent;
   color: #94A3B8;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-.box-dark .portal-pill-btn.inactive:hover {
+.portal-pill-btn.inactive-manager:hover {
   color: #FFFFFF;
   background-color: rgba(255, 255, 255, 0.08);
 }
@@ -1500,7 +1521,7 @@ body {
 .login-welcome-wrap {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .login-welcome-title {
@@ -1518,13 +1539,13 @@ body {
   color: #FFFFFF;
 }
 
-/* Orange underline bar accent for Fleet Manager Dark Theme (Screenshot 4) */
+/* Orange underline bar accent (matching both Screenshots 3 & 4) */
 .orange-title-underline {
   width: 44px;
-  height: 3.5px;
+  height: 4px;
   background-color: #FF7A1A;
   border-radius: 2px;
-  margin: 4px 0 2px 0;
+  margin: 5px 0 3px 0;
 }
 
 .login-welcome-subtitle {
@@ -1582,7 +1603,7 @@ body {
 .login-form-element {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .login-field-group {
@@ -1621,7 +1642,7 @@ body {
 
 .login-text-input {
   width: 100%;
-  padding: 11px 40px 11px 36px;
+  padding: 10px 38px 10px 36px;
   font-size: 13px;
   border-radius: 8px;
   outline: none;
@@ -1630,11 +1651,11 @@ body {
   font-family: inherit;
 }
 
-/* Light Input Styles */
+/* Light Input Styles (Screenshot 3) */
 .wrap-light .login-text-input {
   background-color: #F8FAFD;
   border: 1px solid #E2E8F0;
-  color: #17243A;
+  color: #14213D;
 }
 
 .wrap-light .login-text-input:focus {
@@ -1645,8 +1666,8 @@ body {
 
 /* Dark Input Styles (Screenshot 4) */
 .wrap-dark .login-text-input {
-  background-color: #112344;
-  border: 1px solid #1E3763;
+  background-color: #102242;
+  border: 1px solid #1E3A6B;
   color: #FFFFFF;
 }
 
@@ -1743,7 +1764,7 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(255, 122, 26, 0.35);
   transition: all 0.2s ease;
-  margin-top: 4px;
+  margin-top: 2px;
   font-family: inherit;
 }
 
@@ -1762,7 +1783,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 11px 14px;
   border-radius: 10px;
   box-sizing: border-box;
   margin-top: 2px;
@@ -1774,13 +1795,13 @@ body {
 }
 
 .sec-dark {
-  background-color: #112344;
-  border: 1px solid #1E3763;
+  background-color: #102242;
+  border: 1px solid #1E3A6B;
 }
 
 .sec-icon-circle {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1802,7 +1823,7 @@ body {
 }
 
 .sec-title {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -1830,34 +1851,39 @@ body {
 }
 
 /* ===================================================================
-   RIGHT SECTION: HERO IMAGE (60% Viewport width)
+   RIGHT SECTION: ULTRA-4K HERO IMAGE (64% Viewport width)
    =================================================================== */
 .login-hero-section {
   flex: 1;
   height: 100vh;
   position: relative;
   overflow: hidden;
-  background-color: #0A192F;
+  background-color: #081730;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-hero-img-display {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center left;
+  object-position: center;
   display: block;
   user-select: none;
   pointer-events: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
 }
 
 .login-hero-img-display.fade-in {
-  animation: heroFadeIn 0.35s ease forwards;
+  animation: heroFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes heroFadeIn {
   from {
-    opacity: 0.4;
-    transform: scale(1.01);
+    opacity: 0.35;
+    transform: scale(1.015);
   }
   to {
     opacity: 1;

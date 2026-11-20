@@ -114,7 +114,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
   return (
     <div className={`login-page-container ${isDriver ? 'theme-driver-light' : 'theme-manager-dark'}`}>
       {/* ===================================================================
-          LEFT SECTION - LOGIN FORM (40% Viewport width)
+          LEFT SECTION - LOGIN FORM (38% Viewport width)
           =================================================================== */}
       <div className={`login-form-section ${isDriver ? 'form-light' : 'form-dark'}`}>
         {/* Ambient bottom-left glow wave for dark theme (Screenshot 4) */}
@@ -123,33 +123,35 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
         <div className="login-form-inner">
           {/* Logo and Branding Header */}
           <div className="login-brand-header">
-            <div className="login-logo-box">
-              <Truck size={22} color="#FF7A1A" strokeWidth={2.4} />
+            <div className={`login-logo-box ${isDriver ? 'logo-box-light' : 'logo-box-dark'}`}>
+              <Truck size={22} color={isDriver ? '#FF7A1A' : '#FFFFFF'} strokeWidth={2.4} />
             </div>
             <div className="login-brand-text">
               <span className={`login-app-name ${isDriver ? 'text-navy' : 'text-white'}`}>
                 TTC FLEET<span className="orange-highlight">360</span>
               </span>
-              <span className="login-app-subtitle">ENTERPRISE FLEET OS</span>
+              <span className={`login-app-subtitle ${isDriver ? 'sub-blue' : 'sub-light-blue'}`}>
+                ENTERPRISE FLEET OS
+              </span>
             </div>
           </div>
 
-          {/* Role Portal Switcher Pills (Fixing Screenshot 2 with sleek pill design) */}
+          {/* Role Portal Switcher Pills (Matching Screenshots 3 & 4) */}
           <div className={`portal-switcher-pill-box ${isDriver ? 'box-light' : 'box-dark'}`}>
             <button
               type="button"
-              className={`portal-pill-btn ${isDriver ? 'active-driver' : 'inactive'}`}
+              className={`portal-pill-btn ${isDriver ? 'active-driver' : 'inactive-driver'}`}
               onClick={() => handlePortalSwitch('driver')}
             >
-              <UserCheck size={15} />
+              <UserCheck size={14} />
               <span>Driver Portal</span>
             </button>
             <button
               type="button"
-              className={`portal-pill-btn ${!isDriver ? 'active-manager' : 'inactive'}`}
+              className={`portal-pill-btn ${!isDriver ? 'active-manager' : 'inactive-manager'}`}
               onClick={() => handlePortalSwitch('manager')}
             >
-              <Truck size={15} />
+              <Truck size={14} />
               <span>Fleet Manager</span>
             </button>
           </div>
@@ -159,17 +161,19 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             <h1 className={`login-welcome-title ${isDriver ? 'text-navy' : 'text-white'}`}>
               Welcome Back!
             </h1>
-            {/* Orange Underline Accent for Manager Dark Theme (as in Screenshot 4) */}
-            {!isDriver && <div className="orange-title-underline" />}
+            {/* Orange Underline Accent Bar (Present on both screenshots) */}
+            <div className="orange-title-underline" />
             <p className={`login-welcome-subtitle ${isDriver ? 'sub-light' : 'sub-dark'}`}>
-              Sign in to manage your fleet operations.
+              {isDriver
+                ? 'Sign in to manage your fleet operations.'
+                : 'Sign in to manage vehicles, drivers and fleet operations.'}
             </p>
           </div>
 
           {/* Error Message Alert */}
           {errorMessage && (
             <div className="login-error-alert">
-              <AlertCircle size={16} color="#EF5350" />
+              <AlertCircle size={15} color="#EF5350" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -177,7 +181,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           {/* Forgot Password Alert */}
           {forgotPasswordNotice && (
             <div className="login-info-alert">
-              <CheckCircle2 size={16} color="#16A36A" />
+              <CheckCircle2 size={15} color="#16A36A" />
               <span>Password recovery instructions dispatched to {email}.</span>
               <button
                 type="button"
@@ -197,11 +201,11 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                 Email Address
               </label>
               <div className={`login-input-wrap ${isDriver ? 'wrap-light' : 'wrap-dark'}`}>
-                <Mail className="login-input-icon" size={17} color={isDriver ? '#718096' : '#94A3B8'} />
+                <Mail className="login-input-icon" size={16} color={isDriver ? '#718096' : '#94A3B8'} />
                 <input
                   type="email"
                   className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
-                  placeholder="Enter your company email."
+                  placeholder={isDriver ? 'Enter your email address' : 'Enter company email'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -215,11 +219,11 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                 Password
               </label>
               <div className={`login-input-wrap ${isDriver ? 'wrap-light' : 'wrap-dark'}`}>
-                <Lock className="login-input-icon" size={17} color={isDriver ? '#718096' : '#94A3B8'} />
+                <Lock className="login-input-icon" size={16} color={isDriver ? '#718096' : '#94A3B8'} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
-                  placeholder="Enter your password."
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -231,9 +235,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                   title={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    <EyeOff size={17} color={isDriver ? '#718096' : '#94A3B8'} />
+                    <EyeOff size={16} color={isDriver ? '#718096' : '#94A3B8'} />
                   ) : (
-                    <Eye size={17} color={isDriver ? '#718096' : '#94A3B8'} />
+                    <Eye size={16} color={isDriver ? '#718096' : '#94A3B8'} />
                   )}
                 </button>
               </div>
@@ -271,16 +275,16 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
               ) : (
                 <>
                   <span>Sign In to Dashboard</span>
-                  <ArrowRight size={18} strokeWidth={2.4} />
+                  <ArrowRight size={17} strokeWidth={2.4} />
                 </>
               )}
             </button>
           </form>
 
-          {/* Security Information Footer */}
+          {/* Security Information Footer Card */}
           <div className={`login-security-card ${isDriver ? 'sec-light' : 'sec-dark'}`}>
             <div className={`sec-icon-circle ${isDriver ? 'icon-circle-green' : 'icon-circle-orange'}`}>
-              <ShieldCheck size={20} color={isDriver ? '#16A36A' : '#FF7A1A'} />
+              <ShieldCheck size={18} color={isDriver ? '#16A36A' : '#FF7A1A'} />
             </div>
             <div className="sec-text-box">
               <div className={`sec-title ${isDriver ? 'title-light' : 'title-dark'}`}>
@@ -295,22 +299,22 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
       </div>
 
       {/* ===================================================================
-          RIGHT SECTION - HERO IMAGE (60% Viewport width)
-          Screenshot 3 (Driver) vs Screenshot 4 (Fleet Manager)
+          RIGHT SECTION - ULTRA 4K HERO IMAGE (62% Viewport width)
+          Screenshot 3 (Driver 4K) vs Screenshot 4 (Fleet Manager 4K)
           =================================================================== */}
       <div className="login-hero-section">
         {isDriver ? (
           <img
-            key="driver-hero-img"
-            src="/assets/driver-hero-card.jpg"
-            alt="TTC Fleet360 Driver Dispatch System"
+            key="driver-hero-4k-img"
+            src="/assets/driver-hero-4k.jpg"
+            alt="TTC Fleet360 Driver Dispatch System 4K"
             className="login-hero-img-display fade-in"
           />
         ) : (
           <img
-            key="manager-hero-img"
-            src="/assets/manager-hero-card.jpg"
-            alt="TTC Fleet360 Enterprise Logistics System"
+            key="manager-hero-4k-img"
+            src="/assets/manager-hero-4k.jpg"
+            alt="TTC Fleet360 Enterprise Fleet Manager 4K"
             className="login-hero-img-display fade-in"
           />
         )}
