@@ -9,7 +9,10 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  UserCheck
+  UserCheck,
+  MapPin,
+  Layers,
+  BarChart3
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
@@ -117,7 +120,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           LEFT SECTION - LOGIN FORM (38% Viewport width)
           =================================================================== */}
       <div className={`login-form-section ${isDriver ? 'form-light' : 'form-dark'}`}>
-        {/* Ambient bottom-left glow wave for dark theme (Screenshot 4) */}
+        {/* Ambient bottom-left glow wave for dark theme */}
         {!isDriver && <div className="dark-theme-wave-glow" />}
 
         <div className="login-form-inner">
@@ -161,7 +164,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             <h1 className={`login-welcome-title ${isDriver ? 'text-navy' : 'text-white'}`}>
               Welcome Back!
             </h1>
-            {/* Orange Underline Accent Bar (Present on both screenshots) */}
+            {/* Orange Underline Accent Bar */}
             <div className="orange-title-underline" />
             <p className={`login-welcome-subtitle ${isDriver ? 'sub-light' : 'sub-dark'}`}>
               {isDriver
@@ -205,7 +208,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                 <input
                   type="email"
                   className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
-                  placeholder={isDriver ? 'Enter your email address' : 'Enter company email'}
+                  placeholder={isDriver ? 'Enter your email address' : 'alex.mercer@fleet360.ttc.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -300,7 +303,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
 
       {/* ===================================================================
           RIGHT SECTION - ULTRA 4K HERO IMAGE (62% Viewport width)
-          Screenshot 3 (Driver 4K) vs Screenshot 4 (Fleet Manager 4K)
+          Screenshot 3 (Driver 4K) vs Screenshot 4 / Image 2 (Fleet Manager 4K)
           =================================================================== */}
       <div className="login-hero-section">
         {isDriver ? (
@@ -311,12 +314,52 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             className="login-hero-img-display fade-in"
           />
         ) : (
-          <img
-            key="manager-hero-4k-img"
-            src="/assets/manager-hero-4k.jpg"
-            alt="TTC Fleet360 Enterprise Fleet Manager 4K"
-            className="login-hero-img-display fade-in"
-          />
+          <div className="manager-hero-container fade-in">
+            <img
+              src="/assets/manager-hero-4k.jpg"
+              alt="TTC Fleet360 Enterprise Fleet Manager 4K"
+              className="login-hero-img-display"
+            />
+            {/* Dark gradient overlay for text readability */}
+            <div className="manager-hero-gradient-overlay" />
+
+            {/* Crisp 4K Text & Pills matching Screenshot 4 */}
+            <div className="manager-hero-content">
+              <div className="manager-hero-titles">
+                <h2 className="manager-hero-h2">
+                  Manage Your Fleet.<br />
+                  <span className="orange-highlight-text">Drive Greater Efficiency.</span>
+                </h2>
+                <p className="manager-hero-p">
+                  Monitor vehicles, optimize routes, track deliveries and ensure seamless fleet operations — all in one place.
+                </p>
+              </div>
+
+              {/* 3 Crisp Vector Feature Pills from Screenshot 4 */}
+              <div className="manager-hero-pills-row">
+                <div className="manager-feature-pill">
+                  <div className="pill-icon-circle">
+                    <MapPin size={15} color="#FF7A1A" />
+                  </div>
+                  <span>Real-Time Fleet Visibility</span>
+                </div>
+
+                <div className="manager-feature-pill">
+                  <div className="pill-icon-circle">
+                    <Layers size={15} color="#FF7A1A" />
+                  </div>
+                  <span>Driver & Trip Management</span>
+                </div>
+
+                <div className="manager-feature-pill">
+                  <div className="pill-icon-circle">
+                    <BarChart3 size={15} color="#FF7A1A" />
+                  </div>
+                  <span>Operational Insights & Reports</span>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
