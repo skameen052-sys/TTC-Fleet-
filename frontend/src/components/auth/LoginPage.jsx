@@ -7,12 +7,9 @@ import {
   EyeOff,
   ArrowRight,
   ShieldCheck,
-  MapPin,
   CheckCircle2,
   AlertCircle,
-  UserCheck,
-  Navigation,
-  ClipboardCheck
+  UserCheck
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
@@ -26,6 +23,8 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [forgotPasswordNotice, setForgotPasswordNotice] = useState(false);
+
+  const isDriver = selectedPortal === 'driver';
 
   const handlePortalSwitch = (portal) => {
     setSelectedPortal(portal);
@@ -51,8 +50,8 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
     setIsLoading(true);
 
     try {
-      let isDriver = selectedPortal === 'driver' || email.includes('vance') || email.includes('driver');
-      let userData = isDriver
+      let driverUser = isDriver || email.includes('vance') || email.includes('driver');
+      let userData = driverUser
         ? {
             username: 'driver01',
             email: email,
@@ -75,7 +74,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            username: email.includes('@') ? (isDriver ? 'driver01' : 'fleetmanager') : email,
+            username: email.includes('@') ? (driverUser ? 'driver01' : 'fleetmanager') : email,
             password: password
           })
         });
@@ -101,7 +100,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
         setTimeout(() => {
           setIsLoading(false);
           onLoginSuccess(userData);
-        }, 500);
+        }, 400);
       } else {
         setIsLoading(false);
         setErrorMessage('Invalid credentials. Password must be at least 6 characters.');
@@ -113,48 +112,57 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
   };
 
   return (
-    <div className="login-page-container">
-      {/* LEFT SECTION - LOGIN FORM (45%) */}
-      <div className="login-form-section">
-        <div className="login-form-wrapper">
+    <div className={`login-page-container ${isDriver ? 'theme-driver-light' : 'theme-manager-dark'}`}>
+      {/* ===================================================================
+          LEFT SECTION - LOGIN FORM (40% Viewport width)
+          =================================================================== */}
+      <div className={`login-form-section ${isDriver ? 'form-light' : 'form-dark'}`}>
+        {/* Ambient bottom-left glow wave for dark theme (Screenshot 4) */}
+        {!isDriver && <div className="dark-theme-wave-glow" />}
+
+        <div className="login-form-inner">
           {/* Logo and Branding Header */}
           <div className="login-brand-header">
             <div className="login-logo-box">
-              <Truck size={24} color="#FF7A1A" strokeWidth={2.4} />
+              <Truck size={22} color="#FF7A1A" strokeWidth={2.4} />
             </div>
             <div className="login-brand-text">
-              <span className="login-app-name">
+              <span className={`login-app-name ${isDriver ? 'text-navy' : 'text-white'}`}>
                 TTC FLEET<span className="orange-highlight">360</span>
               </span>
               <span className="login-app-subtitle">ENTERPRISE FLEET OS</span>
             </div>
           </div>
 
-          {/* Role Portal Switcher */}
-          <div className="login-portal-switcher">
+          {/* Role Portal Switcher Pills (Fixing Screenshot 2 with sleek pill design) */}
+          <div className={`portal-switcher-pill-box ${isDriver ? 'box-light' : 'box-dark'}`}>
             <button
               type="button"
-              className={`portal-switch-btn ${selectedPortal === 'driver' ? 'active' : ''}`}
+              className={`portal-pill-btn ${isDriver ? 'active-driver' : 'inactive'}`}
               onClick={() => handlePortalSwitch('driver')}
             >
-              <UserCheck size={16} /> Driver Portal
+              <UserCheck size={15} />
+              <span>Driver Portal</span>
             </button>
             <button
               type="button"
-              className={`portal-switch-btn ${selectedPortal === 'manager' ? 'active' : ''}`}
+              className={`portal-pill-btn ${!isDriver ? 'active-manager' : 'inactive'}`}
               onClick={() => handlePortalSwitch('manager')}
             >
-              <Truck size={16} /> Fleet Manager
+              <Truck size={15} />
+              <span>Fleet Manager</span>
             </button>
           </div>
 
           {/* Welcome Heading */}
           <div className="login-welcome-wrap">
-            <h1 className="login-welcome-title">Welcome Back!</h1>
-            <p className="login-welcome-subtitle">
-              {selectedPortal === 'driver'
-                ? 'Sign in to your Driver Portal & active routes.'
-                : 'Sign in to manage your fleet operations.'}
+            <h1 className={`login-welcome-title ${isDriver ? 'text-navy' : 'text-white'}`}>
+              Welcome Back!
+            </h1>
+            {/* Orange Underline Accent for Manager Dark Theme (as in Screenshot 4) */}
+            {!isDriver && <div className="orange-title-underline" />}
+            <p className={`login-welcome-subtitle ${isDriver ? 'sub-light' : 'sub-dark'}`}>
+              Sign in to manage your fleet operations.
             </p>
           </div>
 
@@ -170,7 +178,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           {forgotPasswordNotice && (
             <div className="login-info-alert">
               <CheckCircle2 size={16} color="#16A36A" />
-              <span>Password recovery instructions dispatched to {email || 'your email'}.</span>
+              <span>Password recovery instructions dispatched to {email}.</span>
               <button
                 type="button"
                 className="alert-close-btn"
@@ -185,13 +193,15 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           <form className="login-form-element" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div className="login-field-group">
-              <label className="login-field-label">Email Address</label>
-              <div className="login-input-wrap">
-                <Mail className="login-input-icon" size={18} color="#718096" />
+              <label className={`login-field-label ${isDriver ? 'label-light' : 'label-dark'}`}>
+                Email Address
+              </label>
+              <div className={`login-input-wrap ${isDriver ? 'wrap-light' : 'wrap-dark'}`}>
+                <Mail className="login-input-icon" size={17} color={isDriver ? '#718096' : '#94A3B8'} />
                 <input
                   type="email"
-                  className="login-text-input"
-                  placeholder="Enter your company email"
+                  className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
+                  placeholder="Enter your company email."
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -201,13 +211,15 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
 
             {/* Password Field */}
             <div className="login-field-group">
-              <label className="login-field-label">Password</label>
-              <div className="login-input-wrap">
-                <Lock className="login-input-icon" size={18} color="#718096" />
+              <label className={`login-field-label ${isDriver ? 'label-light' : 'label-dark'}`}>
+                Password
+              </label>
+              <div className={`login-input-wrap ${isDriver ? 'wrap-light' : 'wrap-dark'}`}>
+                <Lock className="login-input-icon" size={17} color={isDriver ? '#718096' : '#94A3B8'} />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className="login-text-input"
-                  placeholder="Enter your password"
+                  className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
+                  placeholder="Enter your password."
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -219,9 +231,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                   title={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    <EyeOff size={18} color="#718096" />
+                    <EyeOff size={17} color={isDriver ? '#718096' : '#94A3B8'} />
                   ) : (
-                    <Eye size={18} color="#718096" />
+                    <Eye size={17} color={isDriver ? '#718096' : '#94A3B8'} />
                   )}
                 </button>
               </div>
@@ -236,7 +248,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="custom-checkbox"
                 />
-                <span>Remember Me</span>
+                <span className={isDriver ? 'text-sub-light' : 'text-sub-dark'}>Remember Me</span>
               </label>
 
               <button
@@ -251,153 +263,57 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="login-submit-button"
+              className="login-submit-btn"
               disabled={isLoading}
             >
               {isLoading ? (
-                <span className="btn-loading-state">Authenticating...</span>
+                <span>Authenticating Credentials...</span>
               ) : (
                 <>
-                  <span>
-                    {selectedPortal === 'driver'
-                      ? 'Sign In to Driver Portal'
-                      : 'Sign In to Dashboard'}
-                  </span>
-                  <ArrowRight size={18} />
+                  <span>Sign In to Dashboard</span>
+                  <ArrowRight size={18} strokeWidth={2.4} />
                 </>
               )}
             </button>
           </form>
 
-          {/* Quick autofill helper */}
-          <div className="demo-credentials-pill">
-            <span className="demo-pill-label">
-              {selectedPortal === 'driver' ? 'Lead Driver Account:' : 'Fleet Manager Account:'}
-            </span>
-            <button
-              type="button"
-              className="demo-autofill-btn"
-              onClick={() => {
-                if (selectedPortal === 'driver') {
-                  setEmail('m.vance@fleet360.ttc.com');
-                  setPassword('password123');
-                } else {
-                  setEmail('alex.mercer@fleet360.ttc.com');
-                  setPassword('password123');
-                }
-              }}
-            >
-              {selectedPortal === 'driver'
-                ? 'm.vance@fleet360.ttc.com (Autofill)'
-                : 'alex.mercer@fleet360.ttc.com (Autofill)'}
-            </button>
-          </div>
-
           {/* Security Information Footer */}
-          <div className="login-security-footer">
-            <ShieldCheck size={18} color="#16A36A" />
-            <p className="login-security-text">
-              Your fleet operations are protected with enterprise-grade security.
-            </p>
+          <div className={`login-security-card ${isDriver ? 'sec-light' : 'sec-dark'}`}>
+            <div className={`sec-icon-circle ${isDriver ? 'icon-circle-green' : 'icon-circle-orange'}`}>
+              <ShieldCheck size={20} color={isDriver ? '#16A36A' : '#FF7A1A'} />
+            </div>
+            <div className="sec-text-box">
+              <div className={`sec-title ${isDriver ? 'title-light' : 'title-dark'}`}>
+                Secure Login
+              </div>
+              <div className={`sec-desc ${isDriver ? 'desc-light' : 'desc-dark'}`}>
+                Your fleet operations are protected with enterprise-grade security.
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* RIGHT SECTION - HERO IMAGE (55%) */}
+      {/* ===================================================================
+          RIGHT SECTION - HERO IMAGE (60% Viewport width)
+          Screenshot 3 (Driver) vs Screenshot 4 (Fleet Manager)
+          =================================================================== */}
       <div className="login-hero-section">
-        {/* Logistics Truck Image */}
-        <img
-          src="/assets/fleet-manager-trucks.jpg"
-          alt="TTC Fleet Commercial Operations"
-          className="login-hero-bg-img"
-        />
-
-        {/* Navy-Blue Gradient Overlay */}
-        <div className="login-hero-navy-overlay" />
-
-        {/* Subtle Orange Accent Glow */}
-        <div className="login-hero-orange-glow" />
-
-        {/* Marketing Content Overlay */}
-        <div className="login-hero-content">
-          <div className="login-hero-badge">
-            <Truck size={14} color="#FF7A1A" />
-            <span>
-              {selectedPortal === 'driver' ? 'DRIVER DISPATCH SYSTEM' : 'ENTERPRISE LOGISTICS SYSTEM'}
-            </span>
-          </div>
-
-          <h2 className="login-hero-title">
-            {selectedPortal === 'driver' ? (
-              <>
-                Your Journey. Your Fleet.<br />
-                Your Success.
-              </>
-            ) : (
-              <>
-                Manage Your Fleet.<br />
-                Drive Your Business Forward.
-              </>
-            )}
-          </h2>
-
-          <p className="login-hero-subtitle">
-            {selectedPortal === 'driver'
-              ? 'Manage trips, track deliveries and stay connected with your logistics operations in real-time.'
-              : 'Smart fleet management, real-time vehicle tracking and seamless logistics operations — all in one platform.'}
-          </p>
-
-          {/* Feature Highlights */}
-          <div className="login-feature-highlights">
-            {selectedPortal === 'driver' ? (
-              <>
-                <div className="feature-pill-item">
-                  <div className="feature-icon-circle">
-                    <Navigation size={16} color="#FF7A1A" />
-                  </div>
-                  <span>Real-Time Trip Assignments</span>
-                </div>
-
-                <div className="feature-pill-item">
-                  <div className="feature-icon-circle">
-                    <ClipboardCheck size={16} color="#FF7A1A" />
-                  </div>
-                  <span>Instant Pickup & Delivery Confirmation</span>
-                </div>
-
-                <div className="feature-pill-item">
-                  <div className="feature-icon-circle">
-                    <MapPin size={16} color="#FF7A1A" />
-                  </div>
-                  <span>Live GPS Route Navigation</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="feature-pill-item">
-                  <div className="feature-icon-circle">
-                    <MapPin size={16} color="#FF7A1A" />
-                  </div>
-                  <span>Real-Time Fleet Tracking</span>
-                </div>
-
-                <div className="feature-pill-item">
-                  <div className="feature-icon-circle">
-                    <Truck size={16} color="#FF7A1A" />
-                  </div>
-                  <span>Smart Vehicle Management</span>
-                </div>
-
-                <div className="feature-pill-item">
-                  <div className="feature-icon-circle">
-                    <CheckCircle2 size={16} color="#FF7A1A" />
-                  </div>
-                  <span>Complete Operational Visibility</span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+        {isDriver ? (
+          <img
+            key="driver-hero-img"
+            src="/assets/driver-hero-card.jpg"
+            alt="TTC Fleet360 Driver Dispatch System"
+            className="login-hero-img-display fade-in"
+          />
+        ) : (
+          <img
+            key="manager-hero-img"
+            src="/assets/manager-hero-card.jpg"
+            alt="TTC Fleet360 Enterprise Logistics System"
+            className="login-hero-img-display fade-in"
+          />
+        )}
       </div>
     </div>
   );
