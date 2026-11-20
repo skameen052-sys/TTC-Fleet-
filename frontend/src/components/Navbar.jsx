@@ -1,21 +1,53 @@
-import React, { useState } from 'react';
-import { Search, Bell, Calendar, ChevronDown, User, Shield, LogOut, CheckCircle, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Bell, Calendar, ChevronDown, User, Shield, LogOut, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { notificationService } from '../services/notificationService';
 
 export const Navbar = ({ onSearch }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(9);
-
-  const notifications = [
+  const [unreadCount, setUnreadCount] = useState(4);
+  const [notifications, setNotifications] = useState([
     { id: 1, text: 'Acme Corp subscription renews in 7 days', time: '10m ago', type: 'alert' },
     { id: 2, text: 'Vehicle DL-01-AB-1234 reached Bengaluru depot', time: '25m ago', type: 'info' },
     { id: 3, text: 'New fleet driver Rahul Kumar registered', time: '1h ago', type: 'success' },
     { id: 4, text: 'Maintenance alert: Brake inspection due on HYD-32', time: '2h ago', type: 'alert' },
-  ];
+  ]);
+
+  useEffect(() => {
+    fetchNotificationData();
+  }, []);
+
+  const fetchNotificationData = async () => {
+    try {
+      const res = await notificationService.getUnread();
+      if (res && res.data && res.data.length > 0) {
+        setNotifications(
+          res.data.slice(0, 5).map((n) => ({
+            id: n.id,
+            text: n.title,
+            time: n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
+            type: n.priority === 'CRITICAL' || n.priority === 'HIGH' ? 'alert' : 'info',
+          }))
+        );
+        setUnreadCount(res.data.length);
+      }
+    } catch (err) {
+      // Keep static defaults on error
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await notificationService.markAllAsRead();
+      setUnreadCount(0);
+    } catch (e) {
+      setUnreadCount(0);
+    }
+  };
 
   return (
     <header className="dashboard-topbar">
@@ -71,8 +103,8 @@ export const Navbar = ({ onSearch }) => {
                   Notifications ({unreadCount})
                 </span>
                 <span
-                  style={{ fontSize: '11px', color: '#f97316', cursor: 'pointer' }}
-                  onClick={() => setUnreadCount(0)}
+                  style={{ fontSize: '11px', color: '#f97316', cursor: 'pointer', fontWeight: 600 }}
+                  onClick={handleMarkAllRead}
                 >
                   Mark all read
                 </span>
@@ -82,7 +114,7 @@ export const Navbar = ({ onSearch }) => {
                   <div
                     key={n.id}
                     style={{
-                      padding: '8px',
+                      padding: '8px 10px',
                       background: 'rgba(255,255,255,0.02)',
                       borderRadius: '8px',
                       fontSize: '12px',
@@ -94,6 +126,36 @@ export const Navbar = ({ onSearch }) => {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              <div
+                style={{
+                  marginTop: '10px',
+                  paddingTop: '8px',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                  textAlign: 'center',
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setShowNotifications(false);
+                    navigate('/notifications');
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#f97316',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span>Open Operational Alerts Hub</span>
+                  <ExternalLink size={12} />
+                </button>
               </div>
             </div>
           )}
@@ -146,6 +208,29 @@ export const Navbar = ({ onSearch }) => {
                   fontSize: '13px',
                   textAlign: 'left',
                   borderRadius: '6px',
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  navigate('/profile');
+                }}
+              >
+                <User size={15} />
+                <span>My Profile</span>
+              </button>
+              <button
+                style={{
+                  width: '100%',
+                  padding: '8px 10px',
+                  background: 'none',
+                  color: '#cbd5e1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '13px',
+                  textAlign: 'left',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
                 }}
                 onClick={() => {
                   setShowProfileMenu(false);
@@ -167,6 +252,7 @@ export const Navbar = ({ onSearch }) => {
                   fontSize: '13px',
                   textAlign: 'left',
                   borderRadius: '6px',
+                  cursor: 'pointer',
                 }}
                 onClick={() => {
                   setShowProfileMenu(false);
@@ -190,6 +276,7 @@ export const Navbar = ({ onSearch }) => {
                   borderRadius: '6px',
                   marginTop: '4px',
                   borderTop: '1px solid rgba(255,255,255,0.04)',
+                  cursor: 'pointer',
                 }}
                 onClick={logout}
               >

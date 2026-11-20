@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Building2, Truck, Crown } from 'lucide-react';
+import {
+  Users,
+  Building2,
+  Truck,
+  Crown,
+  UserCheck,
+  Package,
+  Navigation,
+  DollarSign,
+  Fuel,
+  Wrench,
+  ShoppingBag,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Boxes,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { dashboardService } from '../services/dashboardService';
 import { subscriptionService } from '../services/subscriptionService';
@@ -38,7 +54,7 @@ export const Dashboard = () => {
       }
     } catch (err) {
       console.warn('Using default dashboard snapshot:', err);
-      // Fallback defaults matching Image 2
+      // Fallback defaults matching Image 2 + operational extensions
       setData({
         totalUsers: 120,
         usersGrowthPercent: 12.0,
@@ -48,6 +64,19 @@ export const Dashboard = () => {
         fleetGrowthPercent: 5.0,
         totalSubscriptions: 95,
         subscriptionsGrowthPercent: 10.0,
+        // Operational logistics KPI metrics
+        totalVehicles: 8,
+        activeVehicles: 7,
+        inactiveVehicles: 1,
+        totalDrivers: 6,
+        availableDrivers: 4,
+        totalCustomers: 8,
+        totalOrders: 15,
+        activeShipments: 4,
+        totalTrips: 10,
+        revenueOverview: 1820000,
+        fuelExpenses: 128500,
+        maintenanceExpenses: 44200,
         months: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
         totalTripsSeries: [40, 58, 68, 78, 74, 88],
         onTimeDeliverySeries: [30, 48, 60, 72, 68, 80],
@@ -145,9 +174,109 @@ export const Dashboard = () => {
 
   const displayName = user?.firstName || 'Admin';
 
+  // Operational KPI metrics configuration
+  const operationalKpis = [
+    {
+      label: 'Total Vehicles',
+      val: data?.totalVehicles ?? 8,
+      sub: 'Heavy haul & transit',
+      icon: Truck,
+      color: '#f97316',
+      bg: 'rgba(249, 115, 22, 0.1)',
+    },
+    {
+      label: 'Active Vehicles',
+      val: data?.activeVehicles ?? 7,
+      sub: 'Currently on road',
+      icon: CheckCircle2,
+      color: '#10b981',
+      bg: 'rgba(16, 185, 129, 0.1)',
+    },
+    {
+      label: 'Inactive Vehicles',
+      val: data?.inactiveVehicles ?? 1,
+      sub: 'Depot / inspection',
+      icon: AlertTriangle,
+      color: '#ef4444',
+      bg: 'rgba(239, 68, 68, 0.1)',
+    },
+    {
+      label: 'Total Drivers',
+      val: data?.totalDrivers ?? 6,
+      sub: 'Licensed pilots',
+      icon: Users,
+      color: '#3b82f6',
+      bg: 'rgba(59, 130, 246, 0.1)',
+    },
+    {
+      label: 'Available Drivers',
+      val: data?.availableDrivers ?? 4,
+      sub: 'Ready for allocation',
+      icon: UserCheck,
+      color: '#06b6d4',
+      bg: 'rgba(6, 182, 212, 0.1)',
+    },
+    {
+      label: 'Total Customers',
+      val: data?.totalCustomers ?? 8,
+      sub: 'Active enterprise clients',
+      icon: ShoppingBag,
+      color: '#8b5cf6',
+      bg: 'rgba(139, 92, 246, 0.1)',
+    },
+    {
+      label: 'Total Orders',
+      val: data?.totalOrders ?? 15,
+      sub: 'B2B freight contracts',
+      icon: Boxes,
+      color: '#ec4899',
+      bg: 'rgba(236, 72, 153, 0.1)',
+    },
+    {
+      label: 'Active Shipments',
+      val: data?.activeShipments ?? 4,
+      sub: 'Consignments in transit',
+      icon: Package,
+      color: '#f59e0b',
+      bg: 'rgba(245, 158, 11, 0.1)',
+    },
+    {
+      label: 'Total Trips',
+      val: data?.totalTrips ?? 10,
+      sub: 'Inter-state dispatches',
+      icon: Navigation,
+      color: '#14b8a6',
+      bg: 'rgba(20, 184, 166, 0.1)',
+    },
+    {
+      label: 'Revenue Overview',
+      val: `₹${(data?.revenueOverview ?? 1820000).toLocaleString()}`,
+      sub: 'Billed & realized turnover',
+      icon: DollarSign,
+      color: '#10b981',
+      bg: 'rgba(16, 185, 129, 0.1)',
+    },
+    {
+      label: 'Fuel Expenses',
+      val: `₹${(data?.fuelExpenses ?? 128500).toLocaleString()}`,
+      sub: 'HSD refueling outlays',
+      icon: Fuel,
+      color: '#f97316',
+      bg: 'rgba(249, 115, 22, 0.1)',
+    },
+    {
+      label: 'Maintenance Expenses',
+      val: `₹${(data?.maintenanceExpenses ?? 44200).toLocaleString()}`,
+      sub: 'Workshop & OEM repairs',
+      icon: Wrench,
+      color: '#ef4444',
+      bg: 'rgba(239, 68, 68, 0.1)',
+    },
+  ];
+
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* 1. Hero Greeting Banner + 4 KPI Cards + 3D Truck Hero */}
+      {/* 1. Hero Greeting Banner + 4 KPI Cards + 3D Truck Hero (100% Intact as Image 2) */}
       <section className="hero-greeting-banner">
         <div className="hero-left-col">
           <div className="hero-title-wrap">
@@ -199,6 +328,100 @@ export const Dashboard = () => {
             alt="TTC Fleet 360 Heavy Haul Logistics"
             className="hero-truck-image"
           />
+        </div>
+      </section>
+
+      {/* Dynamic Summary Cards: 12 Operational Logistics & Fleet Metrics */}
+      <section
+        style={{
+          background: '#111726',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.08)',
+          padding: '20px 24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: 0 }}>
+              Live Operational Fleet Pulse
+            </h2>
+            <p style={{ fontSize: '12px', color: '#94a3b8', margin: '2px 0 0 0' }}>
+              Real-time synchronization across fleet, drivers, shipments, and finance
+            </p>
+          </div>
+          <span
+            style={{
+              fontSize: '11px',
+              color: '#10b981',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(16, 185, 129, 0.1)',
+              padding: '4px 10px',
+              borderRadius: '20px',
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+            Telemetry Live
+          </span>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+            gap: '12px',
+          }}
+        >
+          {operationalKpis.map((kpi) => {
+            const Icon = kpi.icon;
+            return (
+              <div
+                key={kpi.label}
+                style={{
+                  background: '#161e30',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>
+                    {kpi.label}
+                  </span>
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '6px',
+                      background: kpi.bg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Icon size={14} color={kpi.color} />
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+                  {kpi.val}
+                </div>
+
+                <div style={{ fontSize: '10.5px', color: '#64748b' }}>
+                  {kpi.sub}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

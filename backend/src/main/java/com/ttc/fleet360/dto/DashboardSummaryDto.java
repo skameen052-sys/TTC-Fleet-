@@ -17,6 +17,20 @@ public class DashboardSummaryDto {
     private long totalSubscriptions;
     private double subscriptionsGrowthPercent;
 
+    // Operational Logistics Enhancements
+    private long totalVehicles;
+    private long activeVehicles;
+    private long inactiveVehicles;
+    private long totalDrivers;
+    private long availableDrivers;
+    private long totalCustomers;
+    private long totalOrders;
+    private long activeShipments;
+    private long totalTrips;
+    private double revenueOverview;
+    private double fuelExpenses;
+    private double maintenanceExpenses;
+
     // Fleet Performance Chart (Last 6 Months)
     private List<String> months;
     private List<Integer> totalTripsSeries;
@@ -165,4 +179,40 @@ public class DashboardSummaryDto {
 
     public List<RenewalItem> getUpcomingRenewals() { return upcomingRenewals; }
     public void setUpcomingRenewals(List<RenewalItem> upcomingRenewals) { this.upcomingRenewals = upcomingRenewals; }
+
+    public long getTotalVehicles() { return totalVehicles; }
+    public void setTotalVehicles(long totalVehicles) { this.totalVehicles = totalVehicles; }
+
+    public long getActiveVehicles() { return activeVehicles; }
+    public void setActiveVehicles(long activeVehicles) { this.activeVehicles = activeVehicles; }
+
+    public long getInactiveVehicles() { return inactiveVehicles; }
+    public void setInactiveVehicles(long inactiveVehicles) { this.inactiveVehicles = inactiveVehicles; }
+
+    public long getTotalDrivers() { return totalDrivers; }
+    public void setTotalDrivers(long totalDrivers) { this.totalDrivers = totalDrivers; }
+
+    public long getAvailableDrivers() { return availableDrivers; }
+    public void setAvailableDrivers(long availableDrivers) { this.availableDrivers = availableDrivers; }
+
+    public long getTotalCustomers() { return totalCustomers; }
+    public void setTotalCustomers(long totalCustomers) { this.totalCustomers = totalCustomers; }
+
+    public long getTotalOrders() { return totalOrders; }
+    public void setTotalOrders(long totalOrders) { this.totalOrders = totalOrders; }
+
+    public long getActiveShipments() { return activeShipments; }
+    public void setActiveShipments(long activeShipments) { this.activeShipments = activeShipments; }
+
+    public long getTotalTrips() { return totalTrips; }
+    public void setTotalTrips(long totalTrips) { this.totalTrips = totalTrips; }
+
+    public double getRevenueOverview() { return revenueOverview; }
+    public void setRevenueOverview(double revenueOverview) { this.revenueOverview = revenueOverview; }
+
+    public double getFuelExpenses() { return fuelExpenses; }
+    public void setFuelExpenses(double fuelExpenses) { this.fuelExpenses = fuelExpenses; }
+
+    public double getMaintenanceExpenses() { return maintenanceExpenses; }
+    public void setMaintenanceExpenses(double maintenanceExpenses) { this.maintenanceExpenses = maintenanceExpenses; }
 }
