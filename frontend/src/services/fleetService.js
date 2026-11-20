@@ -12,12 +12,26 @@ class FleetService {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (!parsed.driverPortal || !parsed.driverPortal.driver || !parsed.driverPortal.activeTrip) {
+          parsed.driverPortal = JSON.parse(JSON.stringify(initialFleetData.driverPortal));
+        }
+        if (!parsed.driverPortal.trips) {
+          parsed.driverPortal.trips = parsed.driverPortal.driverTrips || [];
+        }
+        if (!parsed.driverPortal.driverTrips) {
+          parsed.driverPortal.driverTrips = parsed.driverPortal.trips || [];
+        }
+        return parsed;
       }
     } catch (e) {
       console.warn('LocalStorage error:', e);
     }
-    return JSON.parse(JSON.stringify(initialFleetData));
+    const fresh = JSON.parse(JSON.stringify(initialFleetData));
+    if (fresh.driverPortal) {
+      fresh.driverPortal.trips = fresh.driverPortal.driverTrips || [];
+    }
+    return fresh;
   }
 
   saveData() {
@@ -492,6 +506,12 @@ class FleetService {
         ]
       };
       this.saveData();
+    }
+    if (!this.data.driverPortal.trips) {
+      this.data.driverPortal.trips = this.data.driverPortal.driverTrips || [];
+    }
+    if (!this.data.driverPortal.driverTrips) {
+      this.data.driverPortal.driverTrips = this.data.driverPortal.trips || [];
     }
     return this.data.driverPortal;
   }

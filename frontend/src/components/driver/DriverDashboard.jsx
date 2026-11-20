@@ -85,8 +85,20 @@ export const DriverDashboard = ({
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    if (!mapInstanceRef.current) {
+    try {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      if (mapContainerRef.current && mapContainerRef.current._leaflet_id) {
+        delete mapContainerRef.current._leaflet_id;
+      }
+
       const currentPos = activeTrip?.route?.currentCoords || [41.6528, -83.5379];
+      const pickupCoords = activeTrip?.route?.pickupCoords || [41.8781, -87.6298];
+      const destCoords = activeTrip?.route?.destCoords || [41.4993, -81.6944];
+
       const map = L.map(mapContainerRef.current, {
         center: currentPos,
         zoom: 7,
@@ -99,7 +111,6 @@ export const DriverDashboard = ({
       }).addTo(map);
 
       // Pickup Marker
-      const pickupCoords = activeTrip?.route?.pickupCoords || [41.8781, -87.6298];
       L.marker(pickupCoords, { icon: createPulseIcon('#3478F6') })
         .addTo(map)
         .bindPopup(`<b>Pickup Origin:</b><br />${activeTrip?.pickup?.address || 'Origin Depot'}`);
@@ -110,7 +121,6 @@ export const DriverDashboard = ({
         .bindPopup(`<b>Current Location:</b> ${activeTrip?.vehicleReg || 'TTC-8492-HD'}<br />Speed: ${activeTrip?.route?.speedKmh || 68} km/h<br />ETA: ${activeTrip?.route?.eta || '1h 45m'}`);
 
       // Destination Marker
-      const destCoords = activeTrip?.route?.destCoords || [41.4993, -81.6944];
       L.marker(destCoords, { icon: createPulseIcon('#16A36A') })
         .addTo(map)
         .bindPopup(`<b>Destination Terminal:</b><br />${activeTrip?.delivery?.address || 'Terminal Bay'}`);
@@ -124,18 +134,25 @@ export const DriverDashboard = ({
       }).addTo(map);
 
       mapInstanceRef.current = map;
+    } catch (mapErr) {
+      console.warn('Driver Leaflet map initialization safely caught:', mapErr);
     }
 
     return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
+      try {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+        }
+      } catch (cleanupErr) {
+        console.warn('Driver Leaflet cleanup warning:', cleanupErr);
       }
     };
   }, [activeTrip]);
 
-  const currentStage = activeTrip?.stages?.[activeTrip.currentStageIndex];
-  const nextStage = activeTrip?.stages?.[activeTrip.currentStageIndex + 1];
+  const currentStageIndex = (activeTrip && typeof activeTrip.currentStageIndex === 'number') ? activeTrip.currentStageIndex : 0;
+  const currentStage = activeTrip?.stages?.[currentStageIndex] || { id: 1, name: 'Assigned', time: '06:00 AM' };
+  const nextStage = activeTrip?.stages?.[currentStageIndex + 1] || null;
 
   return (
     <div className="driver-dashboard-view">
@@ -469,7 +486,7 @@ export const DriverDashboard = ({
           <div className="trip-lifecycle-timeline">
             {activeTrip?.stages?.map((stg, idx) => {
               const isCompleted = stg.completed;
-              const isActive = stg.active || idx === activeTrip.currentStageIndex;
+              const isActive = stg.active || idx === (activeTrip?.currentStageIndex ?? 0);
               const isUpcoming = !isCompleted && !isActive;
 
               return (
