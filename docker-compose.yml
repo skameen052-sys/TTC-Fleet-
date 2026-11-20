@@ -1,32 +1,28 @@
 version: '3.8'
 
 services:
-  # 1. PostgreSQL Database
+  # PostgreSQL Database Container
   postgres:
     image: postgres:16-alpine
     container_name: fleet360-postgres
     restart: always
     environment:
       POSTGRES_DB: ttc_fleet360
-      POSTGRES_USER: fleetadmin
-      POSTGRES_PASSWORD: Fleet360SecurePass!
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-      - ./database/seed_data.sql:/docker-entrypoint-initdb.d/02-seed.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fleetadmin -d ttc_fleet360"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - fleet360-network
 
-  # 2. Redis Caching Engine
+  # Redis Distributed Cache Container
   redis:
-    image: redis:7.2-alpine
+    image: redis:7-alpine
     container_name: fleet360-redis
     restart: always
     ports:
@@ -35,13 +31,11 @@ services:
       - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
-    networks:
-      - fleet360-network
 
-  # 3. Java Spring Boot Backend
+  # Java Spring Boot Backend Container
   backend:
     build:
       context: ./backend
@@ -55,22 +49,19 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ttc_fleet360
-      SPRING_DATASOURCE_USERNAME: fleetadmin
-      SPRING_DATASOURCE_PASSWORD: Fleet360SecurePass!
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      JWT_SECRET: 9a3f8c7e2b1d6f5a4e3c2b1a0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e
-      JWT_EXPIRATION: 86400000
-      AWS_S3_ENABLED: "false"
-      AWS_S3_BUCKET: ttc-fleet360-assets
-      AWS_REGION: ap-south-1
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ttc_fleet360
+      DB_USER: postgres
+      DB_PASSWORD: postgrespassword
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      AWS_S3_BUCKET: ttc-fleet360-vault
+      AWS_REGION: us-east-2
     ports:
       - "8080:8080"
-    networks:
-      - fleet360-network
 
-  # 4. React.js Frontend
+  # React Frontend Container (Nginx)
   frontend:
     build:
       context: ./frontend
@@ -80,14 +71,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "80:80"
       - "3000:80"
-    networks:
-      - fleet360-network
-
-networks:
-  fleet360-network:
-    driver: bridge
 
 volumes:
   postgres_data:
