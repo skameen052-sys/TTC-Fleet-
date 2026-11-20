@@ -266,9 +266,17 @@ body {
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 2px rgba(22, 163, 106, 0.35); }
-  50% { box-shadow: 0 0 0 6px rgba(22, 163, 106, 0.1); }
-  100% { box-shadow: 0 0 0 2px rgba(22, 163, 106, 0.35); }
+  0% {
+    box-shadow: 0 0 0 2px rgba(22, 163, 106, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(22, 163, 106, 0.1);
+  }
+
+  100% {
+    box-shadow: 0 0 0 2px rgba(22, 163, 106, 0.35);
+  }
 }
 
 .sidebar-logout-btn {
@@ -1008,8 +1016,15 @@ body {
 }
 
 @keyframes drop-down {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .notifications-dropdown {
@@ -1199,6 +1214,7 @@ body {
     opacity: 0;
     transform: scale(0.96) translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -1288,8 +1304,15 @@ body {
 }
 
 @keyframes slide-up {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 
@@ -2805,4 +2828,3 @@ body {
   color: var(--primary-navy);
   font-weight: 600;
 }
-

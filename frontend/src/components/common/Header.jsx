@@ -10,7 +10,8 @@ export const Header = ({
   onMarkAllNotificationsRead,
   onSelectTab,
   onLogout,
-  onSwitchToDriver
+  onSwitchToDriver,
+  currentUser
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState('');
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
@@ -158,12 +159,12 @@ export const Header = ({
             className="user-profile-menu"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
           >
-            <div className="user-avatar-circle">
-              <span>FM</span>
+            <div className="user-avatar-circle" style={{ backgroundColor: '#FF7A1A', color: '#FFFFFF', fontWeight: '800' }}>
+              <span>{currentUser?.fullName?.[0]?.toUpperCase() || 'A'}</span>
             </div>
             <div className="user-text-info">
-              <span className="user-display-name">Alexandre Mercer</span>
-              <span className="user-role-text">Fleet Manager (Lead)</span>
+              <span className="user-display-name">{currentUser?.fullName || 'Admin'}</span>
+              <span className="user-role-text">{currentUser?.role === 'ROLE_ADMIN' ? 'Super Admin' : 'Admin'}</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>
@@ -172,9 +173,9 @@ export const Header = ({
           {showProfileDropdown && (
             <div className="header-dropdown profile-dropdown">
               <div className="profile-dropdown-header">
-                <div className="profile-name">Alexandre Mercer</div>
-                <div className="profile-email">alex.mercer@fleet360.ttc.com</div>
-                <span className="profile-tag">ROLE_FLEET_MANAGER</span>
+                <div className="profile-name">{currentUser?.fullName || 'Admin'}</div>
+                <div className="profile-email">{currentUser?.email || 'admin@ttcfleet360.com'}</div>
+                <span className="profile-tag">{currentUser?.role || 'ROLE_ADMIN'}</span>
               </div>
               <div className="dropdown-menu-list">
                 {onSwitchToDriver && (

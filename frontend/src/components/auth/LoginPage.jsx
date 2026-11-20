@@ -15,11 +15,9 @@ import {
   BarChart3
 } from 'lucide-react';
 
-export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
-  const [selectedPortal, setSelectedPortal] = useState(initialPortal); // 'driver' or 'manager'
-  const [email, setEmail] = useState(
-    initialPortal === 'driver' ? 'm.vance@fleet360.ttc.com' : 'alex.mercer@fleet360.ttc.com'
-  );
+export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
+  const [selectedPortal, setSelectedPortal] = useState('manager'); // Default to Admin / Fleet Manager
+  const [email, setEmail] = useState('admin@ttcfleet360.com');
   const [password, setPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -36,7 +34,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
       setEmail('m.vance@fleet360.ttc.com');
       setPassword('password123');
     } else {
-      setEmail('alex.mercer@fleet360.ttc.com');
+      setEmail('admin@ttcfleet360.com');
       setPassword('password123');
     }
   };
@@ -53,7 +51,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
     setIsLoading(true);
 
     try {
-      let driverUser = isDriver || email.includes('vance') || email.includes('driver');
+      let driverUser = (selectedPortal === 'driver' || email.includes('vance') || email.includes('driver')) && !email.toLowerCase().includes('admin');
       let userData = driverUser
         ? {
             username: 'driver01',
@@ -65,10 +63,10 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_driver_fleet360'
           }
         : {
-            username: 'fleetmanager',
-            email: email,
-            fullName: 'Alexandre Mercer',
-            role: 'ROLE_FLEET_MANAGER',
+            username: 'admin',
+            email: email || 'admin@ttcfleet360.com',
+            fullName: 'Admin',
+            role: 'ROLE_ADMIN',
             token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_token_fleet360'
           };
 
@@ -77,7 +75,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            username: email.includes('@') ? (driverUser ? 'driver01' : 'fleetmanager') : email,
+            username: email.includes('@') ? (driverUser ? 'driver01' : 'admin') : email,
             password: password
           })
         });
@@ -143,19 +141,19 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           <div className={`portal-switcher-pill-box ${isDriver ? 'box-light' : 'box-dark'}`}>
             <button
               type="button"
+              className={`portal-pill-btn ${!isDriver ? 'active-manager' : 'inactive-manager'}`}
+              onClick={() => handlePortalSwitch('manager')}
+            >
+              <Truck size={14} />
+              <span>Admin Dashboard</span>
+            </button>
+            <button
+              type="button"
               className={`portal-pill-btn ${isDriver ? 'active-driver' : 'inactive-driver'}`}
               onClick={() => handlePortalSwitch('driver')}
             >
               <UserCheck size={14} />
               <span>Driver Portal</span>
-            </button>
-            <button
-              type="button"
-              className={`portal-pill-btn ${!isDriver ? 'active-manager' : 'inactive-manager'}`}
-              onClick={() => handlePortalSwitch('manager')}
-            >
-              <Truck size={14} />
-              <span>Fleet Manager</span>
             </button>
           </div>
 
@@ -168,8 +166,8 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             <div className="orange-title-underline" />
             <p className={`login-welcome-subtitle ${isDriver ? 'sub-light' : 'sub-dark'}`}>
               {isDriver
-                ? 'Sign in to manage your fleet operations.'
-                : 'Sign in to manage vehicles, drivers and fleet operations.'}
+                ? 'Sign in to access your Driver Portal & route dispatch.'
+                : 'Sign in to access your TTC Fleet360 Admin Dashboard.'}
             </p>
           </div>
 
@@ -185,7 +183,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
           {forgotPasswordNotice && (
             <div className="login-info-alert">
               <CheckCircle2 size={15} color="#16A36A" />
-              <span>Password recovery instructions dispatched to {email}.</span>
+              <span>Recovery instructions sent to {email || 'your email'}.</span>
               <button
                 type="button"
                 className="alert-close-btn"
@@ -196,7 +194,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
             </div>
           )}
 
-          {/* Form */}
+          {/* Login Form */}
           <form className="login-form-element" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div className="login-field-group">
@@ -208,7 +206,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                 <input
                   type="email"
                   className={`login-text-input ${isDriver ? 'input-light' : 'input-dark'}`}
-                  placeholder={isDriver ? 'Enter your email address' : 'alex.mercer@fleet360.ttc.com'}
+                  placeholder={isDriver ? 'Enter driver email' : 'admin@ttcfleet360.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -277,12 +275,44 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'driver' }) => {
                 <span>Authenticating Credentials...</span>
               ) : (
                 <>
-                  <span>Sign In to Dashboard</span>
+                  <span>{isDriver ? 'Sign In to Driver Portal' : 'Sign In to Admin Dashboard'}</span>
                   <ArrowRight size={17} strokeWidth={2.4} />
                 </>
               )}
             </button>
           </form>
+
+          {/* Quick autofill helper */}
+          <div className="demo-credentials-pill" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '11.5px' }}>
+            <span style={{ color: isDriver ? '#718096' : '#94A3B8' }}>
+              {isDriver ? 'Driver Account:' : 'Admin Account:'}
+            </span>
+            <button
+              type="button"
+              className="demo-autofill-btn"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#FF7A1A',
+                fontWeight: '700',
+                cursor: 'pointer',
+                textDecoration: 'underline'
+              }}
+              onClick={() => {
+                if (isDriver) {
+                  setEmail('m.vance@fleet360.ttc.com');
+                  setPassword('password123');
+                } else {
+                  setEmail('admin@ttcfleet360.com');
+                  setPassword('password123');
+                }
+              }}
+            >
+              {isDriver
+                ? 'm.vance@fleet360.ttc.com (Autofill)'
+                : 'admin@ttcfleet360.com (Autofill)'}
+            </button>
+          </div>
 
           {/* Security Information Footer Card */}
           <div className={`login-security-card ${isDriver ? 'sec-light' : 'sec-dark'}`}>
