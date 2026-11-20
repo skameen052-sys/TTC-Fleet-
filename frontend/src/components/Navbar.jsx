@@ -81,11 +81,11 @@ export const Navbar = ({ onSearch }) => {
                 right: 0,
                 top: '48px',
                 width: '320px',
-                background: '#131929',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
                 borderRadius: '12px',
                 padding: '14px',
-                boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
+                boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
                 zIndex: 100,
               }}
             >
@@ -95,11 +95,11 @@ export const Navbar = ({ onSearch }) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginBottom: '10px',
-                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                  borderBottom: '1px solid #e2e8f0',
                   paddingBottom: '8px',
                 }}
               >
-                <span style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a' }}>
                   Notifications ({unreadCount})
                 </span>
                 <span
@@ -115,12 +115,13 @@ export const Navbar = ({ onSearch }) => {
                     key={n.id}
                     style={{
                       padding: '8px 10px',
-                      background: 'rgba(255,255,255,0.02)',
+                      background: '#f8fafc',
+                      border: '1px solid #f1f5f9',
                       borderRadius: '8px',
                       fontSize: '12px',
                     }}
                   >
-                    <div style={{ color: '#e2e8f0', fontWeight: '500' }}>{n.text}</div>
+                    <div style={{ color: '#0f172a', fontWeight: '500' }}>{n.text}</div>
                     <div style={{ color: '#64748b', fontSize: '10.5px', marginTop: '2px' }}>
                       {n.time}
                     </div>
@@ -180,19 +181,19 @@ export const Navbar = ({ onSearch }) => {
                 right: 0,
                 top: '48px',
                 width: '210px',
-                background: '#131929',
-                border: '1px solid rgba(255,255,255,0.12)',
+                background: '#ffffff',
+                border: '1px solid #e2e8f0',
                 borderRadius: '12px',
                 padding: '8px',
-                boxShadow: '0 12px 30px rgba(0,0,0,0.5)',
+                boxShadow: '0 12px 30px rgba(0,0,0,0.12)',
                 zIndex: 100,
               }}
             >
-              <div style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ fontSize: '13px', fontWeight: '700', color: '#fff' }}>
+              <div style={{ padding: '8px 10px', borderBottom: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a' }}>
                   {user?.fullName || 'Administrator'}
                 </div>
-                <div style={{ fontSize: '11px', color: '#94a3b8' }}>
+                <div style={{ fontSize: '11px', color: '#64748b' }}>
                   {user?.roles?.[0]?.replace('ROLE_', '') || 'SUPER ADMIN'}
                 </div>
               </div>
@@ -201,7 +202,7 @@ export const Navbar = ({ onSearch }) => {
                   width: '100%',
                   padding: '8px 10px',
                   background: 'none',
-                  color: '#cbd5e1',
+                  color: '#334155',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
@@ -223,7 +224,7 @@ export const Navbar = ({ onSearch }) => {
                   width: '100%',
                   padding: '8px 10px',
                   background: 'none',
-                  color: '#cbd5e1',
+                  color: '#334155',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
@@ -245,7 +246,7 @@ export const Navbar = ({ onSearch }) => {
                   width: '100%',
                   padding: '8px 10px',
                   background: 'none',
-                  color: '#cbd5e1',
+                  color: '#334155',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',

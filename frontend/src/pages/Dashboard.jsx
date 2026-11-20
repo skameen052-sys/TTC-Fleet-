@@ -334,21 +334,22 @@ export const Dashboard = () => {
       {/* Dynamic Summary Cards: 12 Operational Logistics & Fleet Metrics */}
       <section
         style={{
-          background: '#111726',
+          background: '#ffffff',
           borderRadius: '16px',
-          border: '1px solid rgba(255,255,255,0.08)',
+          border: '1px solid #e2e8f0',
           padding: '20px 24px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#fff', margin: 0 }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
               Live Operational Fleet Pulse
             </h2>
-            <p style={{ fontSize: '12px', color: '#94a3b8', margin: '2px 0 0 0' }}>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0 0' }}>
               Real-time synchronization across fleet, drivers, shipments, and finance
             </p>
           </div>
@@ -383,8 +384,8 @@ export const Dashboard = () => {
               <div
                 key={kpi.label}
                 style={{
-                  background: '#161e30',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '12px',
                   padding: '14px 16px',
                   display: 'flex',
@@ -394,7 +395,7 @@ export const Dashboard = () => {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>
+                  <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
                     {kpi.label}
                   </span>
                   <div
@@ -412,7 +413,7 @@ export const Dashboard = () => {
                   </div>
                 </div>
 
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>
                   {kpi.val}
                 </div>
 
@@ -458,30 +459,30 @@ export const Dashboard = () => {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <p style={{ color: '#94a3b8', fontSize: '13.5px' }}>
+            <p style={{ color: '#64748b', fontSize: '13.5px' }}>
               Confirm your subscription upgrade to the <strong>{selectedPlan?.planName} Tier</strong>.
               Immediate activation includes telematics monitoring, automated routing, and audit logs.
             </p>
             <div
               style={{
-                background: '#161e30',
+                background: '#f8fafc',
                 padding: '14px',
                 borderRadius: '10px',
-                border: '1px solid rgba(255,255,255,0.08)',
+                border: '1px solid #e2e8f0',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ color: '#cbd5e1' }}>Billing Cycle</span>
-                <span style={{ color: '#ffffff', fontWeight: 600 }}>Monthly</span>
+                <span style={{ color: '#64748b' }}>Billing Cycle</span>
+                <span style={{ color: '#0f172a', fontWeight: 600 }}>Monthly</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                <span style={{ color: '#cbd5e1' }}>Amount</span>
+                <span style={{ color: '#64748b' }}>Amount</span>
                 <span style={{ color: '#f97316', fontWeight: 800, fontSize: '16px' }}>
                   ₹{selectedPlan?.monthlyPrice?.toLocaleString() || '2,499'}/mo
                 </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#cbd5e1' }}>Auto-Renewal</span>
+                <span style={{ color: '#64748b' }}>Auto-Renewal</span>
                 <span style={{ color: '#10b981', fontWeight: 600 }}>Enabled</span>
               </div>
             </div>
