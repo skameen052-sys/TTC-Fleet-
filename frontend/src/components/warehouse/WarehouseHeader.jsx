@@ -36,16 +36,9 @@ export const WarehouseHeader = ({
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const options = {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      };
-      setCurrentDateTime(now.toLocaleDateString('en-US', options));
+      const datePart = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const timePart = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      setCurrentDateTime(`${datePart} • ${timePart}`);
     };
 
     updateTime();

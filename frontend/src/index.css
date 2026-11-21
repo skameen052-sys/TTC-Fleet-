@@ -18,7 +18,7 @@
   --danger-red: #EF5350;
 
   --sidebar-width: 260px;
-  --header-height: 72px;
+  --header-height: 60px;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -545,12 +545,12 @@ body {
   border-radius: var(--radius-xl);
   overflow: hidden;
   position: relative;
-  min-height: 240px;
+  min-height: 155px;
   box-shadow: 0 4px 18px rgba(20, 33, 61, 0.08);
 }
 
 .hero-content-left {
-  padding: 30px 38px;
+  padding: 20px 28px;
   z-index: 3;
   display: flex;
   flex-direction: column;
@@ -559,7 +559,7 @@ body {
 }
 
 .hero-welcome-title {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   color: #FFFFFF;
   letter-spacing: -0.02em;
@@ -567,7 +567,7 @@ body {
 }
 
 .hero-manager-title {
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 800;
   color: var(--accent-orange);
   letter-spacing: -0.02em;
@@ -575,11 +575,11 @@ body {
 }
 
 .hero-description {
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: #CBD5E1;
   font-weight: 500;
-  margin-top: 10px;
-  line-height: 1.45;
+  margin-top: 5px;
+  line-height: 1.4;
 }
 
 .hero-image-wrap {
@@ -587,7 +587,7 @@ body {
   flex: 1.25;
   min-width: 0;
   height: 100%;
-  min-height: 200px;
+  min-height: 155px;
   overflow: hidden;
 }
 
@@ -636,12 +636,12 @@ body {
   background-color: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
-  padding: 22px 26px;
+  padding: 14px 20px;
   box-shadow: var(--card-shadow);
 }
 
 .quick-actions-header {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .quick-actions-title-wrap {
@@ -777,8 +777,8 @@ body {
 .kpi-stat-card {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 20px 22px;
+  gap: 14px;
+  padding: 12px 16px;
   background-color: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -794,9 +794,9 @@ body {
 }
 
 .kpi-card-icon-box {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -806,17 +806,17 @@ body {
 .kpi-card-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .kpi-card-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--primary-navy);
 }
 
 .kpi-card-value {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--primary-navy);
   line-height: 1.1;
@@ -2353,15 +2353,15 @@ body {
 .driver-dashboard-view {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 16px;
 }
 
 /* Driver Summary KPI Cards */
 .driver-kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 22px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .driver-kpi-card-wide {
@@ -2392,8 +2392,8 @@ body {
 .driver-quick-actions-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 @media (max-width: 1200px) {
@@ -2411,11 +2411,11 @@ body {
 .driver-action-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background-color: #FFFFFF;
   border: 1px solid #E5EAF2;
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 10px 14px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
@@ -2437,9 +2437,9 @@ body {
 }
 
 .driver-btn-icon-box {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3739,9 +3739,9 @@ body {
    WAREHOUSE MANAGER PORTAL - HEADER, SIDEBAR & HERO BANNER REFINEMENTS
    ========================================================================== */
 .warehouse-header {
-  min-height: 72px;
-  height: 72px;
-  padding: 0 32px;
+  min-height: var(--header-height);
+  height: var(--header-height);
+  padding: 0 24px;
   background-color: #FFFFFF;
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -3757,11 +3757,12 @@ body {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  max-width: 45%;
   white-space: nowrap;
 }
 
 .warehouse-header .header-page-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: var(--primary-navy);
   letter-spacing: -0.02em;
@@ -3773,30 +3774,30 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--accent-orange);
   white-space: nowrap;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .warehouse-header .header-right-col {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 .warehouse-header .header-search-wrapper {
   position: relative;
-  width: 220px;
+  width: 200px;
   flex-shrink: 1;
 }
 
 .warehouse-header .header-search-wrapper .header-search-input {
   width: 100%;
-  padding: 7px 32px 7px 34px;
-  font-size: 12.5px;
+  padding: 6px 28px 6px 30px;
+  font-size: 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-pill);
   background-color: #F8FAFC;
@@ -3813,11 +3814,15 @@ body {
 .warehouse-header .driver-trip-telemetry-pill {
   white-space: nowrap;
   flex-shrink: 0;
+  padding: 5px 10px;
+  font-size: 11.5px;
 }
 
 .warehouse-header .header-datetime-pill {
   white-space: nowrap;
   flex-shrink: 0;
+  padding: 5px 10px;
+  font-size: 11.5px;
 }
 
 .warehouse-header .header-profile-pill {
@@ -3825,24 +3830,21 @@ body {
   flex-shrink: 0;
 }
 
-@media (max-width: 1320px) {
+@media (max-width: 1350px) {
   .warehouse-header .header-search-wrapper {
     display: none;
   }
-}
-
-@media (max-width: 1220px) {
   .warehouse-header .header-datetime-pill {
     display: none;
   }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1120px) {
   .warehouse-header {
     padding: 0 16px;
   }
   .warehouse-header .header-page-title {
-    font-size: 17px;
+    font-size: 16px;
   }
   .warehouse-header .driver-trip-telemetry-pill .pill-status-text,
   .warehouse-header .driver-trip-telemetry-pill .pill-eta-badge {
@@ -3871,8 +3873,8 @@ body {
 }
 
 .warehouse-hero-container {
-  min-height: 210px;
-  margin-bottom: 24px;
+  min-height: 155px;
+  margin-bottom: 16px;
 }
 
 

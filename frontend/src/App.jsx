@@ -442,20 +442,20 @@ export default function App() {
 
   // Page title mapping for Manager
   const activeNavItem = navigationItems.find(item => item.id === activeTab);
-  const managerPageTitle = activeTab === 'dashboard' ? 'Fleet Manager Dashboard' : `${activeNavItem?.label || 'Fleet Manager'} - Fleet360`;
+  const managerPageTitle = activeTab === 'dashboard' ? 'Fleet Dashboard' : (activeNavItem?.label || 'Fleet Manager');
 
   // Page title mapping for Driver
   const activeDriverNavItem = driverNavItems.find(item => item.id === driverActiveTab);
-  const driverPageTitle = driverActiveTab === 'dashboard' ? 'Driver Dashboard' : `${activeDriverNavItem?.label || 'Driver Portal'} - Fleet360`;
+  const driverPageTitle = driverActiveTab === 'dashboard' ? 'Driver Dashboard' : (activeDriverNavItem?.label || 'Driver Portal');
 
   // Page title mapping for Warehouse
   const activeWarehouseNavItem = warehouseNavItems.find(item => item.id === warehouseActiveTab || (item.subItems && item.subItems.some(sub => sub.id === warehouseActiveTab)));
   const activeWarehouseSubItem = activeWarehouseNavItem?.subItems?.find(sub => sub.id === warehouseActiveTab);
   const warehousePageTitle = warehouseActiveTab === 'dashboard'
-    ? 'Warehouse Manager Dashboard'
+    ? 'Warehouse Dashboard'
     : activeWarehouseSubItem
-      ? `${activeWarehouseSubItem.label} • ${activeWarehouseNavItem.label}`
-      : `${activeWarehouseNavItem?.label || 'Warehouse OS'} - Fleet360`;
+      ? activeWarehouseSubItem.label
+      : (activeWarehouseNavItem?.label || 'Warehouse OS');
 
   // If not authenticated or login tab selected, render dedicated LoginPage
   if (!isAuthenticated || activeTab === 'login') {
