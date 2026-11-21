@@ -229,13 +229,13 @@ export const DriverDashboard = ({
           </div>
 
           {/* Card 7: Total Distance Travelled */}
-          <div className="kpi-stat-card">
+          <div className="kpi-stat-card driver-kpi-card-wide" onClick={() => onSelectTab('route-nav')}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
               <Compass size={26} color="#3478F6" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Total Distance Travelled</span>
-              <span className="kpi-card-value" style={{ fontSize: '20px' }}>
+              <span className="kpi-card-value" style={{ fontSize: '24px' }}>
                 {metrics?.totalDistanceTravelled || '124,580 km'}
               </span>
             </div>

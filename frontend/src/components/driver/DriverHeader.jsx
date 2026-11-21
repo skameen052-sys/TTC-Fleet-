@@ -66,12 +66,13 @@ export const DriverHeader = ({
 
   return (
     <header className="fleet-header driver-header">
-      {/* Page Title */}
+      {/* Page Title & Active Session Badge */}
       <div className="header-left-col">
         <div>
           <h1 className="header-page-title">{activeTabTitle}</h1>
-          <div className="header-live-sub">
-            <span className="pulse-circle" style={{ width: 6, height: 6 }} /> Active Commercial CDL Session
+          <div className="driver-header-badge">
+            <span className="live-pulse-green" />
+            <span>Active Commercial CDL Session</span>
           </div>
         </div>
       </div>
@@ -80,13 +81,20 @@ export const DriverHeader = ({
       <div className="header-right-col">
         {/* Active Trip Telemetry Pill */}
         <div
-          className="header-trip-pill"
+          className="driver-trip-telemetry-pill"
           onClick={() => onSelectTab('active-trip')}
           title="Click to view Active Trip details"
         >
-          <Navigation size={14} color="#FF7A1A" />
-          <span className="trip-pill-id">{activeTrip?.id || 'TRIP-5082'}:</span>
-          <span className="trip-pill-status">In Transit (ETA {activeTrip?.route?.eta || '1h 45m'})</span>
+          <div className="pill-icon-circle">
+            <Navigation size={13} color="#FF7A1A" strokeWidth={2.5} />
+          </div>
+          <span className="pill-trip-id">{activeTrip?.id || 'TRIP-5082'}</span>
+          <span className="pill-dot">•</span>
+          <span className="pill-status-text">
+            <span className="live-dot-pulse" />
+            In Transit
+          </span>
+          <span className="pill-eta-badge">ETA {activeTrip?.route?.eta || '1h 45m'}</span>
         </div>
 
         {/* Live Date & Time pill */}
@@ -153,7 +161,7 @@ export const DriverHeader = ({
         {/* Driver Profile Pill */}
         <div className="header-profile-container" ref={profileRef}>
           <div
-            className="user-profile-menu"
+            className="user-profile-menu driver-profile-pill"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
           >
             <div className="user-avatar-circle" style={{ backgroundColor: '#14213D', color: '#FF7A1A' }}>
