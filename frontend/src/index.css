@@ -2202,6 +2202,73 @@ body {
    DRIVER PORTAL STYLES (ENTERPRISE FLEET OS - DRIVER EDITION)
    ========================================================================== */
 
+/* Driver Header Layout & Specifics */
+.driver-header {
+  height: 60px;
+  padding: 0 24px;
+}
+
+.driver-header .header-left-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 1;
+  min-width: 0;
+  max-width: 45%;
+  overflow: hidden;
+}
+
+.driver-header .header-page-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--primary-navy);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.driver-header .driver-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #16A36A;
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+.driver-header .header-right-col {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1200px) {
+  .driver-header .header-datetime-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .driver-header {
+    padding: 0 16px;
+  }
+  .driver-header .driver-trip-telemetry-pill .pill-status-text,
+  .driver-header .driver-trip-telemetry-pill .pill-eta-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .driver-header .driver-trip-telemetry-pill {
+    display: none;
+  }
+}
+
 /* Driver Header Active Trip & Telemetry Pill */
 .driver-header-badge {
   display: inline-flex;

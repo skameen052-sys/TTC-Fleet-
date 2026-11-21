@@ -72,12 +72,13 @@ export const DriverHeader = ({
   return (
     <header className="fleet-header driver-header">
       {/* Page Title */}
-      <div className="header-left-col">
-        <div>
-          <h1 className="header-page-title">{activeTabTitle}</h1>
-          <div className="header-live-sub">
-            <span className="pulse-circle" style={{ width: 6, height: 6 }} /> Active Commercial CDL Session
-          </div>
+      <div className="header-left-col" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
+        <h1 className="header-page-title" style={{ fontSize: '17px', fontWeight: 800, margin: 0, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {activeTabTitle}
+        </h1>
+        <div className="driver-header-badge" style={{ whiteSpace: 'nowrap', marginTop: 2 }}>
+          <span className="live-pulse-green" />
+          <span>Active Commercial CDL Session</span>
         </div>
       </div>
 
@@ -211,13 +212,20 @@ export const DriverHeader = ({
 
         {/* Active Trip Telemetry Pill */}
         <div
-          className="header-trip-pill"
+          className="driver-trip-telemetry-pill"
           onClick={() => onSelectTab('active-trip')}
           title="Click to view Active Trip details"
         >
-          <Navigation size={14} color="#FF7A1A" />
-          <span className="trip-pill-id">{activeTrip?.id || 'TRIP-5082'}:</span>
-          <span className="trip-pill-status">In Transit (ETA {activeTrip?.route?.eta || '1h 45m'})</span>
+          <div className="pill-icon-circle">
+            <Navigation size={13} color="#FF7A1A" strokeWidth={2.4} />
+          </div>
+          <span className="pill-trip-id">{activeTrip?.id || 'TRIP-5082'}</span>
+          <span className="pill-dot">•</span>
+          <span className="pill-status-text">
+            <span className="live-dot-pulse" />
+            {activeTrip?.status || 'In Transit'}
+          </span>
+          <span className="pill-eta-badge">ETA {activeTrip?.route?.eta || '1h 45m'}</span>
         </div>
 
         {/* Live Date & Time pill */}
