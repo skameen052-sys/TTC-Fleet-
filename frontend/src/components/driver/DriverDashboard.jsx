@@ -158,86 +158,123 @@ export const DriverDashboard = ({
   return (
     <div className="driver-dashboard-view">
       {/* ===================================================================
-          1. SUMMARY CARDS (7 KPI METRICS)
+          1. HERO BANNER - DRIVER COMMERCIAL DISPATCH THEME
+          =================================================================== */}
+      <section className="fleet-hero-container driver-hero-container" style={{ minHeight: '155px', marginBottom: '16px' }}>
+        <div className="hero-content-left" style={{ flex: '1.1', minWidth: 0, zIndex: 3, padding: '20px 24px' }}>
+          <div className="hero-badge-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(22, 163, 106, 0.22)', border: '1px solid rgba(22, 163, 106, 0.5)', padding: '4px 12px', borderRadius: 20, marginBottom: 8, width: 'fit-content' }}>
+            <Truck size={13} color="#16A36A" />
+            <span style={{ color: '#86EFAC', fontWeight: '800', fontSize: '11px', letterSpacing: '0.04em' }}>TTC DRIVER OS • COMMERCIAL CDL DISPATCH</span>
+          </div>
+          <div className="hero-heading-wrap">
+            <h1 className="hero-welcome-title" style={{ fontSize: '22px', lineHeight: 1.15, margin: 0, color: '#FFFFFF' }}>Welcome back,</h1>
+            <h2 className="hero-manager-title" style={{ fontSize: '24px', color: '#FF7A1A', lineHeight: 1.15, margin: 0 }}>{driver?.fullName || 'Marcus Vance'}!</h2>
+          </div>
+          <p className="hero-description" style={{ fontSize: '13px', marginTop: '6px', color: '#94A3B8' }}>
+            Assigned Vehicle: <strong style={{ color: '#FFFFFF' }}>{vehicle?.regNumber || 'TTC-8492-HD'}</strong> ({vehicle?.make || 'Freightliner'} {vehicle?.model || 'Cascadia'}) • Active Route: <strong style={{ color: '#FF7A1A' }}>Chicago to Cleveland</strong> (ETA: 1h 45m)
+          </p>
+        </div>
+
+        <div className="hero-image-wrap" style={{ flex: '0.9', minWidth: 0 }}>
+          <img
+            src="/assets/driver-hero-4k.jpg"
+            alt="Driver Commercial Fleet"
+            className="hero-banner-img"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 30%' }}
+          />
+          <div className="hero-gradient-overlay" />
+        </div>
+        <div className="hero-orange-glow-curve" />
+      </section>
+
+      {/* ===================================================================
+          2. SUMMARY CARDS (7 KPI METRICS)
           =================================================================== */}
       <section className="driver-section">
-        <div className="summary-cards-grid driver-kpi-grid">
+        <div className="summary-cards-grid driver-kpi-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px' }}>
           {/* Card 1: Total Assigned Trips */}
-          <div className="kpi-stat-card" onClick={() => onSelectTab('my-trips')}>
+          <div className="kpi-stat-card" onClick={() => onSelectTab('my-trips')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
-              <Navigation size={26} color="#3478F6" strokeWidth={2.2} />
+              <Navigation size={24} color="#3478F6" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Total Assigned Trips</span>
               <span className="kpi-card-value">{metrics?.totalAssignedTrips || 18}</span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#718096' }}>All commercial routes</span>
             </div>
           </div>
 
           {/* Card 2: Today's Trips */}
-          <div className="kpi-stat-card" onClick={() => onSelectTab('my-trips')}>
+          <div className="kpi-stat-card" onClick={() => onSelectTab('my-trips')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#FFF0E5' }}>
-              <Clock size={26} color="#FF7A1A" strokeWidth={2.2} />
+              <Clock size={24} color="#FF7A1A" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Today's Trips</span>
               <span className="kpi-card-value">{metrics?.todayTrips || 1}</span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#FF7A1A' }}>1 in active transit</span>
             </div>
           </div>
 
           {/* Card 3: Active Trips */}
-          <div className="kpi-stat-card" onClick={() => onSelectTab('active-trip')}>
+          <div className="kpi-stat-card" onClick={() => onSelectTab('active-trip')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
-              <Truck size={26} color="#16A36A" strokeWidth={2.2} />
+              <Truck size={24} color="#16A36A" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Active Trips</span>
               <span className="kpi-card-value">{metrics?.activeTrips || 1}</span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#16A36A' }}>Live GPS telemetry</span>
             </div>
           </div>
 
           {/* Card 4: Upcoming Trips */}
-          <div className="kpi-stat-card" onClick={() => onSelectTab('my-trips')}>
+          <div className="kpi-stat-card" onClick={() => onSelectTab('my-trips')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#F3EEFF' }}>
-              <Calendar size={26} color="#7955E8" strokeWidth={2.2} />
+              <Calendar size={24} color="#7955E8" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Upcoming Trips</span>
               <span className="kpi-card-value">{metrics?.upcomingTrips || 3}</span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#7955E8' }}>Scheduled this week</span>
             </div>
           </div>
 
           {/* Card 5: Completed Trips */}
-          <div className="kpi-stat-card" onClick={() => onSelectTab('trip-history')}>
+          <div className="kpi-stat-card" onClick={() => onSelectTab('trip-history')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
-              <CheckCircle2 size={26} color="#16A36A" strokeWidth={2.2} />
+              <CheckCircle2 size={24} color="#16A36A" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Completed Trips</span>
               <span className="kpi-card-value">{metrics?.completedTrips || 482}</span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#16A36A' }}>99.4% on-time rate</span>
             </div>
           </div>
 
           {/* Card 6: Pending Deliveries */}
-          <div className="kpi-stat-card" onClick={() => onSelectTab('delivery')}>
+          <div className="kpi-stat-card" onClick={() => onSelectTab('delivery')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#FFF5EB' }}>
-              <PackageX size={26} color="#FF7A1A" strokeWidth={2.2} />
+              <PackageX size={24} color="#FF7A1A" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Pending Deliveries</span>
               <span className="kpi-card-value">{metrics?.pendingDeliveries || 1}</span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#FF7A1A' }}>Awaiting consignee</span>
             </div>
           </div>
 
           {/* Card 7: Total Distance Travelled */}
-          <div className="kpi-stat-card driver-kpi-card-wide" onClick={() => onSelectTab('route-nav')}>
+          <div className="kpi-stat-card driver-kpi-card-wide" onClick={() => onSelectTab('route-nav')} style={{ cursor: 'pointer' }}>
             <div className="kpi-card-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
-              <Compass size={26} color="#3478F6" strokeWidth={2.2} />
+              <Compass size={24} color="#3478F6" strokeWidth={2.2} />
             </div>
             <div className="kpi-card-info">
               <span className="kpi-card-label">Total Distance Travelled</span>
               <span className="kpi-card-value" style={{ fontSize: '24px' }}>
                 {metrics?.totalDistanceTravelled || '124,580 km'}
               </span>
+              <span className="kpi-sub-text" style={{ fontSize: '11px', color: '#3478F6' }}>Lifetime commercial mileage</span>
             </div>
           </div>
         </div>
@@ -586,19 +623,27 @@ export const DriverDashboard = ({
         {/* Route Stats Ribbon */}
         <div className="route-stats-ribbon">
           <div className="route-stat-box">
-            <span className="r-label">Current Vehicle Location</span>
-            <span className="r-val">{activeTrip?.route?.currentLocation}</span>
+            <span className="r-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <MapPin size={13} color="#3478F6" /> Current Location
+            </span>
+            <span className="r-val">{activeTrip?.route?.currentLocation || 'Toledo, OH (I-80 Corridor)'}</span>
           </div>
           <div className="route-stat-box">
-            <span className="r-label">Live Telemetry Speed</span>
+            <span className="r-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <Radio size={13} color="#FF7A1A" /> Live GNSS Speed
+            </span>
             <span className="r-val highlight">{activeTrip?.route?.speedKmh || 68} km/h</span>
           </div>
           <div className="route-stat-box">
-            <span className="r-label">Remaining Distance</span>
+            <span className="r-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <Compass size={13} color="#16A36A" /> Remaining Route
+            </span>
             <span className="r-val">{activeTrip?.route?.remainingKm || 184} km / {activeTrip?.route?.totalDistanceKm || 552} km</span>
           </div>
           <div className="route-stat-box">
-            <span className="r-label">Estimated Time of Arrival (ETA)</span>
+            <span className="r-label" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <Clock size={13} color="#7955E8" /> Estimated ETA
+            </span>
             <span className="r-val highlight">{activeTrip?.route?.eta || '1h 45m'}</span>
           </div>
         </div>

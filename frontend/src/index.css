@@ -3909,7 +3909,8 @@ body {
   width: 100%;
 }
 
-.warehouse-hero-container {
+.warehouse-hero-container,
+.driver-hero-container {
   min-height: 155px;
   margin-bottom: 16px;
 }
