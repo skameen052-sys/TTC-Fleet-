@@ -6,6 +6,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.File;
 
@@ -24,7 +25,7 @@ public class S3StorageService {
     @Value("${aws.s3.secret-key:SIMULATED_SECRET}")
     private String secretKey;
 
-    private S3Client createS3Client() {
+    public S3Client createS3Client() {
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -34,12 +35,15 @@ public class S3StorageService {
 
     public String uploadDocument(String s3Key, File file) {
         try {
-            // S3Client client = createS3Client();
-            // PutObjectRequest request = PutObjectRequest.builder()
-            //         .bucket(bucketName)
-            //         .key(s3Key)
-            //         .build();
-            // client.putObject(request, file.toPath());
+            if (file != null && file.exists() && accessKey != null && !accessKey.startsWith("SIMULATED")) {
+                try (S3Client client = createS3Client()) {
+                    PutObjectRequest request = PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(s3Key)
+                            .build();
+                    client.putObject(request, file.toPath());
+                }
+            }
             return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + s3Key;
         } catch (Exception e) {
             return "s3://" + bucketName + "/" + s3Key;
