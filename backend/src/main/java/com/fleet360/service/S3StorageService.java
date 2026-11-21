@@ -25,7 +25,7 @@ public class S3StorageService {
     @Value("${aws.s3.secret-key:SIMULATED_SECRET}")
     private String secretKey;
 
-    public S3Client createS3Client() {
+    private S3Client createS3Client() {
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(

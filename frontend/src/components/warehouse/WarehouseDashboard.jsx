@@ -86,10 +86,10 @@ export const WarehouseDashboard = ({
 
         <div className="hero-image-wrap" style={{ flex: '0.9', minWidth: 0 }}>
           <img
-            src="/assets/manager-hero-4k.jpg"
-            alt="Warehouse Loading Bays & Logistics Operations"
+            src="/assets/warehouse-manager-login.webp"
+            alt="Warehouse Operations"
             className="hero-banner-img"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center right' }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
           />
           <div className="hero-gradient-overlay" />
         </div>
@@ -114,89 +114,117 @@ export const WarehouseDashboard = ({
           </div>
         </div>
 
-        <div className="driver-quick-actions-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+        <div className="driver-quick-actions-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))' }}>
           {/* 1. Add Inventory */}
-          <button className="driver-action-btn" onClick={onOpenAddInventory}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenAddInventory}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBF3FF', flexShrink: 0 }}>
               <Boxes size={20} color="#3478F6" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Add Inventory</span>
-              <span className="driver-btn-sub">Register new SKU item</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Add Inventory</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Register new SKU item</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 2. Record Stock In */}
-          <button className="driver-action-btn" onClick={onOpenStockIn}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenStockIn}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8F8F0', flexShrink: 0 }}>
               <PackagePlus size={20} color="#16A36A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Record Stock In</span>
-              <span className="driver-btn-sub">Add received stock</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Record Stock In</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Add received stock</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 3. Record Stock Out */}
-          <button className="driver-action-btn" onClick={onOpenStockOut}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#FFF0E5' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenStockOut}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF0E5', flexShrink: 0 }}>
               <PackageMinus size={20} color="#FF7A1A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Record Stock Out</span>
-              <span className="driver-btn-sub">Deduct dispatched stock</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Record Stock Out</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Deduct dispatched stock</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 4. Receive Shipment */}
-          <button className="driver-action-btn" onClick={onOpenReceiveShipment}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenReceiveShipment}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBF3FF', flexShrink: 0 }}>
               <ArrowDownToLine size={20} color="#3478F6" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Receive Shipment</span>
-              <span className="driver-btn-sub">Verify incoming BOL</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Receive Shipment</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Verify incoming BOL</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 5. Create Dispatch */}
-          <button className="driver-action-btn" onClick={onOpenCreateDispatch}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#FFF5EB' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenCreateDispatch}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF5EB', flexShrink: 0 }}>
               <Truck size={20} color="#FF7A1A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Create Dispatch</span>
-              <span className="driver-btn-sub">Schedule outbound load</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Create Dispatch</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Schedule outbound load</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 6. Transfer Stock */}
-          <button className="driver-action-btn" onClick={onOpenTransferStock}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#F3EEFF' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenTransferStock}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3EEFF', flexShrink: 0 }}>
               <ArrowLeftRight size={20} color="#7955E8" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Transfer Stock</span>
-              <span className="driver-btn-sub">Inter-warehouse transfer</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Transfer Stock</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Inter-warehouse transfer</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 7. Report Damaged Goods */}
-          <button className="driver-action-btn" onClick={onOpenReportDamaged}>
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#FEECEC' }}>
+          <button
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
+            onClick={onOpenReportDamaged}
+          >
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FEECEC', flexShrink: 0 }}>
               <AlertTriangle size={20} color="#EF5350" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Report Damaged</span>
-              <span className="driver-btn-sub">Quarantine inspection defect</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Report Damaged</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Quarantine inspection defect</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
         </div>
       </section>

@@ -65,13 +65,13 @@ export const WarehouseHeader = ({
   return (
     <header className="fleet-header warehouse-header">
       {/* Page Title & Active Session Badge */}
-      <div className="header-left-col">
-        <div>
-          <h1 className="header-page-title">{activeTabTitle}</h1>
-          <div className="driver-header-badge" style={{ color: '#FF7A1A' }}>
-            <span className="live-pulse-green" style={{ backgroundColor: '#FF7A1A', boxShadow: '0 0 0 3px rgba(255, 122, 26, 0.25)' }} />
-            <span>Active WMS Industrial Session</span>
-          </div>
+      <div className="header-left-col" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
+        <h1 className="header-page-title" style={{ fontSize: '17px', fontWeight: 800, margin: 0, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {activeTabTitle}
+        </h1>
+        <div className="driver-header-badge" style={{ color: '#FF7A1A', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '11px', fontWeight: 600, marginTop: 2, whiteSpace: 'nowrap' }}>
+          <span className="live-pulse-green" style={{ width: 6, height: 6, backgroundColor: '#FF7A1A', boxShadow: '0 0 0 3px rgba(255, 122, 26, 0.25)', flexShrink: 0 }} />
+          <span>Active WMS Industrial Session</span>
         </div>
       </div>
 

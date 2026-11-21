@@ -386,9 +386,10 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'manager' }) => {
         {isWarehouse ? (
           <div className="manager-hero-container fade-in">
             <img
-              src="/assets/manager-login-4k.jpg"
+              src="/assets/warehouse-manager-login.webp"
               alt="TTC Fleet360 Enterprise Warehouse Operations"
               className="login-hero-img-display"
+              style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
             />
             {/* Dark gradient overlay for text readability */}
             <div className="manager-hero-gradient-overlay" />

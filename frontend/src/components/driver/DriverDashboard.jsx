@@ -264,128 +264,136 @@ export const DriverDashboard = ({
         <div className="driver-quick-actions-grid">
           {/* 1. Accept Trip */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={() => {
               if (activeTrip?.currentStageIndex < 1) onAdvanceStage();
               else alert('Current trip #TRIP-5082 is already Accepted and In Transit.');
             }}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8F8F0', flexShrink: 0 }}>
               <CheckCircle2 size={20} color="#16A36A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Accept Trip</span>
-              <span className="driver-btn-sub">Acknowledge dispatch</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Accept Trip</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Acknowledge dispatch</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 2. Start Trip */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={() => {
               if (activeTrip?.currentStageIndex < 4) onAdvanceStage();
               else alert('Trip started. Odometer recorded at Chicago Central Depot.');
             }}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#FFF0E5' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF0E5', flexShrink: 0 }}>
               <Truck size={20} color="#FF7A1A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Start Trip</span>
-              <span className="driver-btn-sub">Depart pickup depot</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Start Trip</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Depart pickup depot</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 3. Open Navigation */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={() => onSelectTab('route-nav')}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBF3FF', flexShrink: 0 }}>
               <Navigation size={20} color="#3478F6" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Open Navigation</span>
-              <span className="driver-btn-sub">Turn-by-turn radar</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Open Navigation</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Turn-by-turn radar</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 4. Update Pickup Status */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={() => onSelectTab('pickup')}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8F8F0', flexShrink: 0 }}>
               <PackageCheck size={20} color="#16A36A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Update Pickup</span>
-              <span className="driver-btn-sub">Confirm goods loading</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Update Pickup</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Confirm goods loading</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 5. Update Delivery Status */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={() => onSelectTab('delivery')}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#FFF5EB' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF5EB', flexShrink: 0 }}>
               <PackageX size={20} color="#FF7A1A" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Update Delivery</span>
-              <span className="driver-btn-sub">Destination check-in</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Update Delivery</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Destination check-in</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 6. Upload Delivery Proof */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={onOpenPodModal}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#F3EEFF' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F3EEFF', flexShrink: 0 }}>
               <Camera size={20} color="#7955E8" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Upload POD Proof</span>
-              <span className="driver-btn-sub">Capture photos & sign</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Upload POD Proof</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Capture photos & sign</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 7. Report Vehicle Issue */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={onOpenIssueModal}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#FEECEC' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FEECEC', flexShrink: 0 }}>
               <AlertTriangle size={20} color="#EF5350" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Report Issue</span>
-              <span className="driver-btn-sub">Mechanical or tire alert</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Report Issue</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>Mechanical or tire alert</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
 
           {/* 8. Contact Logistics Manager */}
           <button
-            className="driver-action-btn"
+            className="driver-action-btn action-card-item"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, padding: '12px 14px', width: '100%', textAlign: 'left', borderRadius: 12, border: '1px solid #E5EAF2', background: '#FFFFFF', cursor: 'pointer' }}
             onClick={onOpenContactModal}
           >
-            <div className="driver-btn-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
+            <div className="driver-btn-icon-box" style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBF3FF', flexShrink: 0 }}>
               <Phone size={20} color="#3478F6" />
             </div>
-            <div className="driver-btn-text">
-              <span className="driver-btn-title">Contact Manager</span>
-              <span className="driver-btn-sub">24/7 Dispatch Central</span>
+            <div className="driver-btn-text" style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, minWidth: 0, textAlign: 'left' }}>
+              <strong className="driver-btn-title" style={{ display: 'block', fontSize: '13.5px', fontWeight: 700, color: '#17243A', lineHeight: 1.25 }}>Contact Manager</strong>
+              <span className="driver-btn-sub" style={{ display: 'block', fontSize: '11.5px', color: '#718096', lineHeight: 1.25 }}>24/7 Dispatch Central</span>
             </div>
-            <ChevronRight size={16} color="#94A3B8" />
+            <ChevronRight size={16} color="#94A3B8" style={{ flexShrink: 0, marginLeft: 'auto' }} />
           </button>
         </div>
       </section>
@@ -770,7 +778,7 @@ export const DriverDashboard = ({
               </div>
               <div className="v-spec-row">
                 <span className="v-key">Current Odometer:</span>
-                <span className="v-val highlight">{vehicle?.odometerKm?.toLocaleString()} km</span>
+                <span className="v-val highlight">{Number(vehicle?.odometerKm || 124580).toLocaleString()} km</span>
               </div>
               <div className="v-spec-row">
                 <span className="v-key">Fuel Level:</span>

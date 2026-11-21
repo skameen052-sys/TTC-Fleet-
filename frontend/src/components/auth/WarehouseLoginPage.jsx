@@ -257,7 +257,7 @@ export const WarehouseLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
       <div className="login-hero-pane">
         <div
           className="login-hero-bg-image"
-          style={{ backgroundImage: `url('/assets/manager-login-4k.jpg')` }}
+          style={{ backgroundImage: `url('/assets/warehouse-manager-login.webp')`, backgroundPosition: 'center 20%' }}
         />
         <div className="login-hero-gradient-overlay" />
 
