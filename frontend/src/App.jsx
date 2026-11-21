@@ -55,6 +55,29 @@ import {
   DriverModals
 } from './components/driver/DriverViews';
 
+// Warehouse Manager Portal Components
+import { WarehouseSidebar, warehouseNavItems } from './components/warehouse/WarehouseSidebar';
+import { WarehouseHeader } from './components/warehouse/WarehouseHeader';
+import { WarehouseDashboard } from './components/warehouse/WarehouseDashboard';
+import { WarehouseModals } from './components/warehouse/WarehouseModals';
+import {
+  WarehouseManagementView,
+  InventoryManagementView,
+  GoodsReceivingView,
+  GoodsDispatchView,
+  StockInView,
+  StockOutView,
+  ShipmentManagementView,
+  LoadingManagementView,
+  UnloadingManagementView,
+  StockTransfersView,
+  DamagedGoodsView,
+  InventoryReportsView,
+  WarehouseNotificationsView,
+  WarehouseProfileView
+} from './components/warehouse/WarehouseViews';
+import { warehouseService } from './services/warehouseService';
+
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -171,11 +194,12 @@ export default function App() {
     }
   });
 
-  // Portal State: 'manager' (Fleet Manager Portal) vs 'driver' (Driver Portal)
+  // Portal State: 'manager' (Fleet Manager) vs 'driver' (Driver Portal) vs 'warehouse' (Warehouse Manager)
   const [portal, setPortal] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('portal') === 'driver') return 'driver';
+      if (params.get('portal') === 'warehouse') return 'warehouse';
       if (params.get('portal') === 'manager') return 'manager';
 
       const u = localStorage.getItem('ttc_fleet360_user') || sessionStorage.getItem('ttc_fleet360_user');
@@ -183,18 +207,23 @@ export default function App() {
       if (parsed?.role === 'ROLE_DRIVER') {
         return 'driver';
       }
+      if (parsed?.role === 'ROLE_WAREHOUSE_MANAGER') {
+        return 'warehouse';
+      }
     } catch {}
     return 'manager'; // Default to Fleet Manager Portal
   });
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [driverActiveTab, setDriverActiveTab] = useState('dashboard');
+  const [warehouseActiveTab, setWarehouseActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
-  // Fleet state & Driver state
+  // Fleet state, Driver state & Warehouse state
   const [fleetState, setFleetState] = useState(() => fleetService.loadData());
   const [driverPortalData, setDriverPortalData] = useState(() => fleetService.getDriverPortalData());
+  const [warehouseData, setWarehouseData] = useState(() => warehouseService.getData());
 
   // Manager Modal open states
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
@@ -209,13 +238,29 @@ export default function App() {
   const [isDriverPodOpen, setIsDriverPodOpen] = useState(false);
   const [isDriverContactOpen, setIsDriverContactOpen] = useState(false);
 
-  // Subscribe to changes in fleetService
+  // Warehouse Modal open states
+  const [isAddInventoryOpen, setIsAddInventoryOpen] = useState(false);
+  const [isStockInOpen, setIsStockInOpen] = useState(false);
+  const [isStockOutOpen, setIsStockOutOpen] = useState(false);
+  const [isReceiveShipmentOpen, setIsReceiveShipmentOpen] = useState(false);
+  const [isCreateDispatchOpen, setIsCreateDispatchOpen] = useState(false);
+  const [isTransferStockOpen, setIsTransferStockOpen] = useState(false);
+  const [isReportDamagedOpen, setIsReportDamagedOpen] = useState(false);
+  const [isAddWarehouseOpen, setIsAddWarehouseOpen] = useState(false);
+
+  // Subscribe to changes in fleetService & warehouseService
   useEffect(() => {
-    const unsubscribe = fleetService.subscribe((updatedData) => {
+    const unsubscribeFleet = fleetService.subscribe((updatedData) => {
       setFleetState({ ...updatedData });
       setDriverPortalData(fleetService.getDriverPortalData());
     });
-    return unsubscribe;
+    const unsubscribeWarehouse = warehouseService.subscribe((updatedWhData) => {
+      setWarehouseData({ ...updatedWhData });
+    });
+    return () => {
+      unsubscribeFleet();
+      unsubscribeWarehouse();
+    };
   }, []);
 
   const showToast = (msg) => {
@@ -228,7 +273,10 @@ export default function App() {
   const handleLoginSuccess = (userData) => {
     setCurrentUser(userData);
     setIsAuthenticated(true);
-    if (userData.role === 'ROLE_DRIVER') {
+    if (userData.role === 'ROLE_WAREHOUSE_MANAGER') {
+      setPortal('warehouse');
+      setWarehouseActiveTab('dashboard');
+    } else if (userData.role === 'ROLE_DRIVER') {
       setPortal('driver');
       setDriverActiveTab('dashboard');
     } else {
@@ -333,6 +381,52 @@ export default function App() {
     showToast(`Vehicle inspection defect logged: ${issue.title} (Severity: ${issue.severity}).`);
   };
 
+  // Warehouse Manager Actions
+  const handleAddInventory = (itemData) => {
+    const item = warehouseService.addInventoryItem(itemData);
+    showToast(`Inventory SKU ${item.sku} registered successfully!`);
+  };
+
+  const handleRecordStockIn = (stockData) => {
+    warehouseService.recordStockIn(stockData);
+    showToast(`Stock In recorded for ${stockData.sku} (+${stockData.quantity} units)!`);
+  };
+
+  const handleRecordStockOut = (stockData) => {
+    warehouseService.recordStockOut(stockData);
+    showToast(`Stock Out recorded for ${stockData.sku} (-${stockData.quantity} units)!`);
+  };
+
+  const handleConfirmReceiving = (shipmentId) => {
+    const s = warehouseService.confirmReceiving(shipmentId);
+    showToast(`Shipment ${s?.shipmentId || shipmentId} verified and stored into inventory!`);
+  };
+
+  const handleCreateDispatch = (dispatchData) => {
+    const d = warehouseService.createDispatch(dispatchData);
+    showToast(`Dispatch ${d.orderId} scheduled at ${d.dockBay} for ${d.destination}!`);
+  };
+
+  const handleConfirmDispatch = (dispatchId) => {
+    const d = warehouseService.confirmDispatch(dispatchId);
+    showToast(`Dispatch ${d?.orderId || dispatchId} authorized & released for transit!`);
+  };
+
+  const handleTransferStock = (transferData) => {
+    const t = warehouseService.transferStock(transferData);
+    showToast(`Transfer ${t.id} initiated: ${t.quantity} units to ${t.destWarehouse}!`);
+  };
+
+  const handleReportDamagedGoods = (damageData) => {
+    const dmg = warehouseService.reportDamagedGoods(damageData);
+    showToast(`Damaged stock ${dmg.sku} (${dmg.quantity} units) moved to quarantine!`);
+  };
+
+  const handleAddWarehouse = (whData) => {
+    const wh = warehouseService.addWarehouse(whData);
+    showToast(`Warehouse facility ${wh.name} (${wh.code}) registered successfully!`);
+  };
+
   // Compute live metrics
   const summaryMetrics = fleetService.getSummaryMetrics();
   const statusOverview = fleetService.getVehicleStatusOverview();
@@ -344,6 +438,7 @@ export default function App() {
   const analytics = fleetService.getAnalytics();
   const notifications = fleetService.getNotifications();
   const unreadNotifsCount = notifications.filter(n => !n.read).length;
+  const warehouseMetrics = warehouseService.getSummaryMetrics();
 
   // Page title mapping for Manager
   const activeNavItem = navigationItems.find(item => item.id === activeTab);
@@ -352,6 +447,10 @@ export default function App() {
   // Page title mapping for Driver
   const activeDriverNavItem = driverNavItems.find(item => item.id === driverActiveTab);
   const driverPageTitle = driverActiveTab === 'dashboard' ? 'Driver Dashboard' : `${activeDriverNavItem?.label || 'Driver Portal'} - Fleet360`;
+
+  // Page title mapping for Warehouse
+  const activeWarehouseNavItem = warehouseNavItems.find(item => item.id === warehouseActiveTab || (item.subItems && item.subItems.some(sub => sub.id === warehouseActiveTab)));
+  const warehousePageTitle = warehouseActiveTab === 'dashboard' ? 'Warehouse Manager Dashboard' : `${activeWarehouseNavItem?.label || 'Warehouse OS'} - Fleet360`;
 
   // If not authenticated or login tab selected, render dedicated LoginPage
   if (!isAuthenticated || activeTab === 'login') {
@@ -395,6 +494,10 @@ export default function App() {
               setPortal('manager');
               setActiveTab('dashboard');
             }}
+            onSwitchToWarehouse={() => {
+              setPortal('warehouse');
+              setWarehouseActiveTab('dashboard');
+            }}
           />
 
           {/* Main Content Wrapper */}
@@ -410,6 +513,10 @@ export default function App() {
               onSwitchToManager={() => {
                 setPortal('manager');
                 setActiveTab('dashboard');
+              }}
+              onSwitchToWarehouse={() => {
+                setPortal('warehouse');
+                setWarehouseActiveTab('dashboard');
               }}
             />
 
@@ -576,6 +683,239 @@ export default function App() {
   }
 
   // =========================================================================
+  // RENDER WAREHOUSE MANAGER PORTAL
+  // =========================================================================
+  if (portal === 'warehouse') {
+    return (
+      <ErrorBoundary>
+        <div className="app-container warehouse-portal-theme">
+          {/* Left Sidebar Navigation (Warehouse Manager) */}
+          <WarehouseSidebar
+            activeTab={warehouseActiveTab}
+            onSelectTab={setWarehouseActiveTab}
+            user={currentUser}
+            onLogout={handleLogout}
+            onSwitchToManager={() => {
+              setPortal('manager');
+              setActiveTab('dashboard');
+            }}
+            onSwitchToDriver={() => {
+              setPortal('driver');
+              setDriverActiveTab('dashboard');
+            }}
+          />
+
+          {/* Main Content Wrapper */}
+          <div className="main-wrapper">
+            {/* Top Navigation Bar (Warehouse Manager) */}
+            <WarehouseHeader
+              activeTabTitle={warehousePageTitle}
+              user={currentUser}
+              alerts={warehouseData.alerts || []}
+              onSelectTab={setWarehouseActiveTab}
+              onLogout={handleLogout}
+              onSwitchToManager={() => {
+                setPortal('manager');
+                setActiveTab('dashboard');
+              }}
+              onSwitchToDriver={() => {
+                setPortal('driver');
+                setDriverActiveTab('dashboard');
+              }}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+
+            {/* Dynamic Warehouse Page Views */}
+            <main className="dashboard-content">
+              <ErrorBoundary>
+                {warehouseActiveTab === 'dashboard' && (
+                  <WarehouseDashboard
+                    data={warehouseData}
+                    metrics={warehouseMetrics}
+                    onOpenAddInventory={() => setIsAddInventoryOpen(true)}
+                    onOpenStockIn={() => setIsStockInOpen(true)}
+                    onOpenStockOut={() => setIsStockOutOpen(true)}
+                    onOpenReceiveShipment={() => setIsReceiveShipmentOpen(true)}
+                    onOpenCreateDispatch={() => setIsCreateDispatchOpen(true)}
+                    onOpenTransferStock={() => setIsTransferStockOpen(true)}
+                    onOpenReportDamaged={() => setIsReportDamagedOpen(true)}
+                    onSelectTab={setWarehouseActiveTab}
+                    onConfirmReceiving={handleConfirmReceiving}
+                    onConfirmDispatch={handleConfirmDispatch}
+                  />
+                )}
+
+                {['warehouses', 'all-warehouses', 'add-warehouse', 'edit-warehouse'].includes(warehouseActiveTab) && (
+                  <WarehouseManagementView
+                    warehouses={warehouseData.warehouses || []}
+                    onOpenAddWarehouse={() => setIsAddWarehouseOpen(true)}
+                  />
+                )}
+
+                {['inventory', 'all-inventory', 'add-items', 'stock-details'].includes(warehouseActiveTab) && (
+                  <InventoryManagementView
+                    inventory={warehouseData.inventory || []}
+                    onOpenAddInventory={() => setIsAddInventoryOpen(true)}
+                  />
+                )}
+
+                {['goods-receiving', 'incoming-goods', 'receiving-confirmation'].includes(warehouseActiveTab) && (
+                  <GoodsReceivingView
+                    incomingGoods={warehouseData.incomingGoods || []}
+                    onConfirmReceiving={handleConfirmReceiving}
+                  />
+                )}
+
+                {['goods-dispatch', 'outgoing-goods', 'dispatch-records'].includes(warehouseActiveTab) && (
+                  <GoodsDispatchView
+                    outgoingGoods={warehouseData.outgoingGoods || []}
+                    onConfirmDispatch={handleConfirmDispatch}
+                    onOpenCreateDispatch={() => setIsCreateDispatchOpen(true)}
+                  />
+                )}
+
+                {['stock-in', 'add-stock', 'receiving-history'].includes(warehouseActiveTab) && (
+                  <StockInView
+                    inventory={warehouseData.inventory || []}
+                    stockMovement={warehouseData.stockMovement || []}
+                    onOpenStockIn={() => setIsStockInOpen(true)}
+                  />
+                )}
+
+                {['stock-out', 'remove-stock', 'stock-out-history'].includes(warehouseActiveTab) && (
+                  <StockOutView
+                    inventory={warehouseData.inventory || []}
+                    stockMovement={warehouseData.stockMovement || []}
+                    onOpenStockOut={() => setIsStockOutOpen(true)}
+                  />
+                )}
+
+                {['shipment-management', 'incoming-shipments', 'outgoing-shipments'].includes(warehouseActiveTab) && (
+                  <ShipmentManagementView
+                    incomingGoods={warehouseData.incomingGoods || []}
+                    outgoingGoods={warehouseData.outgoingGoods || []}
+                  />
+                )}
+
+                {['loading-management', 'loading-schedule', 'loading-confirmation'].includes(warehouseActiveTab) && (
+                  <LoadingManagementView
+                    loadingSchedule={warehouseData.loadingSchedule || []}
+                  />
+                )}
+
+                {['unloading-management', 'unloading-schedule', 'unloading-confirmation'].includes(warehouseActiveTab) && (
+                  <UnloadingManagementView
+                    loadingSchedule={warehouseData.loadingSchedule || []}
+                  />
+                )}
+
+                {warehouseActiveTab === 'stock-transfers' && (
+                  <StockTransfersView
+                    stockTransfers={warehouseData.stockTransfers || []}
+                    onOpenTransferStock={() => setIsTransferStockOpen(true)}
+                  />
+                )}
+
+                {['damaged-goods', 'damaged-stock', 'damage-reports'].includes(warehouseActiveTab) && (
+                  <DamagedGoodsView
+                    damagedGoods={warehouseData.damagedGoods || []}
+                    onOpenReportDamaged={() => setIsReportDamagedOpen(true)}
+                  />
+                )}
+
+                {['inventory-reports', 'stock-reports', 'movement-reports'].includes(warehouseActiveTab) && (
+                  <InventoryReportsView
+                    inventory={warehouseData.inventory || []}
+                    warehouses={warehouseData.warehouses || []}
+                  />
+                )}
+
+                {['notifications', 'low-stock-alerts', 'pending-dispatch-alerts'].includes(warehouseActiveTab) && (
+                  <WarehouseNotificationsView
+                    alerts={warehouseData.alerts || []}
+                  />
+                )}
+
+                {['profile', 'personal-profile', 'change-password'].includes(warehouseActiveTab) && (
+                  <WarehouseProfileView
+                    user={currentUser}
+                    onLogout={handleLogout}
+                  />
+                )}
+              </ErrorBoundary>
+            </main>
+          </div>
+
+          {/* Warehouse Modals */}
+          <WarehouseModals.AddInventoryModal
+            isOpen={isAddInventoryOpen}
+            onClose={() => setIsAddInventoryOpen(false)}
+            onSubmit={handleAddInventory}
+            warehouses={warehouseData.warehouses || []}
+          />
+
+          <WarehouseModals.StockInModal
+            isOpen={isStockInOpen}
+            onClose={() => setIsStockInOpen(false)}
+            onSubmit={handleRecordStockIn}
+            inventory={warehouseData.inventory || []}
+          />
+
+          <WarehouseModals.StockOutModal
+            isOpen={isStockOutOpen}
+            onClose={() => setIsStockOutOpen(false)}
+            onSubmit={handleRecordStockOut}
+            inventory={warehouseData.inventory || []}
+          />
+
+          <WarehouseModals.ReceiveShipmentModal
+            isOpen={isReceiveShipmentOpen}
+            onClose={() => setIsReceiveShipmentOpen(false)}
+            onConfirm={handleConfirmReceiving}
+            incomingGoods={warehouseData.incomingGoods || []}
+          />
+
+          <WarehouseModals.CreateDispatchModal
+            isOpen={isCreateDispatchOpen}
+            onClose={() => setIsCreateDispatchOpen(false)}
+            onSubmit={handleCreateDispatch}
+          />
+
+          <WarehouseModals.TransferStockModal
+            isOpen={isTransferStockOpen}
+            onClose={() => setIsTransferStockOpen(false)}
+            onSubmit={handleTransferStock}
+            warehouses={warehouseData.warehouses || []}
+            inventory={warehouseData.inventory || []}
+          />
+
+          <WarehouseModals.ReportDamagedModal
+            isOpen={isReportDamagedOpen}
+            onClose={() => setIsReportDamagedOpen(false)}
+            onSubmit={handleReportDamagedGoods}
+            inventory={warehouseData.inventory || []}
+          />
+
+          <WarehouseModals.AddWarehouseModal
+            isOpen={isAddWarehouseOpen}
+            onClose={() => setIsAddWarehouseOpen(false)}
+            onSubmit={handleAddWarehouse}
+          />
+
+          {/* Toast Feedback Notification Banner */}
+          {toastMessage && (
+            <div className="toast-banner">
+              <CheckCircle size={18} color="#16A36A" />
+              <span>{toastMessage}</span>
+            </div>
+          )}
+        </div>
+      </ErrorBoundary>
+    );
+  }
+
+  // =========================================================================
   // RENDER FLEET MANAGER PORTAL
   // =========================================================================
   return (
@@ -588,6 +928,10 @@ export default function App() {
         unreadNotificationsCount={unreadNotifsCount}
         onLogout={handleLogout}
         onSwitchToDriver={() => setPortal('driver')}
+        onSwitchToWarehouse={() => {
+          setPortal('warehouse');
+          setWarehouseActiveTab('dashboard');
+        }}
       />
 
       {/* Main Content Wrapper */}

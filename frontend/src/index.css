@@ -3586,3 +3586,110 @@ body {
   border-color: rgba(239, 83, 80, 0.35);
 }
 
+/* ==========================================================================
+   WAREHOUSE MANAGER PORTAL STYLES (ENTERPRISE WAREHOUSE OS)
+   ========================================================================== */
+.warehouse-portal-theme {
+  background-color: var(--bg-dashboard);
+}
+
+.warehouse-sidebar .brand-sub-badge {
+  color: #FFB37C;
+}
+
+.warehouse-manager-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-item-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.submenu-arrow-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-submenu-list {
+  display: flex;
+  flex-direction: column;
+  padding-left: 28px;
+  padding-right: 14px;
+  margin-top: 2px;
+  margin-bottom: 6px;
+  gap: 2px;
+}
+
+.sidebar-submenu-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.sidebar-submenu-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(2px);
+}
+
+.sidebar-submenu-btn.active {
+  color: #FF7A1A;
+  background: rgba(255, 122, 26, 0.12);
+  font-weight: 700;
+}
+
+.submenu-bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #64748B;
+  flex-shrink: 0;
+  transition: background-color 0.18s ease;
+}
+
+.sidebar-submenu-btn:hover .submenu-bullet {
+  background-color: #CBD5E1;
+}
+
+.sidebar-submenu-btn.active .submenu-bullet {
+  background-color: #FF7A1A;
+  box-shadow: 0 0 0 2px rgba(255, 122, 26, 0.3);
+}
+
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-grid-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .form-grid-2col,
+  .form-grid-3col {
+    grid-template-columns: 1fr;
+  }
+}
+
+

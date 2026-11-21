@@ -15,7 +15,8 @@ import {
   Bell,
   User,
   Radio,
-  LogOut
+  LogOut,
+  Warehouse
 } from 'lucide-react';
 
 export const navigationItems = [
@@ -35,7 +36,7 @@ export const navigationItems = [
   { id: 'profile', label: 'My Profile', icon: User }
 ];
 
-export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCount, onLogout, onSwitchToDriver }) => {
+export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCount, onLogout, onSwitchToDriver, onSwitchToWarehouse }) => {
   const getBadgeValue = (item) => {
     if (item.badgeKey === 'vehicles') return metrics?.totalVehicles || 16;
     if (item.badgeKey === 'available') return metrics?.availableVehicles || 4;
@@ -111,6 +112,18 @@ export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCo
         >
           <Truck size={15} color="#FF7A1A" />
           <span>Switch to Driver Portal</span>
+        </button>
+      )}
+
+      {onSwitchToWarehouse && (
+        <button
+          className="sidebar-switcher-btn"
+          style={{ marginTop: 6 }}
+          onClick={onSwitchToWarehouse}
+          title="Switch to Warehouse Manager Portal"
+        >
+          <Warehouse size={15} color="#FF7A1A" />
+          <span>Switch to Warehouse OS</span>
         </button>
       )}
 

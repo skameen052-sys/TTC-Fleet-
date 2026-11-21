@@ -41,7 +41,8 @@ export const DriverSidebar = ({
   onSelectTab,
   driver,
   onLogout,
-  onSwitchToManager
+  onSwitchToManager,
+  onSwitchToWarehouse
 }) => {
   return (
     <aside className="fleet-sidebar driver-sidebar">
@@ -126,6 +127,18 @@ export const DriverSidebar = ({
           title="Switch role view to Fleet Manager"
         >
           <span>Switch to Fleet Manager</span>
+        </button>
+      )}
+
+      {/* Switch to Warehouse Manager */}
+      {onSwitchToWarehouse && (
+        <button
+          className="portal-switch-action-btn"
+          style={{ marginTop: 6 }}
+          onClick={onSwitchToWarehouse}
+          title="Switch role view to Warehouse Manager"
+        >
+          <span>Switch to Warehouse OS</span>
         </button>
       )}
 
