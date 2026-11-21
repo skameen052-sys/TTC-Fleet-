@@ -450,7 +450,12 @@ export default function App() {
 
   // Page title mapping for Warehouse
   const activeWarehouseNavItem = warehouseNavItems.find(item => item.id === warehouseActiveTab || (item.subItems && item.subItems.some(sub => sub.id === warehouseActiveTab)));
-  const warehousePageTitle = warehouseActiveTab === 'dashboard' ? 'Warehouse Manager Dashboard' : `${activeWarehouseNavItem?.label || 'Warehouse OS'} - Fleet360`;
+  const activeWarehouseSubItem = activeWarehouseNavItem?.subItems?.find(sub => sub.id === warehouseActiveTab);
+  const warehousePageTitle = warehouseActiveTab === 'dashboard'
+    ? 'Warehouse Manager Dashboard'
+    : activeWarehouseSubItem
+      ? `${activeWarehouseSubItem.label} • ${activeWarehouseNavItem.label}`
+      : `${activeWarehouseNavItem?.label || 'Warehouse OS'} - Fleet360`;
 
   // If not authenticated or login tab selected, render dedicated LoginPage
   if (!isAuthenticated || activeTab === 'login') {
@@ -749,6 +754,8 @@ export default function App() {
                 {['warehouses', 'all-warehouses', 'add-warehouse', 'edit-warehouse'].includes(warehouseActiveTab) && (
                   <WarehouseManagementView
                     warehouses={warehouseData.warehouses || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onOpenAddWarehouse={() => setIsAddWarehouseOpen(true)}
                   />
                 )}
@@ -756,6 +763,8 @@ export default function App() {
                 {['inventory', 'all-inventory', 'add-items', 'stock-details'].includes(warehouseActiveTab) && (
                   <InventoryManagementView
                     inventory={warehouseData.inventory || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onOpenAddInventory={() => setIsAddInventoryOpen(true)}
                   />
                 )}
@@ -763,6 +772,8 @@ export default function App() {
                 {['goods-receiving', 'incoming-goods', 'receiving-confirmation'].includes(warehouseActiveTab) && (
                   <GoodsReceivingView
                     incomingGoods={warehouseData.incomingGoods || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onConfirmReceiving={handleConfirmReceiving}
                   />
                 )}
@@ -770,6 +781,8 @@ export default function App() {
                 {['goods-dispatch', 'outgoing-goods', 'dispatch-records'].includes(warehouseActiveTab) && (
                   <GoodsDispatchView
                     outgoingGoods={warehouseData.outgoingGoods || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onConfirmDispatch={handleConfirmDispatch}
                     onOpenCreateDispatch={() => setIsCreateDispatchOpen(true)}
                   />
@@ -779,6 +792,8 @@ export default function App() {
                   <StockInView
                     inventory={warehouseData.inventory || []}
                     stockMovement={warehouseData.stockMovement || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onOpenStockIn={() => setIsStockInOpen(true)}
                   />
                 )}
@@ -787,6 +802,8 @@ export default function App() {
                   <StockOutView
                     inventory={warehouseData.inventory || []}
                     stockMovement={warehouseData.stockMovement || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onOpenStockOut={() => setIsStockOutOpen(true)}
                   />
                 )}
@@ -795,18 +812,24 @@ export default function App() {
                   <ShipmentManagementView
                     incomingGoods={warehouseData.incomingGoods || []}
                     outgoingGoods={warehouseData.outgoingGoods || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                   />
                 )}
 
                 {['loading-management', 'loading-schedule', 'loading-confirmation'].includes(warehouseActiveTab) && (
                   <LoadingManagementView
                     loadingSchedule={warehouseData.loadingSchedule || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                   />
                 )}
 
                 {['unloading-management', 'unloading-schedule', 'unloading-confirmation'].includes(warehouseActiveTab) && (
                   <UnloadingManagementView
                     loadingSchedule={warehouseData.loadingSchedule || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                   />
                 )}
 
@@ -820,6 +843,8 @@ export default function App() {
                 {['damaged-goods', 'damaged-stock', 'damage-reports'].includes(warehouseActiveTab) && (
                   <DamagedGoodsView
                     damagedGoods={warehouseData.damagedGoods || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onOpenReportDamaged={() => setIsReportDamagedOpen(true)}
                   />
                 )}
@@ -828,18 +853,24 @@ export default function App() {
                   <InventoryReportsView
                     inventory={warehouseData.inventory || []}
                     warehouses={warehouseData.warehouses || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                   />
                 )}
 
                 {['notifications', 'low-stock-alerts', 'pending-dispatch-alerts'].includes(warehouseActiveTab) && (
                   <WarehouseNotificationsView
                     alerts={warehouseData.alerts || []}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                   />
                 )}
 
                 {['profile', 'personal-profile', 'change-password'].includes(warehouseActiveTab) && (
                   <WarehouseProfileView
                     user={currentUser}
+                    activeSubTab={warehouseActiveTab}
+                    onSelectTab={setWarehouseActiveTab}
                     onLogout={handleLogout}
                   />
                 )}

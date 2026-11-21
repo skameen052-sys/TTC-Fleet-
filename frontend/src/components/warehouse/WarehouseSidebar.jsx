@@ -192,6 +192,19 @@ export const WarehouseSidebar = ({
     profile: false
   });
 
+  // Auto-expand parent section when activeTab is one of its sub-items
+  React.useEffect(() => {
+    const parentItem = warehouseNavItems.find(item =>
+      item.subItems && item.subItems.some(sub => sub.id === activeTab)
+    );
+    if (parentItem) {
+      setExpandedMenus(prev => ({
+        ...prev,
+        [parentItem.id]: true
+      }));
+    }
+  }, [activeTab]);
+
   const toggleSubmenu = (itemId, e) => {
     e.stopPropagation();
     setExpandedMenus(prev => ({
@@ -202,10 +215,9 @@ export const WarehouseSidebar = ({
 
   const handleNavClick = (item) => {
     if (item.subItems && item.subItems.length > 0) {
-      // Toggle expanded and select primary sub-item or item ID
       setExpandedMenus(prev => ({
         ...prev,
-        [item.id]: !prev[item.id]
+        [item.id]: true
       }));
       onSelectTab(item.subItems[0].id);
     } else {
