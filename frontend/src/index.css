@@ -36,6 +36,12 @@
   padding: 0;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--main-background);
@@ -54,6 +60,9 @@ body {
   min-height: 100vh;
   background-color: var(--main-background);
   position: relative;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 .main-wrapper {
@@ -62,6 +71,9 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  max-width: calc(100vw - var(--sidebar-width));
+  width: calc(100vw - var(--sidebar-width));
+  overflow-x: hidden;
   background-color: var(--main-background);
 }
 
@@ -70,6 +82,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 22px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-content {
+    padding: 16px 20px 36px 20px;
+  }
 }
 
 /* ==========================================================================
@@ -565,9 +585,9 @@ body {
 .hero-image-wrap {
   position: relative;
   flex: 1.25;
-  min-width: 460px;
+  min-width: 0;
   height: 100%;
-  min-height: 240px;
+  min-height: 200px;
   overflow: hidden;
 }
 
@@ -3805,20 +3825,33 @@ body {
   flex-shrink: 0;
 }
 
-@media (max-width: 1380px) {
-  .warehouse-header .header-search-wrapper {
-    width: 160px;
-  }
-}
-
-@media (max-width: 1240px) {
+@media (max-width: 1320px) {
   .warehouse-header .header-search-wrapper {
     display: none;
   }
 }
 
-@media (max-width: 1060px) {
+@media (max-width: 1220px) {
   .warehouse-header .header-datetime-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .warehouse-header {
+    padding: 0 16px;
+  }
+  .warehouse-header .header-page-title {
+    font-size: 17px;
+  }
+  .warehouse-header .driver-trip-telemetry-pill .pill-status-text,
+  .warehouse-header .driver-trip-telemetry-pill .pill-eta-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .warehouse-header .driver-trip-telemetry-pill {
     display: none;
   }
 }
