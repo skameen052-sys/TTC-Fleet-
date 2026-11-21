@@ -1,11 +1,9 @@
 import React from 'react';
 import {
   LayoutDashboard,
-  Navigation,
-  Activity,
-  History,
   Truck,
   MapPin,
+  Route,
   PackageCheck,
   PackageX,
   Boxes,
@@ -14,18 +12,19 @@ import {
   FileText,
   Bell,
   User,
-  LogOut,
+  ShieldCheck,
   Radio,
-  ShieldCheck
+  LogOut,
+  Warehouse,
+  Shield
 } from 'lucide-react';
 
 export const driverNavItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'my-trips', label: 'My Trips', icon: Navigation, badge: '4' },
-  { id: 'active-trip', label: 'Active Trip', icon: Activity, live: true },
-  { id: 'trip-history', label: 'Trip History', icon: History },
+  { id: 'dashboard', label: 'Driver Dashboard', icon: LayoutDashboard },
+  { id: 'my-trips', label: 'My Trips', icon: Truck, badge: '1', badgeType: 'active' },
+  { id: 'active-trip', label: 'Active Trip', icon: MapPin, liveBadge: true },
   { id: 'my-vehicle', label: 'My Vehicle', icon: Truck },
-  { id: 'route-nav', label: 'Route & Navigation', icon: MapPin },
+  { id: 'route-nav', label: 'Route Navigation', icon: Route },
   { id: 'pickup', label: 'Pickup Management', icon: PackageCheck },
   { id: 'delivery', label: 'Delivery Management', icon: PackageX },
   { id: 'shipment', label: 'Shipment Details', icon: Boxes },
@@ -42,7 +41,8 @@ export const DriverSidebar = ({
   driver,
   onLogout,
   onSwitchToManager,
-  onSwitchToWarehouse
+  onSwitchToWarehouse,
+  onSwitchPortal
 }) => {
   return (
     <aside className="fleet-sidebar driver-sidebar">
@@ -84,21 +84,14 @@ export const DriverSidebar = ({
               <Icon className="btn-icon" size={18} strokeWidth={isActive ? 2.5 : 2} />
               <span>{item.label}</span>
 
-              {item.live && (
+              {item.liveBadge && (
                 <span className="nav-live-pill">
-                  <span className="pulse-circle" style={{ width: 6, height: 6 }} /> ON TRIP
+                  <span className="live-dot" /> LIVE
                 </span>
               )}
 
-              {item.badge && !item.live && (
-                <span
-                  className="nav-badge-pill"
-                  style={
-                    item.badgeType === 'alert'
-                      ? { backgroundColor: '#EF5350', color: '#FFFFFF' }
-                      : {}
-                  }
-                >
+              {item.badge && !item.liveBadge && (
+                <span className={`nav-badge-pill ${item.badgeType === 'alert' ? 'badge-alert' : ''}`}>
                   {item.badge}
                 </span>
               )}
@@ -119,28 +112,42 @@ export const DriverSidebar = ({
         <Radio size={16} color="#16A36A" />
       </div>
 
-      {/* Switch to Fleet Manager (Evaluator Shortcut) */}
-      {onSwitchToManager && (
-        <button
-          className="portal-switch-action-btn"
-          onClick={onSwitchToManager}
-          title="Switch role view to Fleet Manager"
-        >
-          <span>Switch to Fleet Manager</span>
-        </button>
-      )}
-
-      {/* Switch to Warehouse Manager */}
-      {onSwitchToWarehouse && (
-        <button
-          className="portal-switch-action-btn"
-          style={{ marginTop: 6 }}
-          onClick={onSwitchToWarehouse}
-          title="Switch role view to Warehouse Manager"
-        >
-          <span>Switch to Warehouse OS</span>
-        </button>
-      )}
+      {/* Switch Portal Buttons */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
+        {onSwitchPortal && (
+          <button
+            className="sidebar-switcher-btn"
+            style={{ background: 'rgba(255,122,26,0.12)', border: '1px solid rgba(255,122,26,0.3)', color: '#FF9E4A' }}
+            onClick={() => onSwitchPortal('admin')}
+            title="Switch to Admin Dashboard"
+          >
+            <Shield size={14} color="#FF7A1A" />
+            <span>Switch to Admin Dashboard</span>
+          </button>
+        )}
+        {(onSwitchPortal || onSwitchToManager) && (
+          <button
+            className="sidebar-switcher-btn"
+            style={{ background: 'rgba(0,163,255,0.12)', border: '1px solid rgba(0,163,255,0.3)', color: '#00d2ff' }}
+            onClick={() => onSwitchPortal ? onSwitchPortal('manager') : onSwitchToManager()}
+            title="Switch to Fleet Manager"
+          >
+            <Truck size={14} color="#00d2ff" />
+            <span>Switch to Fleet Manager</span>
+          </button>
+        )}
+        {(onSwitchPortal || onSwitchToWarehouse) && (
+          <button
+            className="sidebar-switcher-btn"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#cbd5e1' }}
+            onClick={() => onSwitchPortal ? onSwitchPortal('warehouse') : onSwitchToWarehouse()}
+            title="Switch to Warehouse OS"
+          >
+            <Warehouse size={14} />
+            <span>Switch to Warehouse OS</span>
+          </button>
+        )}
+      </div>
 
       {/* Logout Action */}
       <button

@@ -16,7 +16,8 @@ import {
   User,
   Radio,
   LogOut,
-  Warehouse
+  Warehouse,
+  Shield
 } from 'lucide-react';
 
 export const navigationItems = [
@@ -36,7 +37,16 @@ export const navigationItems = [
   { id: 'profile', label: 'My Profile', icon: User }
 ];
 
-export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCount, onLogout, onSwitchToDriver, onSwitchToWarehouse }) => {
+export const Sidebar = ({
+  activeTab,
+  onSelectTab,
+  metrics,
+  unreadNotificationsCount,
+  onLogout,
+  onSwitchToDriver,
+  onSwitchToWarehouse,
+  onSwitchPortal
+}) => {
   const getBadgeValue = (item) => {
     if (item.badgeKey === 'vehicles') return metrics?.totalVehicles || 16;
     if (item.badgeKey === 'available') return metrics?.availableVehicles || 4;
@@ -57,7 +67,7 @@ export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCo
           <span className="brand-app-name">
             TTC FLEET<span className="orange-accent-text">360</span>
           </span>
-          <span className="brand-sub-badge">ENTERPRISE FLEET OS</span>
+          <span className="brand-sub-badge">FLEET OPERATIONS OS</span>
         </div>
       </div>
 
@@ -79,7 +89,7 @@ export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCo
 
               {item.liveBadge && (
                 <span className="nav-live-pill">
-                  <span className="pulse-circle" style={{ width: 6, height: 6 }} /> LIVE
+                  <span className="live-dot" /> LIVE
                 </span>
               )}
 
@@ -103,29 +113,42 @@ export const Sidebar = ({ activeTab, onSelectTab, metrics, unreadNotificationsCo
         <Radio size={16} color="#16A36A" />
       </div>
 
-      {/* Portal Switcher Button */}
-      {onSwitchToDriver && (
-        <button
-          className="sidebar-switcher-btn"
-          onClick={onSwitchToDriver}
-          title="Switch to Driver Portal"
-        >
-          <Truck size={15} color="#FF7A1A" />
-          <span>Switch to Driver Portal</span>
-        </button>
-      )}
-
-      {onSwitchToWarehouse && (
-        <button
-          className="sidebar-switcher-btn"
-          style={{ marginTop: 6 }}
-          onClick={onSwitchToWarehouse}
-          title="Switch to Warehouse Manager Portal"
-        >
-          <Warehouse size={15} color="#FF7A1A" />
-          <span>Switch to Warehouse OS</span>
-        </button>
-      )}
+      {/* Portal Switcher Buttons */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
+        {onSwitchPortal && (
+          <button
+            className="sidebar-switcher-btn"
+            style={{ background: 'rgba(255,122,26,0.12)', border: '1px solid rgba(255,122,26,0.3)', color: '#FF9E4A' }}
+            onClick={() => onSwitchPortal('admin')}
+            title="Switch to Admin Dashboard"
+          >
+            <Shield size={14} color="#FF7A1A" />
+            <span>Switch to Admin Dashboard</span>
+          </button>
+        )}
+        {(onSwitchPortal || onSwitchToDriver) && (
+          <button
+            className="sidebar-switcher-btn"
+            style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', color: '#10B981' }}
+            onClick={() => onSwitchPortal ? onSwitchPortal('driver') : onSwitchToDriver()}
+            title="Switch to Driver Portal"
+          >
+            <Truck size={14} color="#10B981" />
+            <span>Switch to Driver Portal</span>
+          </button>
+        )}
+        {(onSwitchPortal || onSwitchToWarehouse) && (
+          <button
+            className="sidebar-switcher-btn"
+            style={{ background: 'rgba(0,163,255,0.12)', border: '1px solid rgba(0,163,255,0.3)', color: '#00d2ff' }}
+            onClick={() => onSwitchPortal ? onSwitchPortal('warehouse') : onSwitchToWarehouse()}
+            title="Switch to Warehouse Portal"
+          >
+            <Warehouse size={14} color="#00d2ff" />
+            <span>Switch to Warehouse OS</span>
+          </button>
+        )}
+      </div>
 
       {/* Logout Action */}
       <button
