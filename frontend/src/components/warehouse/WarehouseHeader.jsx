@@ -43,7 +43,6 @@ export const WarehouseHeader = ({
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
         hour12: true
       };
       setCurrentDateTime(now.toLocaleDateString('en-US', options));
@@ -85,9 +84,9 @@ export const WarehouseHeader = ({
 
       {/* Middle & Right Navigation Elements */}
       <div className="header-right-col">
-        {/* Search Input */}
-        <div className="header-search-box">
-          <Search size={16} color="#718096" />
+        {/* Global Search Input */}
+        <div className="header-search-wrapper">
+          <Search className="header-search-icon" size={16} />
           <input
             type="text"
             className="header-search-input"
@@ -95,7 +94,7 @@ export const WarehouseHeader = ({
             value={searchQuery || ''}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
           />
-          <kbd className="header-search-shortcut">/</kbd>
+          <kbd className="header-search-kbd">/</kbd>
         </div>
 
         {/* Live Warehouse Telemetry Pill */}

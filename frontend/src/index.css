@@ -89,6 +89,25 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 24px 16px 20px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.fleet-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fleet-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fleet-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+}
+
+.fleet-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 122, 26, 0.6);
 }
 
 /* Logo Brand Header */
@@ -356,6 +375,8 @@ body {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--primary-navy);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Search Wrapper */
@@ -2166,6 +2187,8 @@ body {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .driver-trip-telemetry-pill:hover {
@@ -3690,6 +3713,133 @@ body {
   .form-grid-3col {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================================================
+   WAREHOUSE MANAGER PORTAL - HEADER, SIDEBAR & HERO BANNER REFINEMENTS
+   ========================================================================== */
+.warehouse-header {
+  min-height: 72px;
+  height: 72px;
+  padding: 0 32px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 1px 3px rgba(20, 33, 61, 0.04);
+}
+
+.warehouse-header .header-left-col {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.warehouse-header .header-page-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary-navy);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.warehouse-header .driver-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent-orange);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.warehouse-header .header-right-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.warehouse-header .header-search-wrapper {
+  position: relative;
+  width: 220px;
+  flex-shrink: 1;
+}
+
+.warehouse-header .header-search-wrapper .header-search-input {
+  width: 100%;
+  padding: 7px 32px 7px 34px;
+  font-size: 12.5px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  background-color: #F8FAFC;
+  color: var(--primary-text);
+  transition: all 0.2s ease;
+}
+
+.warehouse-header .header-search-wrapper .header-search-input:focus {
+  background-color: #FFFFFF;
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.15);
+}
+
+.warehouse-header .driver-trip-telemetry-pill {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.warehouse-header .header-datetime-pill {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.warehouse-header .header-profile-pill {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1380px) {
+  .warehouse-header .header-search-wrapper {
+    width: 160px;
+  }
+}
+
+@media (max-width: 1240px) {
+  .warehouse-header .header-search-wrapper {
+    display: none;
+  }
+}
+
+@media (max-width: 1060px) {
+  .warehouse-header .header-datetime-pill {
+    display: none;
+  }
+}
+
+/* Warehouse Sidebar Specifics */
+.warehouse-sidebar .sidebar-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.warehouse-sidebar .nav-item-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.warehouse-hero-container {
+  min-height: 210px;
+  margin-bottom: 24px;
 }
 
 

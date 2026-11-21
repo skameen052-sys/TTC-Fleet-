@@ -69,27 +69,31 @@ export const WarehouseDashboard = ({
       {/* ===================================================================
           1. HERO BANNER - WAREHOUSE LOGISTICS THEME
           =================================================================== */}
-      <section className="fleet-hero-banner" style={{ minHeight: '190px' }}>
-        <div className="hero-content-col">
-          <div className="hero-badge-pill" style={{ background: 'rgba(255, 122, 26, 0.25)', border: '1px solid rgba(255, 122, 26, 0.5)' }}>
+      <section className="fleet-hero-container warehouse-hero-container" style={{ minHeight: '210px', marginBottom: '24px' }}>
+        <div className="hero-content-left" style={{ maxWidth: '520px', zIndex: 3 }}>
+          <div className="hero-badge-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255, 122, 26, 0.22)', border: '1px solid rgba(255, 122, 26, 0.5)', padding: '4px 12px', borderRadius: 20, marginBottom: 12, width: 'fit-content' }}>
             <Warehouse size={13} color="#FF7A1A" />
-            <span style={{ color: '#FFB37C', fontWeight: '800' }}>TTC WAREHOUSE OS • ENTERPRISE LOGISTICS</span>
+            <span style={{ color: '#FFB37C', fontWeight: '800', fontSize: '11px', letterSpacing: '0.04em' }}>TTC WAREHOUSE OS • ENTERPRISE LOGISTICS</span>
           </div>
-          <h2 className="hero-heading">
-            Welcome Back, <span className="highlight-orange">Warehouse Manager!</span>
-          </h2>
-          <p className="hero-subtext">
+          <div className="hero-heading-wrap">
+            <h1 className="hero-welcome-title" style={{ fontSize: '26px' }}>Welcome back,</h1>
+            <h2 className="hero-manager-title" style={{ fontSize: '28px', color: '#FF7A1A' }}>Warehouse Manager!</h2>
+          </div>
+          <p className="hero-description" style={{ fontSize: '13.5px', marginTop: '8px' }}>
             Optimize storage. Accelerate dispatch. Master inventory operations across all regional distribution hubs.
           </p>
         </div>
 
-        <div className="hero-image-col">
+        <div className="hero-image-wrap" style={{ flex: '1.25', minWidth: '380px' }}>
           <img
-            src="/assets/manager-login-4k.jpg"
-            alt="Warehouse Loading Bays & Operations"
-            className="hero-truck-image"
+            src="/assets/manager-hero-4k.jpg"
+            alt="Warehouse Loading Bays & Logistics Operations"
+            className="hero-banner-img"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center right' }}
           />
+          <div className="hero-gradient-overlay" />
         </div>
+        <div className="hero-orange-glow-curve" />
       </section>
 
       {/* ===================================================================

@@ -244,7 +244,7 @@ export const WarehouseSidebar = ({
       <div className="sidebar-section-label">Warehouse Operations</div>
 
       {/* Main Navigation List */}
-      <nav className="sidebar-nav-list" style={{ overflowY: 'auto', flex: 1 }}>
+      <nav className="sidebar-nav-list">
         {warehouseNavItems.map((item) => {
           const Icon = item.icon;
           const isItemActive = activeTab === item.id || (item.subItems && item.subItems.some(sub => sub.id === activeTab));
@@ -309,50 +309,53 @@ export const WarehouseSidebar = ({
         })}
       </nav>
 
-      {/* WMS Telemetry Pill */}
-      <div className="telemetry-sidebar-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span className="pulse-circle" />
-          <div>
-            <div className="telemetry-card-title">WMS GATEWAY ACTIVE</div>
-            <div className="telemetry-card-sub">CHI-01 • 82% Capacity</div>
+      {/* Sidebar Footer Elements */}
+      <div className="sidebar-footer-group" style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* WMS Telemetry Pill */}
+        <div className="telemetry-sidebar-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="pulse-circle" />
+            <div>
+              <div className="telemetry-card-title">WMS GATEWAY ACTIVE</div>
+              <div className="telemetry-card-sub">CHI-01 • 82% Capacity</div>
+            </div>
           </div>
+          <Radio size={16} color="#16A36A" />
         </div>
-        <Radio size={16} color="#16A36A" />
-      </div>
 
-      {/* Switchers to Other Portals */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {onSwitchToManager && (
-          <button
-            className="portal-switch-action-btn"
-            onClick={onSwitchToManager}
-            title="Switch to Fleet Manager Portal"
-          >
-            <span>Switch to Fleet Manager</span>
-          </button>
-        )}
-        {onSwitchToDriver && (
-          <button
-            className="portal-switch-action-btn"
-            style={{ marginTop: 0 }}
-            onClick={onSwitchToDriver}
-            title="Switch to Driver Portal"
-          >
-            <span>Switch to Driver Portal</span>
-          </button>
-        )}
-      </div>
+        {/* Switchers to Other Portals */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {onSwitchToManager && (
+            <button
+              className="portal-switch-action-btn"
+              onClick={onSwitchToManager}
+              title="Switch to Fleet Manager Portal"
+            >
+              <span>Switch to Fleet Manager</span>
+            </button>
+          )}
+          {onSwitchToDriver && (
+            <button
+              className="portal-switch-action-btn"
+              style={{ marginTop: 0 }}
+              onClick={onSwitchToDriver}
+              title="Switch to Driver Portal"
+            >
+              <span>Switch to Driver Portal</span>
+            </button>
+          )}
+        </div>
 
-      {/* Logout Action */}
-      <button
-        className="sidebar-logout-btn"
-        onClick={onLogout}
-        title="Sign Out of Warehouse OS"
-      >
-        <LogOut size={16} />
-        <span>Logout</span>
-      </button>
+        {/* Logout Action */}
+        <button
+          className="sidebar-logout-btn"
+          onClick={onLogout}
+          title="Sign Out of Warehouse OS"
+        >
+          <LogOut size={16} />
+          <span>Logout</span>
+        </button>
+      </div>
 
       {/* Ambient Orange Glow */}
       <div className="sidebar-ambient-glow" />
