@@ -480,7 +480,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               src="/assets/warehouse-manager-login.webp"
               alt="TTC Fleet360 Enterprise Warehouse Operations"
               className="login-hero-img-display"
-              style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+              style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = '/assets/manager-hero-4k.jpg';
@@ -488,6 +488,30 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
             />
             <div className="manager-hero-gradient-overlay" />
             <div className="manager-hero-content">
+              <div
+                className="login-hero-tag"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  width: 'fit-content',
+                  maxWidth: 'fit-content',
+                  alignSelf: 'flex-start',
+                  background: 'rgba(255, 122, 26, 0.22)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 122, 26, 0.55)',
+                  padding: '6px 14px',
+                  borderRadius: 24,
+                  marginBottom: 12,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+                }}
+              >
+                <Forklift size={15} color="#FF7A1A" strokeWidth={2.4} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#FFB37C', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  WAREHOUSE MANAGEMENT SYSTEM (WMS)
+                </span>
+              </div>
+
               <div className="manager-hero-titles">
                 <h2 className="manager-hero-h2">
                   Streamline Warehousing.<br />

@@ -253,52 +253,77 @@ export const WarehouseLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
         </div>
       </div>
 
-      {/* RIGHT SECTION - HERO IMAGE WITH WAREHOUSE LOGISTICS DOCKS */}
-      <div className="login-hero-pane">
-        <div
-          className="login-hero-bg-image"
-          style={{ backgroundImage: `url('/assets/warehouse-manager-login.webp')`, backgroundPosition: 'center 20%' }}
-        />
-        <div className="login-hero-gradient-overlay" />
+      {/* RIGHT SECTION - ULTRA 4K HERO IMAGE */}
+      <div className="login-hero-section">
+        <div className="manager-hero-container fade-in">
+          <img
+            src="/assets/warehouse-manager-login.webp"
+            alt="TTC Fleet360 Enterprise Warehouse Operations"
+            className="login-hero-img-display"
+            style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
+          />
+          {/* Dark gradient overlay for text readability */}
+          <div className="manager-hero-gradient-overlay" />
 
-        {/* Marketing Content */}
-        <div className="login-hero-content">
-          <div className="login-hero-tag">
-            <Forklift size={16} color="#FF7A1A" />
-            <span>WAREHOUSE MANAGEMENT SYSTEM (WMS)</span>
-          </div>
-
-          <h2 className="login-hero-title">
-            Optimize Storage. <br />
-            Accelerate Dispatch. <br />
-            <span className="hero-accent-text">Master Inventory.</span>
-          </h2>
-
-          <p className="login-hero-description">
-            Real-time cross-dock receiving, automated stock replenishment, and multi-facility warehouse operations — all in one unified enterprise platform.
-          </p>
-
-          {/* 3 Value Proposition Features */}
-          <div className="login-hero-features-grid">
-            <div className="hero-feature-pill">
-              <div className="feature-icon-box">
-                <Boxes size={18} color="#FF7A1A" />
-              </div>
-              <span>Real-Time Inventory & SKU Control</span>
+          {/* Warehouse Marketing Content */}
+          <div className="manager-hero-content">
+            <div
+              className="login-hero-tag"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                width: 'fit-content',
+                maxWidth: 'fit-content',
+                alignSelf: 'flex-start',
+                background: 'rgba(255, 122, 26, 0.22)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 122, 26, 0.55)',
+                padding: '6px 14px',
+                borderRadius: 24,
+                marginBottom: 14,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+              }}
+            >
+              <Forklift size={15} color="#FF7A1A" strokeWidth={2.4} />
+              <span style={{ fontSize: 11.5, fontWeight: 800, color: '#FFB37C', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                WAREHOUSE MANAGEMENT SYSTEM (WMS)
+              </span>
             </div>
 
-            <div className="hero-feature-pill">
-              <div className="feature-icon-box">
-                <Forklift size={18} color="#FF7A1A" />
-              </div>
-              <span>Intelligent Dock & Bay Scheduling</span>
+            <div className="manager-hero-titles">
+              <h2 className="manager-hero-h2">
+                Optimize Storage. <br />
+                Accelerate Dispatch. <br />
+                <span className="orange-highlight-text">Master Inventory.</span>
+              </h2>
+              <p className="manager-hero-p">
+                Real-time cross-dock receiving, automated stock replenishment, and multi-facility warehouse operations — all in one unified enterprise platform.
+              </p>
             </div>
 
-            <div className="hero-feature-pill">
-              <div className="feature-icon-box">
-                <ArrowLeftRight size={18} color="#FF7A1A" />
+            {/* 3 Value Proposition Features */}
+            <div className="manager-hero-pills-row">
+              <div className="manager-feature-pill">
+                <div className="pill-icon-circle">
+                  <Boxes size={15} color="#FF7A1A" />
+                </div>
+                <span>Real-Time Inventory & SKU Control</span>
               </div>
-              <span>Seamless Inter-Warehouse Transfers</span>
+
+              <div className="manager-feature-pill">
+                <div className="pill-icon-circle">
+                  <Forklift size={15} color="#FF7A1A" />
+                </div>
+                <span>Intelligent Dock & Bay Scheduling</span>
+              </div>
+
+              <div className="manager-feature-pill">
+                <div className="pill-icon-circle">
+                  <ArrowLeftRight size={15} color="#FF7A1A" />
+                </div>
+                <span>Seamless Inter-Warehouse Transfers</span>
+              </div>
             </div>
           </div>
         </div>
