@@ -949,12 +949,117 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
         )}
 
         {selectedPortal === 'driver' && (
-          <img
-            key="driver-hero-4k-img"
-            src="/assets/driver-hero-4k.jpg"
-            alt="TTC Fleet360 Driver Dispatch System 4K"
-            className="login-hero-img-display fade-in"
-          />
+          <div className="manager-hero-container fade-in">
+            <img
+              src="/assets/driver-hero-volvo.jpg"
+              alt="TTC Fleet360 Volvo Highway Linehaul Fleet"
+              className="login-hero-img-display"
+              style={{ objectFit: 'cover', objectPosition: 'center 38%' }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/assets/driver-hero-4k.jpg';
+              }}
+            />
+            <div
+              className="manager-hero-gradient-overlay"
+              style={{
+                background: 'linear-gradient(180deg, rgba(8, 15, 30, 0.15) 0%, rgba(10, 20, 40, 0.45) 45%, rgba(5, 10, 22, 0.94) 100%)'
+              }}
+            />
+            <div
+              className="manager-hero-content"
+              style={{
+                background: 'linear-gradient(180deg, rgba(10, 16, 32, 0) 0%, rgba(8, 14, 28, 0.75) 25%, rgba(6, 12, 24, 0.92) 100%)',
+                backdropFilter: 'blur(4px)',
+                borderRadius: '16px',
+                padding: '20px 24px',
+                boxShadow: '0 -10px 25px rgba(0,0,0,0.3)'
+              }}
+            >
+              <div
+                className="login-hero-tag"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  width: 'fit-content',
+                  maxWidth: 'fit-content',
+                  alignSelf: 'flex-start',
+                  background: 'rgba(255, 122, 26, 0.28)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 122, 26, 0.65)',
+                  padding: '6px 14px',
+                  borderRadius: 24,
+                  marginBottom: 10,
+                  boxShadow: '0 4px 16px rgba(255, 122, 26, 0.35)'
+                }}
+              >
+                <Truck size={15} color="#FF7A1A" strokeWidth={2.4} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#FFB37C', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  DRIVER DISPATCH & TELEMATICS (DDS)
+                </span>
+              </div>
+
+              <div className="manager-hero-titles">
+                <h2
+                  className="manager-hero-h2"
+                  style={{ textShadow: '0 2px 14px rgba(0, 0, 0, 0.9)' }}
+                >
+                  Your Journey. Your Fleet.<br />
+                  <span
+                    className="h2-gradient"
+                    style={{
+                      background: 'linear-gradient(90deg, #FF7A1A, #FFA34D, #FFC285)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      textShadow: '0 2px 20px rgba(255, 122, 26, 0.3)'
+                    }}
+                  >
+                    Your Success on the Road.
+                  </span>
+                </h2>
+                <p
+                  className="manager-hero-p"
+                  style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.85)', color: '#cbd5e1' }}
+                >
+                  Real-time trip assignments, turn-by-turn linehaul GPS navigation, pre-trip vehicle inspections, and instant electronic proof of delivery (e-POD).
+                </p>
+              </div>
+
+              <div className="manager-feature-pills">
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 122, 26, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#FF7A1A' }} /> Live Trip Assignments & Milestone HUD
+                </div>
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(16, 185, 129, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#10b981' }} /> Digital Pre-Trip Inspection & Bay Sign-off
+                </div>
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(56, 189, 248, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#38bdf8' }} /> Verified Electronic Proof of Delivery (e-POD)
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {selectedPortal === 'manager' && (
