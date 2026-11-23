@@ -659,6 +659,120 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
           </div>
         )}
 
+        {selectedPortal === 'billing' && (
+          <div className="manager-hero-container fade-in">
+            <img
+              src="/assets/finance-hero.jpg"
+              alt="TTC Fleet360 Financial Intelligence, Invoicing & Cashflow OS"
+              className="login-hero-img-display"
+              style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/assets/manager-hero-4k.jpg';
+              }}
+            />
+            <div
+              className="manager-hero-gradient-overlay"
+              style={{
+                background: 'linear-gradient(180deg, rgba(8, 15, 30, 0.15) 0%, rgba(10, 20, 40, 0.45) 45%, rgba(5, 10, 22, 0.94) 100%)'
+              }}
+            />
+            <div
+              className="manager-hero-content"
+              style={{
+                background: 'linear-gradient(180deg, rgba(10, 16, 32, 0) 0%, rgba(8, 14, 28, 0.75) 25%, rgba(6, 12, 24, 0.92) 100%)',
+                backdropFilter: 'blur(4px)',
+                borderRadius: '16px',
+                padding: '20px 24px',
+                boxShadow: '0 -10px 25px rgba(0,0,0,0.3)'
+              }}
+            >
+              <div
+                className="login-hero-tag"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  width: 'fit-content',
+                  maxWidth: 'fit-content',
+                  alignSelf: 'flex-start',
+                  background: 'rgba(37, 99, 235, 0.32)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(56, 189, 248, 0.65)',
+                  padding: '6px 14px',
+                  borderRadius: 24,
+                  marginBottom: 10,
+                  boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)'
+                }}
+              >
+                <CreditCard size={15} color="#38bdf8" strokeWidth={2.4} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#bae6fd', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  FINANCIAL & BILLING MANAGEMENT (FBS)
+                </span>
+              </div>
+
+              <div className="manager-hero-titles">
+                <h2
+                  className="manager-hero-h2"
+                  style={{ textShadow: '0 2px 14px rgba(0, 0, 0, 0.9)' }}
+                >
+                  Accelerate Cashflow.<br />
+                  <span
+                    className="h2-gradient"
+                    style={{
+                      background: 'linear-gradient(90deg, #38bdf8, #60a5fa, #93c5fd)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      textShadow: '0 2px 20px rgba(56, 189, 248, 0.3)'
+                    }}
+                  >
+                    Precision Invoicing & Audits.
+                  </span>
+                </h2>
+                <p
+                  className="manager-hero-p"
+                  style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.85)', color: '#cbd5e1' }}
+                >
+                  Automated GST e-invoices, multi-gateway freight payment reconciliation, driver settlement accounts, and real-time P&L analytics.
+                </p>
+              </div>
+
+              <div className="manager-feature-pills">
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(56, 189, 248, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#38bdf8' }} /> Automated Freight e-Invoicing & GST Breakdown
+                </div>
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(16, 185, 129, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#10b981' }} /> RTGS, NEFT & Gateway Payment Reconciliation
+                </div>
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#f59e0b' }} /> Route-Level Margins & Fleet Operating P&L
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {selectedPortal === 'logistics' && (
           <div className="manager-hero-container fade-in">
             <img

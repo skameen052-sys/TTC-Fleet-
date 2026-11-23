@@ -392,47 +392,79 @@ export const BillingLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
         {/* Right Side: Visual Showcase Banner */}
         <div
           style={{
-            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
+            position: 'relative',
+            overflow: 'hidden',
             padding: '40px 36px',
             borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            backgroundColor: '#0a1020'
           }}
         >
-          <div>
+          {/* Background Hero Image */}
+          <img
+            src="/assets/finance-hero.jpg"
+            alt="TTC Fleet360 Financial Intelligence & Invoicing"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center 30%',
+              opacity: 0.45
+            }}
+          />
+          {/* Gradient Overlay */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.72) 0%, rgba(15, 23, 42, 0.82) 50%, rgba(10, 16, 32, 0.95) 100%)',
+              backdropFilter: 'blur(1px)'
+            }}
+          />
+
+          <div style={{ position: 'relative', zIndex: 2 }}>
             <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: 'rgba(37, 99, 235, 0.15)',
-                border: '1px solid rgba(37, 99, 235, 0.3)',
-                padding: '4px 10px',
+                background: 'rgba(37, 99, 235, 0.3)',
+                border: '1px solid rgba(56, 189, 248, 0.5)',
+                padding: '5px 12px',
                 borderRadius: '20px',
                 color: '#38bdf8',
                 fontSize: '11px',
                 fontWeight: 700,
-                marginBottom: '20px'
+                marginBottom: '18px',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)'
               }}
             >
-              <ShieldCheck size={13} />
-              <span>FINANCIAL INTELLIGENCE CLOUD</span>
+              <CreditCard size={13} color="#38bdf8" />
+              <span>FINANCIAL & BILLING MANAGEMENT (FBS)</span>
             </div>
 
-            <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#fff', margin: '0 0 12px 0', lineHeight: 1.3 }}>
-              Comprehensive Cashflow, Freight Invoicing & GST Tax Governance
+            <h2 style={{ fontSize: '23px', fontWeight: 800, color: '#fff', margin: '0 0 12px 0', lineHeight: 1.3, letterSpacing: '-0.3px' }}>
+              Accelerate Cashflow.<br />
+              <span style={{ background: 'linear-gradient(90deg, #38bdf8, #60a5fa, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Precision Invoicing & Audits.
+              </span>
             </h2>
             <p style={{ fontSize: '13px', color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>
               Automated reconciliation of freight bills, driver allowances, toll fees, vehicle OEM maintenance, and customer accounts receivable.
             </p>
 
             {/* Feature Cards List */}
-            <div style={{ marginTop: '28px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(56, 189, 248, 0.2)',
                   borderRadius: '10px',
                   padding: '12px 14px',
                   display: 'flex',
@@ -440,19 +472,20 @@ export const BillingLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
                   gap: '12px'
                 }}
               >
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(37, 99, 235, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(37, 99, 235, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Receipt size={16} color="#38bdf8" />
                 </div>
                 <div>
-                  <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#fff' }}>Automated e-Invoicing</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Instant GST-compliant tax invoices with QR & IRN</div>
+                  <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#fff' }}>Automated e-Invoicing & GST</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>Instant GST-compliant tax invoices with SAC 996511 codes</div>
                 </div>
               </div>
 
               <div
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
                   borderRadius: '10px',
                   padding: '12px 14px',
                   display: 'flex',
@@ -460,19 +493,20 @@ export const BillingLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
                   gap: '12px'
                 }}
               >
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <DollarSign size={16} color="#10b981" />
                 </div>
                 <div>
                   <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#fff' }}>Real-time Cashflow Audit</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Live reconciliation of RTGS, NEFT, ACH & Gateway receipts</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>Live reconciliation of RTGS, NEFT, ACH & Gateway receipts</div>
                 </div>
               </div>
 
               <div
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
                   borderRadius: '10px',
                   padding: '12px 14px',
                   display: 'flex',
@@ -480,12 +514,12 @@ export const BillingLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
                   gap: '12px'
                 }}
               >
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <PieChart size={16} color="#f59e0b" />
                 </div>
                 <div>
                   <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#fff' }}>Profit & Loss Telemetry</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Route-level and vehicle-level operating margins</div>
+                  <div style={{ fontSize: '11px', color: '#94a3b8' }}>Route-level and vehicle-level operating margins</div>
                 </div>
               </div>
             </div>
@@ -494,11 +528,13 @@ export const BillingLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
           {/* Security Badge */}
           <div
             style={{
+              position: 'relative',
+              zIndex: 2,
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
               fontSize: '11px',
-              color: '#64748b',
+              color: '#94a3b8',
               marginTop: '20px'
             }}
           >

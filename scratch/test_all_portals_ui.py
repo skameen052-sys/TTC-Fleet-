@@ -11,6 +11,21 @@ portals_to_test = [
         'screenshot': 'verify_login_page.png'
     },
     {
+        'id': 'finance_login_tab',
+        'name': 'Unified Login Page - Finance Tab Clicked',
+        'url': 'http://localhost:3000/',
+        'setup': """
+            localStorage.clear(); sessionStorage.clear();
+            window.location.href = 'http://localhost:3000/';
+            setTimeout(() => {
+                const btns = Array.from(document.querySelectorAll('.portal-pill-btn'));
+                const finBtn = btns.find(b => b.innerText.includes('Finance'));
+                if (finBtn) finBtn.click();
+            }, 800);
+        """,
+        'screenshot': 'verify_unified_finance_login.png'
+    },
+    {
         'id': 'admin',
         'name': 'Admin Dashboard',
         'url': 'http://localhost:3000/?portal=admin',
