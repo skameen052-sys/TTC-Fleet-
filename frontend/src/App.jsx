@@ -767,76 +767,20 @@ export default function App() {
   // =========================================================================
   if (portal === 'driver') {
     return (
-      <div className="app-container driver-portal-theme">
-        {/* Quick Portal Switcher Banner */}
-        <div style={{
-          backgroundColor: '#0F172A',
-          color: '#E2E8F0',
-          padding: '10px 24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '13px',
-          borderBottom: '1px solid #334155',
-          zIndex: 100
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
-            <strong style={{ color: '#10B981' }}>Driver Portal</strong>
-            <span style={{ color: '#94A3B8' }}>(Marcus Vance - Commercial CDL Pilot)</span>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => {
-                setPortal('admin');
-                setActiveTab('dashboard');
-              }}
-              style={{
-                backgroundColor: '#FF7A1A',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '6px 14px',
-                borderRadius: '6px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-            >
-              👑 Open Admin Dashboard
-            </button>
-            <button
-              onClick={() => {
-                setPortal('manager');
-                setActiveTab('dashboard');
-              }}
-              style={{
-                backgroundColor: '#00a3ff',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '6px 14px',
-                borderRadius: '6px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-            >
-              🚚 Open Fleet Manager
-            </button>
-          </div>
-        </div>
-
-        {/* Left Sidebar Navigation (Driver) */}
-        <DriverSidebar
-          activeTab={driverActiveTab}
-          onSelectTab={setDriverActiveTab}
-          driver={driverPortalData.driver}
-          onLogout={handleLogout}
-          onSwitchToManager={() => {
-            setPortal('manager');
-            setActiveTab('dashboard');
-          }}
-          onSwitchPortal={(p) => setPortal(p)}
-        />
+      <ErrorBoundary>
+        <div className="app-container driver-portal-theme">
+          {/* Left Sidebar Navigation (Driver) */}
+          <DriverSidebar
+            activeTab={driverActiveTab}
+            onSelectTab={setDriverActiveTab}
+            driver={driverPortalData.driver}
+            onLogout={handleLogout}
+            onSwitchToManager={() => {
+              setPortal('manager');
+              setActiveTab('dashboard');
+            }}
+            onSwitchPortal={(p) => setPortal(p)}
+          />
 
         {/* Main Content Wrapper */}
         <div className="main-wrapper">
@@ -997,103 +941,30 @@ export default function App() {
           </div>
         )}
       </div>
-    );
-  }
+    </ErrorBoundary>
+  );
+}
 
   // =========================================================================
   // 4. RENDER FLEET OPERATIONS MANAGER PORTAL
   // =========================================================================
   return (
-    <div className="app-container">
-      {/* Quick Portal Switcher Banner */}
-      <div style={{
-        backgroundColor: '#0d121f',
-        color: '#E2E8F0',
-        padding: '10px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        fontSize: '13px',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
-        zIndex: 100
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
-          <strong style={{ color: '#00d2ff' }}>Fleet Operations Manager Portal</strong>
-          <span style={{ color: '#94A3B8' }}>(16 Logistics Modules & 3D Cruising Telemetry)</span>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            onClick={() => {
-              setPortal('admin');
-              setActiveTab('dashboard');
-            }}
-            style={{
-              backgroundColor: '#FF7A1A',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '6px 14px',
-              borderRadius: '6px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-          >
-            👑 Open Admin Dashboard
-          </button>
-          <button
-            onClick={() => {
-              setPortal('driver');
-              setDriverActiveTab('dashboard');
-            }}
-            style={{
-              backgroundColor: '#10b981',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '6px 14px',
-              borderRadius: '6px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-          >
-            🧑‍✈️ Open Driver Portal
-          </button>
-          <button
-            onClick={() => {
-              setPortal('warehouse');
-              setWarehouseActiveTab('dashboard');
-            }}
-            style={{
-              backgroundColor: '#8b5cf6',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '6px 14px',
-              borderRadius: '6px',
-              fontWeight: '700',
-              cursor: 'pointer',
-              fontSize: '12px'
-            }}
-          >
-            🏭 Open Warehouse OS
-          </button>
-        </div>
-      </div>
-
-      {/* Left Sidebar Navigation (Fleet Manager) */}
-      <Sidebar
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-        metrics={summaryMetrics}
-        unreadNotificationsCount={unreadNotifsCount}
-        onLogout={handleLogout}
-        onSwitchToDriver={() => setPortal('driver')}
-        onSwitchToWarehouse={() => {
-          setPortal('warehouse');
-          setWarehouseActiveTab('dashboard');
-        }}
-        onSwitchPortal={(p) => setPortal(p)}
-      />
+    <ErrorBoundary>
+      <div className="app-container">
+        {/* Left Sidebar Navigation (Fleet Manager) */}
+        <Sidebar
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+          metrics={summaryMetrics}
+          unreadNotificationsCount={unreadNotifsCount}
+          onLogout={handleLogout}
+          onSwitchToDriver={() => setPortal('driver')}
+          onSwitchToWarehouse={() => {
+            setPortal('warehouse');
+            setWarehouseActiveTab('dashboard');
+          }}
+          onSwitchPortal={(p) => setPortal(p)}
+        />
 
       {/* Main Content Wrapper */}
       <div className="main-wrapper">
@@ -1324,6 +1195,7 @@ export default function App() {
           <span>{toastMessage}</span>
         </div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
