@@ -543,6 +543,7 @@ export default function App() {
                 setPortal('driver');
                 setDriverActiveTab('dashboard');
               }}
+              onSwitchPortal={(p) => setPortal(p)}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
             />

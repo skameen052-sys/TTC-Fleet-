@@ -38,17 +38,9 @@ export const Header = ({
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const options = {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      };
-      setCurrentDateTime(now.toLocaleDateString('en-US', options));
+      const datePart = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      const timePart = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      setCurrentDateTime(`${datePart} • ${timePart}`);
     };
 
     updateTime();
@@ -102,81 +94,23 @@ export const Header = ({
 
       {/* Middle & Right Navigation Elements */}
       <div className="header-right-col">
-        {/* Quick Portal Switcher Pill */}
-        {onSwitchPortal && (
-          <div className="header-portal-switcher-container" style={{ position: 'relative' }} ref={portalRef}>
-            <button
-              onClick={() => setShowPortalDropdown(!showPortalDropdown)}
-              className="header-portal-switcher-btn"
-              title="Current: Fleet Manager Portal"
-            >
-              <Truck size={14} color="#1D4ED8" />
-              <span>Fleet Manager</span>
-              <ChevronDown size={13} color="#1D4ED8" />
-            </button>
-
-            {showPortalDropdown && (
-              <div className="header-portal-dropdown">
-                <div className="header-portal-dropdown-title">
-                  Switch Workspace Portal
-                </div>
-                <button
-                  onClick={() => {
-                    setShowPortalDropdown(false);
-                    onSwitchPortal('admin');
-                  }}
-                  className="header-portal-dropdown-item"
-                  style={{ color: '#FF7A1A' }}
-                >
-                  <Shield size={14} color="#FF7A1A" />
-                  <span>Admin Dashboard</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowPortalDropdown(false);
-                    onSwitchPortal('manager');
-                  }}
-                  className="header-portal-dropdown-item"
-                  style={{ color: '#1D4ED8', background: '#EFF6FF', fontWeight: 700 }}
-                >
-                  <Truck size={14} color="#1D4ED8" />
-                  <span style={{ flex: 1, textAlign: 'left' }}>Fleet Manager</span>
-                  <span className="portal-badge-active">Active</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowPortalDropdown(false);
-                    onSwitchPortal('driver');
-                  }}
-                  className="header-portal-dropdown-item"
-                  style={{ color: '#16A34A' }}
-                >
-                  <User size={14} color="#16A34A" />
-                  <span>Driver Portal</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowPortalDropdown(false);
-                    onSwitchPortal('warehouse');
-                  }}
-                  className="header-portal-dropdown-item"
-                  style={{ color: '#EA580C' }}
-                >
-                  <Building2 size={14} color="#EA580C" />
-                  <span>Warehouse Portal</span>
-                </button>
-              </div>
-            )}
+        {/* Live Fleet Telemetry Pill */}
+        <div
+          className="driver-trip-telemetry-pill fleet-telemetry-pill"
+          onClick={() => onSelectTab && onSelectTab('vehicles')}
+          title="Click to view Fleet Assets"
+          style={{ background: '#EFF6FF', borderColor: '#BFDBFE' }}
+        >
+          <div className="pill-icon-circle" style={{ background: '#DBEAFE' }}>
+            <Truck size={13} color="#2563EB" strokeWidth={2.5} />
           </div>
-        )}
-
-        {/* Live Date & Time pill */}
-        <div className="header-datetime-pill">
-          <Calendar size={15} color="#3478F6" />
-          <span>{currentDateTime || 'Fri, Nov 20, 2026, 02:48:17 PM'}</span>
+          <span className="pill-trip-id">16 Assets</span>
+          <span className="pill-dot">•</span>
+          <span className="pill-status-text" style={{ color: '#16A36A' }}>
+            <span className="live-dot-pulse" />
+            14 Active
+          </span>
+          <span className="pill-eta-badge" style={{ background: '#2563EB' }}>92% Online</span>
         </div>
 
         {/* Global Search Pill */}
@@ -191,6 +125,12 @@ export const Header = ({
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
           />
           <kbd className="header-search-kbd">/</kbd>
+        </div>
+
+        {/* Live Date & Time pill */}
+        <div className="header-datetime-pill">
+          <Calendar size={15} color="#3478F6" />
+          <span>{currentDateTime || 'Mon, Nov 23, 2026 • 10:25 AM'}</span>
         </div>
 
         {/* Notification Bell Button */}
@@ -254,12 +194,12 @@ export const Header = ({
             className="user-profile-menu"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
           >
-            <div className="user-avatar-circle" style={{ backgroundColor: '#00a3ff', color: '#FFFFFF', fontWeight: '800' }}>
-              <span>{currentUser?.fullName?.[0]?.toUpperCase() || 'M'}</span>
+            <div className="user-avatar-circle" style={{ backgroundColor: '#2563EB', color: '#FFFFFF', fontWeight: '800' }}>
+              <span>{currentUser?.fullName ? currentUser.fullName.split(' ').map(n=>n[0]).join('').slice(0,2) : 'VM'}</span>
             </div>
             <div className="user-text-info">
               <span className="user-display-name">{currentUser?.fullName || 'Vikram Malhotra'}</span>
-              <span className="user-role-text">Fleet Operations Manager</span>
+              <span className="user-role-text" style={{ color: '#2563EB' }}>Fleet Operations Manager</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>

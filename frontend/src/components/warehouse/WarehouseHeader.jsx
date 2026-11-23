@@ -24,6 +24,7 @@ export const WarehouseHeader = ({
   onLogout,
   onSwitchToManager,
   onSwitchToDriver,
+  onSwitchPortal,
   searchQuery,
   onSearchChange
 }) => {
@@ -36,7 +37,7 @@ export const WarehouseHeader = ({
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const datePart = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      const datePart = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
       const timePart = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
       setCurrentDateTime(`${datePart} • ${timePart}`);
     };
@@ -176,12 +177,12 @@ export const WarehouseHeader = ({
             className="user-profile-menu driver-profile-pill"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
           >
-            <div className="user-avatar-circle" style={{ backgroundColor: '#14213D', color: '#FF7A1A' }}>
-              <span>EC</span>
+            <div className="user-avatar-circle" style={{ backgroundColor: '#14213D', color: '#FF7A1A', fontWeight: '800' }}>
+              <span>{user?.fullName ? user.fullName.split(' ').map(n=>n[0]).join('').slice(0,2) : 'EC'}</span>
             </div>
             <div className="user-text-info">
               <span className="user-display-name">{user?.fullName || 'Ethan Cole'}</span>
-              <span className="user-role-text" style={{ color: '#FF7A1A' }}>Warehouse Director</span>
+              <span className="user-role-text" style={{ color: '#FF7A1A' }}>Warehouse Director • WH-CENTRAL-01</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>
@@ -214,28 +215,42 @@ export const WarehouseHeader = ({
                 >
                   <Warehouse size={15} /> Facilities Overview
                 </button>
-                {onSwitchToManager && (
+                {onSwitchPortal && (
                   <button
                     className="dropdown-menu-btn"
                     onClick={() => {
                       setShowProfileDropdown(false);
-                      onSwitchToManager();
+                      onSwitchPortal('admin');
                     }}
-                    style={{ color: '#3478F6', fontWeight: '700' }}
+                    style={{ color: '#FF7A1A', fontWeight: '600' }}
                   >
-                    <Settings size={15} /> Switch to Fleet Manager
+                    <ShieldCheck size={15} color="#FF7A1A" /> Switch to Admin Dashboard
                   </button>
                 )}
-                {onSwitchToDriver && (
+                {(onSwitchPortal || onSwitchToManager) && (
                   <button
                     className="dropdown-menu-btn"
                     onClick={() => {
                       setShowProfileDropdown(false);
-                      onSwitchToDriver();
+                      if (onSwitchPortal) onSwitchPortal('manager');
+                      else if (onSwitchToManager) onSwitchToManager();
                     }}
-                    style={{ color: '#FF7A1A', fontWeight: '700' }}
+                    style={{ color: '#3478F6', fontWeight: '600' }}
                   >
-                    <Truck size={15} /> Switch to Driver Portal
+                    <Truck size={15} color="#3478F6" /> Switch to Fleet Manager
+                  </button>
+                )}
+                {(onSwitchPortal || onSwitchToDriver) && (
+                  <button
+                    className="dropdown-menu-btn"
+                    onClick={() => {
+                      setShowProfileDropdown(false);
+                      if (onSwitchPortal) onSwitchPortal('driver');
+                      else if (onSwitchToDriver) onSwitchToDriver();
+                    }}
+                    style={{ color: '#16A36A', fontWeight: '600' }}
+                  >
+                    <User size={15} color="#16A36A" /> Switch to Driver Portal
                   </button>
                 )}
                 <button
