@@ -131,6 +131,12 @@ import {
 } from './components/customer/CustomerModals';
 import { customerService } from './services/customerService';
 
+// Billing & Finance Manager Portal Components
+import { BillingSidebar } from './components/billing/BillingSidebar';
+import { BillingHeader } from './components/billing/BillingHeader';
+import { BillingDashboard } from './components/billing/BillingDashboard';
+import { BillingLoginPage } from './components/auth/BillingLoginPage';
+import { billingService } from './services/billingService';
 
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
@@ -259,17 +265,19 @@ export default function App() {
       if (urlPortal === 'logistics') return 'logistics';
       if (urlPortal === 'manager' || urlPortal === 'fleet') return 'manager';
       if (urlPortal === 'admin') return 'admin';
+      if (urlPortal === 'billing' || urlPortal === 'finance') return 'billing';
 
       const u = localStorage.getItem('ttc_fleet360_user') || sessionStorage.getItem('ttc_fleet360_user');
       const parsed = u ? JSON.parse(u) : null;
       if (parsed?.portal && parsed.portal !== 'maintenance') return parsed.portal;
+      if (parsed?.role === 'ROLE_FINANCE_MANAGER') return 'billing';
       if (parsed?.role === 'ROLE_CUSTOMER') return 'customer';
       if (parsed?.role === 'ROLE_DRIVER') return 'driver';
       if (parsed?.role === 'ROLE_WAREHOUSE_MANAGER') return 'warehouse';
       if (parsed?.role === 'ROLE_LOGISTICS_MANAGER') return 'logistics';
       if (parsed?.role === 'ROLE_MANAGER') return 'manager';
       if (parsed?.role === 'ROLE_ADMIN') return 'admin';
-    } catch {}
+    } catch { }
     return 'admin'; // Default to Super Admin Dashboard
   });
 
@@ -278,15 +286,17 @@ export default function App() {
   const [warehouseActiveTab, setWarehouseActiveTab] = useState('dashboard');
   const [logisticsActiveTab, setLogisticsActiveTab] = useState('dashboard');
   const [customerActiveTab, setCustomerActiveTab] = useState('dashboard');
+  const [billingActiveTab, setBillingActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
-  // Fleet state, Driver state, Warehouse state, Logistics state & Customer state
+  // Fleet state, Driver state, Warehouse state, Logistics state, Customer state & Billing state
   const [fleetState, setFleetState] = useState(() => fleetService.loadData());
   const [driverPortalData, setDriverPortalData] = useState(() => fleetService.getDriverPortalData());
   const [warehouseData, setWarehouseData] = useState(() => warehouseService.getData());
   const [logisticsData, setLogisticsData] = useState(() => logisticsService.getData());
   const [customerData, setCustomerData] = useState(() => customerService.getData());
+  const [billingData, setBillingData] = useState(() => billingService.getData());
 
   // Customer Modal & Active State
   const [selectedCustomerOrder, setSelectedCustomerOrder] = useState(null);
@@ -361,15 +371,18 @@ export default function App() {
     setCurrentUser(userData);
     setIsAuthenticated(true);
     const targetPortal = userData.portal || (
+      userData.role === 'ROLE_FINANCE_MANAGER' ? 'billing' :
       userData.role === 'ROLE_CUSTOMER' ? 'customer' :
-      userData.role === 'ROLE_DRIVER' ? 'driver' :
-      userData.role === 'ROLE_WAREHOUSE_MANAGER' ? 'warehouse' :
-      userData.role === 'ROLE_LOGISTICS_MANAGER' ? 'logistics' :
-      userData.role === 'ROLE_MANAGER' ? 'manager' : 'admin'
+        userData.role === 'ROLE_DRIVER' ? 'driver' :
+          userData.role === 'ROLE_WAREHOUSE_MANAGER' ? 'warehouse' :
+            userData.role === 'ROLE_LOGISTICS_MANAGER' ? 'logistics' :
+              userData.role === 'ROLE_MANAGER' ? 'manager' : 'admin'
     );
     setPortal(targetPortal);
     if (targetPortal === 'customer') {
       setCustomerActiveTab('dashboard');
+    } else if (targetPortal === 'billing') {
+      setBillingActiveTab('dashboard');
     } else if (targetPortal === 'driver') {
       setDriverActiveTab('dashboard');
     } else if (targetPortal === 'warehouse') {
@@ -582,6 +595,27 @@ export default function App() {
 
   // If not authenticated or login tab selected, render dedicated LoginPage
   if (!isAuthenticated || activeTab === 'login') {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('portal') === 'billing' || portal === 'billing') {
+      return (
+        <>
+          <BillingLoginPage
+            onLoginSuccess={handleLoginSuccess}
+            onSwitchPortal={(p) => {
+              setPortal(p);
+              window.history.replaceState({}, '', `/?portal=${p}`);
+            }}
+          />
+          {toastMessage && (
+            <div className="toast-banner">
+              <CheckCircle size={18} color="#16A36A" />
+              <span>{toastMessage}</span>
+            </div>
+          )}
+        </>
+      );
+    }
+
     return (
       <>
         <LoginPage onLoginSuccess={handleLoginSuccess} initialPortal={portal} />
@@ -1347,6 +1381,38 @@ export default function App() {
   }
 
   // =========================================================================
+  // 2.5 RENDER BILLING & FINANCE MANAGER DASHBOARD
+  // =========================================================================
+  if (portal === 'billing') {
+    return (
+      <ErrorBoundary>
+        <BillingDashboard
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onSwitchPortal={(targetPortal) => {
+            setPortal(targetPortal);
+            if (targetPortal === 'driver') setDriverActiveTab('dashboard');
+            else if (targetPortal === 'warehouse') setWarehouseActiveTab('dashboard');
+            else if (targetPortal === 'logistics') setLogisticsActiveTab('dashboard');
+            else if (targetPortal === 'customer') setCustomerActiveTab('dashboard');
+            else if (targetPortal === 'billing') setBillingActiveTab('dashboard');
+            else setActiveTab('dashboard');
+          }}
+          billingData={billingData}
+          billingService={billingService}
+          showToast={showToast}
+        />
+        {toastMessage && (
+          <div className="toast-banner">
+            <CheckCircle size={18} color="#16A36A" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
+      </ErrorBoundary>
+    );
+  }
+
+  // =========================================================================
   // 3. RENDER DRIVER PORTAL
   // =========================================================================
   if (portal === 'driver') {
@@ -1366,168 +1432,168 @@ export default function App() {
             onSwitchPortal={(p) => setPortal(p)}
           />
 
-        {/* Main Content Wrapper */}
-        <div className="main-wrapper">
-          {/* Top Navigation Bar (Driver) */}
-          <DriverHeader
-            activeTabTitle={driverPageTitle}
-            driver={driverPortalData.driver}
-            activeTrip={driverPortalData.activeTrip}
-            notifications={driverPortalData.driverNotifications}
-            onSelectTab={setDriverActiveTab}
-            onLogout={handleLogout}
-            onSwitchToManager={() => setPortal('manager')}
-            onSwitchPortal={(p) => setPortal(p)}
+          {/* Main Content Wrapper */}
+          <div className="main-wrapper">
+            {/* Top Navigation Bar (Driver) */}
+            <DriverHeader
+              activeTabTitle={driverPageTitle}
+              driver={driverPortalData.driver}
+              activeTrip={driverPortalData.activeTrip}
+              notifications={driverPortalData.driverNotifications}
+              onSelectTab={setDriverActiveTab}
+              onLogout={handleLogout}
+              onSwitchToManager={() => setPortal('manager')}
+              onSwitchPortal={(p) => setPortal(p)}
+            />
+
+            {/* Dynamic Driver Page Views */}
+            <main className="dashboard-content">
+              {driverActiveTab === 'dashboard' && (
+                <DriverDashboard
+                  driverData={driverPortalData}
+                  onAdvanceStage={handleAdvanceDriverStage}
+                  onConfirmPickup={handleConfirmPickup}
+                  onConfirmDelivery={handleConfirmDelivery}
+                  onCancelTrip={handleCancelDriverTrip}
+                  onToggleGpsSharing={handleToggleGpsSharing}
+                  onOpenFuelModal={() => setIsDriverFuelOpen(true)}
+                  onOpenIssueModal={() => setIsDriverIssueOpen(true)}
+                  onOpenPodModal={() => setIsDriverPodOpen(true)}
+                  onOpenContactModal={() => setIsDriverContactOpen(true)}
+                  onSelectTab={setDriverActiveTab}
+                />
+              )}
+
+              {driverActiveTab === 'my-trips' && (
+                <MyTripsView
+                  trips={driverPortalData.trips}
+                  onSelectTrip={() => setDriverActiveTab('active-trip')}
+                />
+              )}
+
+              {driverActiveTab === 'active-trip' && (
+                <ActiveTripView
+                  activeTrip={driverPortalData.activeTrip}
+                  onAdvanceStage={handleAdvanceDriverStage}
+                  onOpenPodModal={() => setIsDriverPodOpen(true)}
+                  onOpenIssueModal={() => setIsDriverIssueOpen(true)}
+                  onToggleGps={() => handleToggleGpsSharing(driverPortalData.activeTrip.id)}
+                />
+              )}
+
+              {driverActiveTab === 'trip-history' && (
+                <TripHistoryView trips={driverPortalData.trips} />
+              )}
+
+              {driverActiveTab === 'my-vehicle' && (
+                <MyVehicleView
+                  vehicle={driverPortalData.vehicle}
+                  onReportIssue={() => setIsDriverIssueOpen(true)}
+                />
+              )}
+
+              {driverActiveTab === 'route-nav' && (
+                <RouteNavView
+                  activeTrip={driverPortalData.activeTrip}
+                  onToggleGps={() => handleToggleGpsSharing(driverPortalData.activeTrip.id)}
+                />
+              )}
+
+              {driverActiveTab === 'pickup' && (
+                <PickupManagementView
+                  pickup={driverPortalData.activeTrip?.pickup}
+                  onConfirmPickup={(notes) => handleConfirmPickup(driverPortalData.activeTrip.id, notes)}
+                />
+              )}
+
+              {driverActiveTab === 'delivery' && (
+                <DeliveryManagementView
+                  delivery={driverPortalData.activeTrip?.delivery}
+                  onConfirmDelivery={(recipient, podPhoto) => handleConfirmDelivery(driverPortalData.activeTrip.id, recipient, podPhoto)}
+                />
+              )}
+
+              {driverActiveTab === 'shipment' && (
+                <ShipmentDetailsView
+                  activeTrip={driverPortalData.activeTrip}
+                  onOpenPodModal={() => setIsDriverPodOpen(true)}
+                />
+              )}
+
+              {driverActiveTab === 'fuel' && (
+                <DriverFuelRecordsView
+                  fuelLogs={driverPortalData.fuelLogs}
+                  onAddFuel={() => setIsDriverFuelOpen(true)}
+                />
+              )}
+
+              {driverActiveTab === 'inspection' && (
+                <DriverInspectionView
+                  vehicle={driverPortalData.vehicle}
+                  onReportIssue={() => setIsDriverIssueOpen(true)}
+                />
+              )}
+
+              {driverActiveTab === 'documents' && (
+                <DriverDocumentsView
+                  documents={driverPortalData.documents}
+                  driver={driverPortalData.driver}
+                  vehicle={driverPortalData.vehicle}
+                />
+              )}
+
+              {driverActiveTab === 'notifications' && (
+                <DriverNotificationsView
+                  notifications={driverPortalData.driverNotifications}
+                />
+              )}
+
+              {driverActiveTab === 'profile' && (
+                <DriverProfileView
+                  driver={driverPortalData.driver}
+                  metrics={driverPortalData.metrics}
+                />
+              )}
+            </main>
+          </div>
+
+          {/* Driver Modals */}
+          <DriverModals.FuelModal
+            isOpen={isDriverFuelOpen}
+            onClose={() => setIsDriverFuelOpen(false)}
+            onSubmit={handleAddDriverFuel}
+            vehicleReg={driverPortalData.vehicle?.regNumber}
           />
 
-          {/* Dynamic Driver Page Views */}
-          <main className="dashboard-content">
-            {driverActiveTab === 'dashboard' && (
-              <DriverDashboard
-                driverData={driverPortalData}
-                onAdvanceStage={handleAdvanceDriverStage}
-                onConfirmPickup={handleConfirmPickup}
-                onConfirmDelivery={handleConfirmDelivery}
-                onCancelTrip={handleCancelDriverTrip}
-                onToggleGpsSharing={handleToggleGpsSharing}
-                onOpenFuelModal={() => setIsDriverFuelOpen(true)}
-                onOpenIssueModal={() => setIsDriverIssueOpen(true)}
-                onOpenPodModal={() => setIsDriverPodOpen(true)}
-                onOpenContactModal={() => setIsDriverContactOpen(true)}
-                onSelectTab={setDriverActiveTab}
-              />
-            )}
+          <DriverModals.ReportIssueModal
+            isOpen={isDriverIssueOpen}
+            onClose={() => setIsDriverIssueOpen(false)}
+            onSubmit={handleReportDriverIssue}
+            vehicleReg={driverPortalData.vehicle?.regNumber}
+          />
 
-            {driverActiveTab === 'my-trips' && (
-              <MyTripsView
-                trips={driverPortalData.trips}
-                onSelectTrip={() => setDriverActiveTab('active-trip')}
-              />
-            )}
+          <DriverModals.PodModal
+            isOpen={isDriverPodOpen}
+            onClose={() => setIsDriverPodOpen(false)}
+            onSubmit={(sigName) => handleConfirmDelivery(driverPortalData.activeTrip?.id, sigName, true)}
+          />
 
-            {driverActiveTab === 'active-trip' && (
-              <ActiveTripView
-                activeTrip={driverPortalData.activeTrip}
-                onAdvanceStage={handleAdvanceDriverStage}
-                onOpenPodModal={() => setIsDriverPodOpen(true)}
-                onOpenIssueModal={() => setIsDriverIssueOpen(true)}
-                onToggleGps={() => handleToggleGpsSharing(driverPortalData.activeTrip.id)}
-              />
-            )}
+          <DriverModals.ContactModal
+            isOpen={isDriverContactOpen}
+            onClose={() => setIsDriverContactOpen(false)}
+          />
 
-            {driverActiveTab === 'trip-history' && (
-              <TripHistoryView trips={driverPortalData.trips} />
-            )}
-
-            {driverActiveTab === 'my-vehicle' && (
-              <MyVehicleView
-                vehicle={driverPortalData.vehicle}
-                onReportIssue={() => setIsDriverIssueOpen(true)}
-              />
-            )}
-
-            {driverActiveTab === 'route-nav' && (
-              <RouteNavView
-                activeTrip={driverPortalData.activeTrip}
-                onToggleGps={() => handleToggleGpsSharing(driverPortalData.activeTrip.id)}
-              />
-            )}
-
-            {driverActiveTab === 'pickup' && (
-              <PickupManagementView
-                pickup={driverPortalData.activeTrip?.pickup}
-                onConfirmPickup={(notes) => handleConfirmPickup(driverPortalData.activeTrip.id, notes)}
-              />
-            )}
-
-            {driverActiveTab === 'delivery' && (
-              <DeliveryManagementView
-                delivery={driverPortalData.activeTrip?.delivery}
-                onConfirmDelivery={(recipient, podPhoto) => handleConfirmDelivery(driverPortalData.activeTrip.id, recipient, podPhoto)}
-              />
-            )}
-
-            {driverActiveTab === 'shipment' && (
-              <ShipmentDetailsView
-                activeTrip={driverPortalData.activeTrip}
-                onOpenPodModal={() => setIsDriverPodOpen(true)}
-              />
-            )}
-
-            {driverActiveTab === 'fuel' && (
-              <DriverFuelRecordsView
-                fuelLogs={driverPortalData.fuelLogs}
-                onAddFuel={() => setIsDriverFuelOpen(true)}
-              />
-            )}
-
-            {driverActiveTab === 'inspection' && (
-              <DriverInspectionView
-                vehicle={driverPortalData.vehicle}
-                onReportIssue={() => setIsDriverIssueOpen(true)}
-              />
-            )}
-
-            {driverActiveTab === 'documents' && (
-              <DriverDocumentsView
-                documents={driverPortalData.documents}
-                driver={driverPortalData.driver}
-                vehicle={driverPortalData.vehicle}
-              />
-            )}
-
-            {driverActiveTab === 'notifications' && (
-              <DriverNotificationsView
-                notifications={driverPortalData.driverNotifications}
-              />
-            )}
-
-            {driverActiveTab === 'profile' && (
-              <DriverProfileView
-                driver={driverPortalData.driver}
-                metrics={driverPortalData.metrics}
-              />
-            )}
-          </main>
+          {/* Toast Feedback Notification Banner */}
+          {toastMessage && (
+            <div className="toast-banner">
+              <CheckCircle size={18} color="#16A36A" />
+              <span>{toastMessage}</span>
+            </div>
+          )}
         </div>
-
-        {/* Driver Modals */}
-        <DriverModals.FuelModal
-          isOpen={isDriverFuelOpen}
-          onClose={() => setIsDriverFuelOpen(false)}
-          onSubmit={handleAddDriverFuel}
-          vehicleReg={driverPortalData.vehicle?.regNumber}
-        />
-
-        <DriverModals.ReportIssueModal
-          isOpen={isDriverIssueOpen}
-          onClose={() => setIsDriverIssueOpen(false)}
-          onSubmit={handleReportDriverIssue}
-          vehicleReg={driverPortalData.vehicle?.regNumber}
-        />
-
-        <DriverModals.PodModal
-          isOpen={isDriverPodOpen}
-          onClose={() => setIsDriverPodOpen(false)}
-          onSubmit={(sigName) => handleConfirmDelivery(driverPortalData.activeTrip?.id, sigName, true)}
-        />
-
-        <DriverModals.ContactModal
-          isOpen={isDriverContactOpen}
-          onClose={() => setIsDriverContactOpen(false)}
-        />
-
-        {/* Toast Feedback Notification Banner */}
-        {toastMessage && (
-          <div className="toast-banner">
-            <CheckCircle size={18} color="#16A36A" />
-            <span>{toastMessage}</span>
-          </div>
-        )}
-      </div>
-    </ErrorBoundary>
-  );
-}
+      </ErrorBoundary>
+    );
+  }
 
   // =========================================================================
   // 4. RENDER FLEET OPERATIONS MANAGER PORTAL
@@ -1550,235 +1616,235 @@ export default function App() {
           onSwitchPortal={(p) => setPortal(p)}
         />
 
-      {/* Main Content Wrapper */}
-      <div className="main-wrapper">
-        {/* Top Navigation Bar (Fleet Manager) */}
-        <Header
-          pageTitle={managerPageTitle}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          notifications={notifications}
-          onMarkNotificationRead={handleMarkNotificationRead}
-          onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
-          onSelectTab={setActiveTab}
-          onLogout={handleLogout}
-          onSwitchToDriver={() => setPortal('driver')}
-          onSwitchPortal={(p) => setPortal(p)}
-          currentUser={currentUser}
-        />
+        {/* Main Content Wrapper */}
+        <div className="main-wrapper">
+          {/* Top Navigation Bar (Fleet Manager) */}
+          <Header
+            pageTitle={managerPageTitle}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            notifications={notifications}
+            onMarkNotificationRead={handleMarkNotificationRead}
+            onMarkAllNotificationsRead={handleMarkAllNotificationsRead}
+            onSelectTab={setActiveTab}
+            onLogout={handleLogout}
+            onSwitchToDriver={() => setPortal('driver')}
+            onSwitchPortal={(p) => setPortal(p)}
+            currentUser={currentUser}
+          />
 
-        {/* Dynamic Page Views */}
-        <main className="dashboard-content">
-          {/* Main Fleet Manager Dashboard */}
-          {activeTab === 'dashboard' && (
-            <>
-              {/* Hero Banner */}
-              <HeroBanner />
+          {/* Dynamic Page Views */}
+          <main className="dashboard-content">
+            {/* Main Fleet Manager Dashboard */}
+            {activeTab === 'dashboard' && (
+              <>
+                {/* Hero Banner */}
+                <HeroBanner />
 
-              {/* Quick Actions Section */}
-              <QuickActions
-                onAddVehicle={() => setIsAddVehicleOpen(true)}
-                onAssignVehicle={() => setIsAssignVehicleOpen(true)}
-                onAddFuelRecord={() => setIsAddFuelOpen(true)}
-                onScheduleMaintenance={() => setIsScheduleMaintOpen(true)}
-                onRecordInspection={() => setIsRecordInspectionOpen(true)}
-                onViewLiveTracking={() => setActiveTab('tracking')}
-              />
+                {/* Quick Actions Section */}
+                <QuickActions
+                  onAddVehicle={() => setIsAddVehicleOpen(true)}
+                  onAssignVehicle={() => setIsAssignVehicleOpen(true)}
+                  onAddFuelRecord={() => setIsAddFuelOpen(true)}
+                  onScheduleMaintenance={() => setIsScheduleMaintOpen(true)}
+                  onRecordInspection={() => setIsRecordInspectionOpen(true)}
+                  onViewLiveTracking={() => setActiveTab('tracking')}
+                />
 
-              {/* Summary Cards */}
-              <SummaryCards
-                metrics={summaryMetrics}
-                onCardClick={(targetTab) => {
-                  if (targetTab) setActiveTab(targetTab);
-                }}
-              />
-
-              {/* Two Column Grid: Vehicle Status Overview + Fleet Utilization Analytics */}
-              <div className="dashboard-grid-2col">
-                <VehicleStatusOverview
-                  overview={statusOverview}
-                  onStatusFilter={() => {
-                    setActiveTab('vehicles');
+                {/* Summary Cards */}
+                <SummaryCards
+                  metrics={summaryMetrics}
+                  onCardClick={(targetTab) => {
+                    if (targetTab) setActiveTab(targetTab);
                   }}
                 />
-                <FleetUtilizationAnalytics analytics={analytics} />
-              </div>
 
-              {/* Live Fleet Tracking Interactive Map Section */}
-              <div id="live-tracking-section">
+                {/* Two Column Grid: Vehicle Status Overview + Fleet Utilization Analytics */}
+                <div className="dashboard-grid-2col">
+                  <VehicleStatusOverview
+                    overview={statusOverview}
+                    onStatusFilter={() => {
+                      setActiveTab('vehicles');
+                    }}
+                  />
+                  <FleetUtilizationAnalytics analytics={analytics} />
+                </div>
+
+                {/* Live Fleet Tracking Interactive Map Section */}
+                <div id="live-tracking-section">
+                  <LiveFleetTracking
+                    gpsData={gpsData}
+                    onSimulateTick={handleSimulateTick}
+                  />
+                </div>
+
+                {/* Two Column Grid: Fuel Management Overview + Maintenance Overview */}
+                <div className="dashboard-grid-2col">
+                  <FuelManagementOverview
+                    fuelStats={fuelStats}
+                    onOpenFuelModal={() => setIsAddFuelOpen(true)}
+                  />
+                  <MaintenanceOverview
+                    maintenanceData={maintenanceData}
+                    onOpenScheduleModal={() => setIsScheduleMaintOpen(true)}
+                  />
+                </div>
+
+                {/* Vehicle & Driver Assignment Section */}
+                <VehicleDriverAssignment
+                  assignments={assignments}
+                  vehicles={fleetState.vehicles}
+                  drivers={fleetState.drivers}
+                  onOpenAssignModal={() => setIsAssignVehicleOpen(true)}
+                />
+
+                {/* Charts & Reports Section */}
+                <ChartsAndReports
+                  analytics={analytics}
+                  vehicles={fleetState.vehicles}
+                  fuelStats={fuelStats}
+                  maintenanceData={maintenanceData}
+                />
+              </>
+            )}
+
+            {/* Dedicated Sub-views */}
+            {activeTab === 'vehicles' && (
+              <VehicleManagementView
+                vehicles={fleetState.vehicles}
+                onAddVehicle={() => setIsAddVehicleOpen(true)}
+              />
+            )}
+
+            {activeTab === 'categories' && (
+              <VehicleCategoriesView vehicles={fleetState.vehicles} />
+            )}
+
+            {activeTab === 'allocation' && (
+              <VehicleAllocationView
+                vehicles={fleetState.vehicles}
+                assignments={assignments}
+                onAssignVehicle={() => setIsAssignVehicleOpen(true)}
+              />
+            )}
+
+            {activeTab === 'availability' && (
+              <VehicleAvailabilityView
+                vehicles={fleetState.vehicles}
+                onAssignVehicle={() => setIsAssignVehicleOpen(true)}
+              />
+            )}
+
+            {activeTab === 'documents' && (
+              <VehicleDocumentsView maintenanceData={maintenanceData} />
+            )}
+
+            {activeTab === 'tracking' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <LiveFleetTracking
                   gpsData={gpsData}
                   onSimulateTick={handleSimulateTick}
                 />
               </div>
+            )}
 
-              {/* Two Column Grid: Fuel Management Overview + Maintenance Overview */}
-              <div className="dashboard-grid-2col">
+            {activeTab === 'fuel' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <FuelManagementOverview
                   fuelStats={fuelStats}
                   onOpenFuelModal={() => setIsAddFuelOpen(true)}
                 />
+              </div>
+            )}
+
+            {activeTab === 'maintenance' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <MaintenanceOverview
                   maintenanceData={maintenanceData}
                   onOpenScheduleModal={() => setIsScheduleMaintOpen(true)}
                 />
               </div>
+            )}
 
-              {/* Vehicle & Driver Assignment Section */}
-              <VehicleDriverAssignment
-                assignments={assignments}
-                vehicles={fleetState.vehicles}
+            {activeTab === 'driver-assignment' && (
+              <DriverAssignmentView
                 drivers={fleetState.drivers}
                 onOpenAssignModal={() => setIsAssignVehicleOpen(true)}
               />
+            )}
 
-              {/* Charts & Reports Section */}
-              <ChartsAndReports
+            {activeTab === 'inspection' && (
+              <VehicleInspectionView
+                inspections={inspections}
+                onRecordInspection={() => setIsRecordInspectionOpen(true)}
+              />
+            )}
+
+            {activeTab === 'reports' && (
+              <FleetReportsView
                 analytics={analytics}
-                vehicles={fleetState.vehicles}
                 fuelStats={fuelStats}
                 maintenanceData={maintenanceData}
               />
-            </>
-          )}
+            )}
 
-          {/* Dedicated Sub-views */}
-          {activeTab === 'vehicles' && (
-            <VehicleManagementView
-              vehicles={fleetState.vehicles}
-              onAddVehicle={() => setIsAddVehicleOpen(true)}
-            />
-          )}
-
-          {activeTab === 'categories' && (
-            <VehicleCategoriesView vehicles={fleetState.vehicles} />
-          )}
-
-          {activeTab === 'allocation' && (
-            <VehicleAllocationView
-              vehicles={fleetState.vehicles}
-              assignments={assignments}
-              onAssignVehicle={() => setIsAssignVehicleOpen(true)}
-            />
-          )}
-
-          {activeTab === 'availability' && (
-            <VehicleAvailabilityView
-              vehicles={fleetState.vehicles}
-              onAssignVehicle={() => setIsAssignVehicleOpen(true)}
-            />
-          )}
-
-          {activeTab === 'documents' && (
-            <VehicleDocumentsView maintenanceData={maintenanceData} />
-          )}
-
-          {activeTab === 'tracking' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <LiveFleetTracking
-                gpsData={gpsData}
-                onSimulateTick={handleSimulateTick}
+            {activeTab === 'notifications' && (
+              <NotificationsView
+                notifications={notifications}
+                onMarkRead={handleMarkNotificationRead}
+                onMarkAllRead={handleMarkAllNotificationsRead}
               />
-            </div>
-          )}
+            )}
 
-          {activeTab === 'fuel' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <FuelManagementOverview
-                fuelStats={fuelStats}
-                onOpenFuelModal={() => setIsAddFuelOpen(true)}
-              />
-            </div>
-          )}
-
-          {activeTab === 'maintenance' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <MaintenanceOverview
-                maintenanceData={maintenanceData}
-                onOpenScheduleModal={() => setIsScheduleMaintOpen(true)}
-              />
-            </div>
-          )}
-
-          {activeTab === 'driver-assignment' && (
-            <DriverAssignmentView
-              drivers={fleetState.drivers}
-              onOpenAssignModal={() => setIsAssignVehicleOpen(true)}
-            />
-          )}
-
-          {activeTab === 'inspection' && (
-            <VehicleInspectionView
-              inspections={inspections}
-              onRecordInspection={() => setIsRecordInspectionOpen(true)}
-            />
-          )}
-
-          {activeTab === 'reports' && (
-            <FleetReportsView
-              analytics={analytics}
-              fuelStats={fuelStats}
-              maintenanceData={maintenanceData}
-            />
-          )}
-
-          {activeTab === 'notifications' && (
-            <NotificationsView
-              notifications={notifications}
-              onMarkRead={handleMarkNotificationRead}
-              onMarkAllRead={handleMarkAllNotificationsRead}
-            />
-          )}
-
-          {activeTab === 'profile' && (
-            <MyProfileView />
-          )}
-        </main>
-      </div>
-
-      {/* Modals for Quick Actions */}
-      <AddVehicleModal
-        isOpen={isAddVehicleOpen}
-        onClose={() => setIsAddVehicleOpen(false)}
-        onAddVehicle={handleAddVehicle}
-      />
-
-      <AssignVehicleModal
-        isOpen={isAssignVehicleOpen}
-        onClose={() => setIsAssignVehicleOpen(false)}
-        vehicles={fleetState.vehicles}
-        drivers={fleetState.drivers}
-        onAssignVehicle={handleAssignVehicle}
-      />
-
-      <AddFuelRecordModal
-        isOpen={isAddFuelOpen}
-        onClose={() => setIsAddFuelOpen(false)}
-        vehicles={fleetState.vehicles}
-        onAddFuelRecord={handleAddFuelRecord}
-      />
-
-      <ScheduleMaintenanceModal
-        isOpen={isScheduleMaintOpen}
-        onClose={() => setIsScheduleMaintOpen(false)}
-        vehicles={fleetState.vehicles}
-        onScheduleMaintenance={handleScheduleMaintenance}
-      />
-
-      <RecordInspectionModal
-        isOpen={isRecordInspectionOpen}
-        onClose={() => setIsRecordInspectionOpen(false)}
-        vehicles={fleetState.vehicles}
-        onRecordInspection={handleRecordInspection}
-      />
-
-      {/* Toast Feedback Notification Banner */}
-      {toastMessage && (
-        <div className="toast-banner">
-          <CheckCircle size={18} color="#16A36A" />
-          <span>{toastMessage}</span>
+            {activeTab === 'profile' && (
+              <MyProfileView />
+            )}
+          </main>
         </div>
-      )}
+
+        {/* Modals for Quick Actions */}
+        <AddVehicleModal
+          isOpen={isAddVehicleOpen}
+          onClose={() => setIsAddVehicleOpen(false)}
+          onAddVehicle={handleAddVehicle}
+        />
+
+        <AssignVehicleModal
+          isOpen={isAssignVehicleOpen}
+          onClose={() => setIsAssignVehicleOpen(false)}
+          vehicles={fleetState.vehicles}
+          drivers={fleetState.drivers}
+          onAssignVehicle={handleAssignVehicle}
+        />
+
+        <AddFuelRecordModal
+          isOpen={isAddFuelOpen}
+          onClose={() => setIsAddFuelOpen(false)}
+          vehicles={fleetState.vehicles}
+          onAddFuelRecord={handleAddFuelRecord}
+        />
+
+        <ScheduleMaintenanceModal
+          isOpen={isScheduleMaintOpen}
+          onClose={() => setIsScheduleMaintOpen(false)}
+          vehicles={fleetState.vehicles}
+          onScheduleMaintenance={handleScheduleMaintenance}
+        />
+
+        <RecordInspectionModal
+          isOpen={isRecordInspectionOpen}
+          onClose={() => setIsRecordInspectionOpen(false)}
+          vehicles={fleetState.vehicles}
+          onRecordInspection={handleRecordInspection}
+        />
+
+        {/* Toast Feedback Notification Banner */}
+        {toastMessage && (
+          <div className="toast-banner">
+            <CheckCircle size={18} color="#16A36A" />
+            <span>{toastMessage}</span>
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   );

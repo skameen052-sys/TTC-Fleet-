@@ -43,8 +43,8 @@ export const UserManagementView = () => {
   const filtered = usersList.filter(u => {
     const matchRole = roleFilter === 'ALL' || u.role.toLowerCase().includes(roleFilter.toLowerCase());
     const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) ||
-                        u.email.toLowerCase().includes(search.toLowerCase()) ||
-                        u.branch.toLowerCase().includes(search.toLowerCase());
+      u.email.toLowerCase().includes(search.toLowerCase()) ||
+      u.branch.toLowerCase().includes(search.toLowerCase());
     return matchRole && matchSearch;
   });
 

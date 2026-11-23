@@ -17,7 +17,8 @@ import {
   Warehouse,
   Forklift,
   Boxes,
-  Building2
+  Building2,
+  CreditCard
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
@@ -64,6 +65,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
     } else if (portal === 'customer') {
       setEmail('customer@ttcfleet360.com');
       setPassword('password123');
+    } else if (portal === 'billing') {
+      setEmail('finance@ttcfleet360.com');
+      setPassword('password123');
     }
   };
 
@@ -80,7 +84,19 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
 
     try {
       let userData;
-      if (selectedPortal === 'logistics' || email.includes('elena') || email.includes('rostova') || email.includes('logistics')) {
+      if (selectedPortal === 'billing' || email.includes('finance') || email.includes('billing')) {
+        userData = {
+          username: 'fin_controller01',
+          email: email || 'finance@ttcfleet360.com',
+          fullName: 'Devin Vance',
+          role: 'ROLE_FINANCE_MANAGER',
+          portal: 'billing',
+          title: 'Chief Financial Controller',
+          staffId: 'FIN-CFO-891',
+          department: 'Corporate Accounts & Treasury',
+          token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_billing_finance_fleet360'
+        };
+      } else if (selectedPortal === 'logistics' || email.includes('elena') || email.includes('rostova') || email.includes('logistics')) {
         userData = {
           username: 'logistics_dir01',
           email: email || 'elena.rostova@fleet360.ttc.com',
@@ -167,6 +183,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
   };
 
   const getPortalTitle = () => {
+    if (selectedPortal === 'billing') return 'Billing & Finance Manager';
     if (selectedPortal === 'admin') return 'Admin Dashboard';
     if (selectedPortal === 'manager') return 'Fleet Manager Dashboard';
     if (selectedPortal === 'warehouse') return 'Warehouse OS';
@@ -176,6 +193,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
   };
 
   const getPortalSubtitle = () => {
+    if (selectedPortal === 'billing') return 'Sign in to access corporate cashflow, freight invoices, and tax ledger.';
     if (selectedPortal === 'admin') return 'Sign in to access Executive Overview, System Control & Subscriptions.';
     if (selectedPortal === 'manager') return 'Sign in to manage 16 Fleet Modules, Live Telemetry & Dispatches.';
     if (selectedPortal === 'warehouse') return 'Sign in to manage Inventory, Goods Receiving, Dispatches & Stock.';
@@ -206,14 +224,15 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
             </div>
           </div>
 
-          {/* 6-WAY ROLE / PORTAL SELECTOR */}
+          {/* 7-WAY ROLE / PORTAL SELECTOR */}
           <div
             className={`portal-switcher-pill-box ${isDriver || isWarehouse || isLogistics ? 'box-light' : 'box-dark'}`}
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(6, 1fr)',
-              gap: '3px',
-              padding: '3px'
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '4px',
+              padding: '4px',
+              borderRadius: '8px'
             }}
           >
             {/* 1. Admin */}
@@ -222,12 +241,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               className="portal-pill-btn"
               onClick={() => handlePortalSwitch('admin')}
               style={{
+                flex: '1 1 calc(25% - 4px)',
+                minWidth: '70px',
                 background: selectedPortal === 'admin' ? '#FF7A1A' : 'transparent',
                 color: selectedPortal === 'admin' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'admin' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 2px',
+                padding: '6px 4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -247,12 +268,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               className="portal-pill-btn"
               onClick={() => handlePortalSwitch('manager')}
               style={{
+                flex: '1 1 calc(25% - 4px)',
+                minWidth: '70px',
                 background: selectedPortal === 'manager' ? '#00a3ff' : 'transparent',
                 color: selectedPortal === 'manager' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'manager' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 2px',
+                padding: '6px 4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -272,12 +295,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               className="portal-pill-btn"
               onClick={() => handlePortalSwitch('driver')}
               style={{
+                flex: '1 1 calc(25% - 4px)',
+                minWidth: '70px',
                 background: selectedPortal === 'driver' ? '#10b981' : 'transparent',
                 color: selectedPortal === 'driver' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'driver' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 2px',
+                padding: '6px 4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -297,12 +322,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               className="portal-pill-btn"
               onClick={() => handlePortalSwitch('warehouse')}
               style={{
+                flex: '1 1 calc(25% - 4px)',
+                minWidth: '70px',
                 background: selectedPortal === 'warehouse' ? '#a855f7' : 'transparent',
                 color: selectedPortal === 'warehouse' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'warehouse' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 2px',
+                padding: '6px 4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -322,12 +349,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               className="portal-pill-btn"
               onClick={() => handlePortalSwitch('logistics')}
               style={{
+                flex: '1 1 calc(33.3% - 4px)',
+                minWidth: '85px',
                 background: selectedPortal === 'logistics' ? '#FF7A1A' : 'transparent',
                 color: selectedPortal === 'logistics' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'logistics' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 2px',
+                padding: '6px 6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -347,12 +376,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               className="portal-pill-btn"
               onClick={() => handlePortalSwitch('customer')}
               style={{
+                flex: '1 1 calc(33.3% - 4px)',
+                minWidth: '85px',
                 background: selectedPortal === 'customer' ? '#079DF2' : 'transparent',
                 color: selectedPortal === 'customer' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'customer' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
-                padding: '6px 2px',
+                padding: '6px 6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -364,6 +395,33 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
             >
               <Building2 size={12} />
               <span>Customer</span>
+            </button>
+
+            {/* 7. Finance */}
+            <button
+              type="button"
+              className="portal-pill-btn"
+              onClick={() => handlePortalSwitch('billing')}
+              style={{
+                flex: '1 1 calc(33.3% - 4px)',
+                minWidth: '85px',
+                background: selectedPortal === 'billing' ? '#2563eb' : 'transparent',
+                color: selectedPortal === 'billing' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
+                fontWeight: selectedPortal === 'billing' ? '700' : '600',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 6px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                boxShadow: selectedPortal === 'billing' ? '0 2px 8px rgba(37,99,235,0.4)' : 'none'
+              }}
+            >
+              <CreditCard size={12} />
+              <span>Finance</span>
             </button>
           </div>
 

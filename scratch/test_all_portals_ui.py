@@ -87,6 +87,29 @@ portals_to_test = [
             window.location.href = 'http://localhost:3000/?portal=customer';
         """,
         'screenshot': 'verify_customer_dashboard.png'
+    },
+    {
+        'id': 'billing_login',
+        'name': 'Billing & Finance Manager Login Page',
+        'url': 'http://localhost:3000/?portal=billing',
+        'setup': """
+            localStorage.clear(); sessionStorage.clear();
+            window.location.href = 'http://localhost:3000/?portal=billing';
+        """,
+        'screenshot': 'verify_billing_login.png'
+    },
+    {
+        'id': 'billing_dashboard',
+        'name': 'Billing & Finance Manager Dashboard',
+        'url': 'http://localhost:3000/?portal=billing',
+        'setup': """
+            localStorage.setItem('ttc_auth_token', 'jwt_verified_test_token');
+            localStorage.setItem('ttc_fleet360_user', JSON.stringify({
+                fullName: 'Devin Vance', role: 'ROLE_FINANCE_MANAGER', email: 'finance@ttcfleet360.com', portal: 'billing', title: 'Chief Financial Controller'
+            }));
+            window.location.href = 'http://localhost:3000/?portal=billing';
+        """,
+        'screenshot': 'verify_billing_dashboard.png'
     }
 ]
 

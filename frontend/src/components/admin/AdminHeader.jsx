@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Bell,
@@ -11,7 +11,12 @@ import {
   LogOut,
   Sparkles,
   Wrench,
-  Package
+  Package,
+  Building2,
+  CheckCircle2,
+  AlertTriangle,
+  Clock,
+  CreditCard
 } from 'lucide-react';
 
 export const AdminHeader = ({
@@ -19,30 +24,61 @@ export const AdminHeader = ({
   onSearchChange,
   currentUser,
   onLogout,
-  onSwitchPortal
+  onSwitchPortal,
+  onNavigateTab
 }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showPortalMenu, setShowPortalMenu] = useState(false);
+  const [showNotificationsMenu, setShowNotificationsMenu] = useState(false);
+  const [currentDateStr, setCurrentDateStr] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentDateStr(
+        now.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const notifications = [
+    { id: 1, title: 'Maintenance Due: Volvo FH16 (TRK-01)', time: '12 min ago', type: 'warning' },
+    { id: 2, title: 'Driver License Expiry: Marcus Vance in 20 days', time: '1 hr ago', type: 'info' },
+    { id: 3, title: 'NH-44 Highway Congestion reroute SHP-8091', time: '2 hrs ago', type: 'warning' },
+    { id: 4, title: 'Invoice INV-2024-001 (₹45,000) pending payment', time: '3 hrs ago', type: 'info' },
+    { id: 5, title: 'Warehouse Hyderabad Central: Low pallet stock', time: '5 hrs ago', type: 'alert' }
+  ];
 
   return (
-    <header className="dashboard-topbar">
-      {/* Search Input */}
+    <header className="dashboard-topbar" style={{ position: 'relative', zIndex: 40 }}>
+      {/* 1. Global Search Input */}
       <div className="topbar-search-box">
         <Search size={16} color="#64748b" />
         <input
           type="text"
-          placeholder="Search users, branches, vehicles..."
+          placeholder="Search vehicles, drivers, shipments, orders, invoices..."
           value={searchQuery || ''}
           onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
         />
       </div>
 
-      {/* Right Actions: Portal Switcher, Notifications, Profile, Date */}
-      <div className="topbar-right-actions">
-        {/* Quick Portal Switcher */}
+      {/* 2. Right Actions: Portal Switcher, Notifications, Profile, Live Date */}
+      <div className="topbar-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Workspace Portal Switcher Dropdown */}
         <div style={{ position: 'relative' }}>
           <button
-            onClick={() => setShowPortalMenu(!showPortalMenu)}
+            onClick={() => {
+              setShowPortalMenu(!showPortalMenu);
+              setShowNotificationsMenu(false);
+              setShowProfileMenu(false);
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -69,7 +105,7 @@ export const AdminHeader = ({
                 position: 'absolute',
                 top: 'calc(100% + 8px)',
                 right: 0,
-                width: '240px',
+                width: '260px',
                 background: '#131929',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '12px',
@@ -78,9 +114,20 @@ export const AdminHeader = ({
                 zIndex: 100
               }}
             >
-              <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, padding: '6px 10px', textTransform: 'uppercase' }}>
+              <div
+                style={{
+                  fontSize: '11px',
+                  color: '#64748b',
+                  fontWeight: 700,
+                  padding: '6px 10px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}
+              >
                 Switch Workspace Portal
               </div>
+
+              {/* Admin Portal */}
               <button
                 onClick={() => {
                   setShowPortalMenu(false);
@@ -107,6 +154,7 @@ export const AdminHeader = ({
                 <span style={{ fontSize: '10px', background: '#FF7A1A', color: '#fff', padding: '1px 5px', borderRadius: '4px' }}>Active</span>
               </button>
 
+              {/* Fleet Manager */}
               <button
                 onClick={() => {
                   setShowPortalMenu(false);
@@ -127,13 +175,14 @@ export const AdminHeader = ({
                   cursor: 'pointer',
                   marginBottom: '4px'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 <Truck size={15} color="#00d2ff" />
                 <span style={{ flex: 1, textAlign: 'left' }}>Fleet Manager Dashboard</span>
               </button>
 
+              {/* Driver Portal */}
               <button
                 onClick={() => {
                   setShowPortalMenu(false);
@@ -154,13 +203,14 @@ export const AdminHeader = ({
                   cursor: 'pointer',
                   marginBottom: '4px'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
                 <User size={15} color="#10b981" />
                 <span style={{ flex: 1, textAlign: 'left' }}>Driver Portal</span>
               </button>
 
+              {/* Warehouse Manager */}
               <button
                 onClick={() => {
                   setShowPortalMenu(false);
@@ -181,13 +231,14 @@ export const AdminHeader = ({
                   cursor: 'pointer',
                   marginBottom: '4px'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <Truck size={15} color="#a855f7" />
+                <Package size={15} color="#a855f7" />
                 <span style={{ flex: 1, textAlign: 'left' }}>Warehouse Manager (WMS)</span>
               </button>
 
+              {/* Logistics Manager */}
               <button
                 onClick={() => {
                   setShowPortalMenu(false);
@@ -205,33 +256,196 @@ export const AdminHeader = ({
                   color: '#cbd5e1',
                   fontSize: '12.5px',
                   fontWeight: 500,
+                  cursor: 'pointer',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Sparkles size={15} color="#f97316" />
+                <span style={{ flex: 1, textAlign: 'left' }}>Logistics Manager (LOS)</span>
+              </button>
+
+              {/* Customer Portal */}
+              <button
+                onClick={() => {
+                  setShowPortalMenu(false);
+                  onSwitchPortal('customer');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '9px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#cbd5e1',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                <Building2 size={15} color="#38bdf8" />
+                <span style={{ flex: 1, textAlign: 'left' }}>Customer Portal</span>
+              </button>
+
+              {/* Billing & Finance Manager */}
+              <button
+                onClick={() => {
+                  setShowPortalMenu(false);
+                  onSwitchPortal('billing');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '9px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#cbd5e1',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
                   cursor: 'pointer'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <Sparkles size={15} color="#FF7A1A" />
-                <span style={{ flex: 1, textAlign: 'left' }}>Logistics Manager (LOS)</span>
+                <CreditCard size={15} color="#38bdf8" />
+                <span style={{ flex: 1, textAlign: 'left' }}>Billing & Finance OS</span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Notifications Icon with unread badge */}
-        <button className="icon-badge-btn" title="5 unread notifications">
-          <Bell size={17} />
-          <span className="badge-unread">5</span>
-        </button>
+        {/* Notifications Bell with Interactive Dropdown */}
+        <div style={{ position: 'relative' }}>
+          <button
+            className="icon-badge-btn"
+            title="5 unread notifications"
+            onClick={() => {
+              setShowNotificationsMenu(!showNotificationsMenu);
+              setShowPortalMenu(false);
+              setShowProfileMenu(false);
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            <Bell size={17} />
+            <span className="badge-unread">5</span>
+          </button>
 
-        {/* Profile Pill */}
+          {showNotificationsMenu && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                width: '320px',
+                background: '#131929',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '12px',
+                padding: '12px',
+                boxShadow: '0 16px 32px rgba(0,0,0,0.6)',
+                zIndex: 100
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                  paddingBottom: '8px',
+                  marginBottom: '8px'
+                }}
+              >
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>Operational Alerts</span>
+                <span style={{ fontSize: '11px', color: '#10b981', fontWeight: 600 }}>5 Unread</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '240px', overflowY: 'auto' }}>
+                {notifications.map((n) => (
+                  <div
+                    key={n.id}
+                    style={{
+                      padding: '8px 10px',
+                      background: 'rgba(255,255,255,0.03)',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '3px'
+                    }}
+                  >
+                    <div style={{ color: '#e2e8f0', fontWeight: 500 }}>{n.title}</div>
+                    <div style={{ color: '#94a3b8', fontSize: '10.5px' }}>{n.time}</div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => {
+                  setShowNotificationsMenu(false);
+                  if (onNavigateTab) onNavigateTab('notifications');
+                }}
+                style={{
+                  width: '100%',
+                  marginTop: '10px',
+                  padding: '7px 0',
+                  background: 'rgba(255, 122, 26, 0.12)',
+                  border: '1px solid rgba(255, 122, 26, 0.3)',
+                  borderRadius: '6px',
+                  color: '#FF9E4A',
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                View All Notifications →
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Profile Pill with User Name & Avatar */}
         <div style={{ position: 'relative' }}>
           <div
             className="profile-pill"
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            onClick={() => {
+              setShowProfileMenu(!showProfileMenu);
+              setShowPortalMenu(false);
+              setShowNotificationsMenu(false);
+            }}
             title={currentUser?.fullName || 'Super Admin'}
-            style={{ cursor: 'pointer', padding: '3px 8px 3px 3px' }}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 10px 4px 5px',
+              borderRadius: '24px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}
           >
-            <div className="avatar-circle">A</div>
+            <div className="avatar-circle" style={{ width: '28px', height: '28px', fontSize: '12px' }}>
+              {(currentUser?.fullName || 'Admin').charAt(0).toUpperCase()}
+            </div>
+            <span
+              className="profile-name"
+              style={{
+                color: '#ffffff',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                letterSpacing: '-0.2px'
+              }}
+            >
+              {currentUser?.fullName || 'Super Admin'}
+            </span>
             <ChevronDown size={13} color="#94a3b8" />
           </div>
 
@@ -241,7 +455,7 @@ export const AdminHeader = ({
                 position: 'absolute',
                 top: 'calc(100% + 8px)',
                 right: 0,
-                width: '210px',
+                width: '220px',
                 background: '#131929',
                 border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '12px',
@@ -257,7 +471,7 @@ export const AdminHeader = ({
               <button
                 onClick={() => {
                   setShowProfileMenu(false);
-                  onSwitchPortal('manager');
+                  if (onNavigateTab) onNavigateTab('profile');
                 }}
                 style={{
                   width: '100%',
@@ -273,7 +487,7 @@ export const AdminHeader = ({
                   borderRadius: '6px'
                 }}
               >
-                <ArrowRightLeft size={14} /> Switch to Fleet Manager
+                <User size={14} /> My Profile & Security
               </button>
               <button
                 onClick={() => {
@@ -300,11 +514,10 @@ export const AdminHeader = ({
           )}
         </div>
 
-        {/* Date Selector */}
-        <div className="date-pill">
+        {/* Dynamic Live Date Pill */}
+        <div className="date-pill" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Calendar size={14} color="#64748b" />
-          <span>Nov 19, 2024</span>
-          <ChevronDown size={13} color="#64748b" />
+          <span style={{ fontSize: '12px', fontWeight: 600, color: '#cbd5e1' }}>{currentDateStr || 'Nov 23, 2026'}</span>
         </div>
       </div>
     </header>
