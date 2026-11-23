@@ -16,17 +16,19 @@ import {
   BarChart3,
   Warehouse,
   Forklift,
-  Boxes
+  Boxes,
+  Building2
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
-  // Distinct portals: 'admin', 'manager', 'driver', 'warehouse', 'logistics'
+  // Distinct portals: 'admin', 'manager', 'driver', 'warehouse', 'logistics', 'customer'
   const [selectedPortal, setSelectedPortal] = useState(initialPortal);
   const [email, setEmail] = useState(() => {
     if (initialPortal === 'manager') return 'manager@ttcfleet360.com';
     if (initialPortal === 'driver') return 'm.vance@fleet360.ttc.com';
     if (initialPortal === 'warehouse') return 'ethan.cole@fleet360.ttc.com';
     if (initialPortal === 'logistics') return 'elena.rostova@fleet360.ttc.com';
+    if (initialPortal === 'customer') return 'customer@ttcfleet360.com';
     return 'admin@ttcfleet360.com';
   });
   const [password, setPassword] = useState('password123');
@@ -39,6 +41,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
   const isDriver = selectedPortal === 'driver';
   const isWarehouse = selectedPortal === 'warehouse';
   const isLogistics = selectedPortal === 'logistics';
+  const isCustomer = selectedPortal === 'customer';
 
   const handlePortalSwitch = (portal) => {
     setSelectedPortal(portal);
@@ -57,6 +60,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
       setPassword('password123');
     } else if (portal === 'logistics') {
       setEmail('elena.rostova@fleet360.ttc.com');
+      setPassword('password123');
+    } else if (portal === 'customer') {
+      setEmail('customer@ttcfleet360.com');
       setPassword('password123');
     }
   };
@@ -107,6 +113,17 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
           vehicleReg: 'TTC-8492-HD',
           token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_driver_fleet360'
         };
+      } else if (selectedPortal === 'customer' || email.includes('customer') || email.includes('nexgen')) {
+        userData = {
+          username: 'customer_nexgen',
+          email: email || 'customer@ttcfleet360.com',
+          fullName: 'Sarah Jenkins',
+          companyName: 'NexGen Industrial Corp',
+          role: 'ROLE_CUSTOMER',
+          portal: 'customer',
+          customerId: 'CUST-8021',
+          token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_customer_fleet360'
+        };
       } else if (selectedPortal === 'manager' || email.includes('manager')) {
         userData = {
           username: 'manager01',
@@ -154,6 +171,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
     if (selectedPortal === 'manager') return 'Fleet Manager Dashboard';
     if (selectedPortal === 'warehouse') return 'Warehouse OS';
     if (selectedPortal === 'logistics') return 'Logistics Operations';
+    if (selectedPortal === 'customer') return 'Customer Portal';
     return 'Driver Portal';
   };
 
@@ -162,6 +180,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
     if (selectedPortal === 'manager') return 'Sign in to manage 16 Fleet Modules, Live Telemetry & Dispatches.';
     if (selectedPortal === 'warehouse') return 'Sign in to manage Inventory, Goods Receiving, Dispatches & Stock.';
     if (selectedPortal === 'logistics') return 'Sign in to access your logistics operations dashboard.';
+    if (selectedPortal === 'customer') return 'Sign in to book freight, track linehaul dispatches & settle invoices.';
     return 'Sign in to access assigned trips, turn-by-turn navigation & electronic POD.';
   };
 
@@ -187,12 +206,12 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
             </div>
           </div>
 
-          {/* 5-WAY ROLE / PORTAL SELECTOR */}
+          {/* 6-WAY ROLE / PORTAL SELECTOR */}
           <div
             className={`portal-switcher-pill-box ${isDriver || isWarehouse || isLogistics ? 'box-light' : 'box-dark'}`}
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
+              gridTemplateColumns: 'repeat(6, 1fr)',
               gap: '3px',
               padding: '3px'
             }}
@@ -320,6 +339,31 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
             >
               <Boxes size={12} />
               <span>Logistics</span>
+            </button>
+
+            {/* 6. Customer */}
+            <button
+              type="button"
+              className="portal-pill-btn"
+              onClick={() => handlePortalSwitch('customer')}
+              style={{
+                background: selectedPortal === 'customer' ? '#079DF2' : 'transparent',
+                color: selectedPortal === 'customer' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
+                fontWeight: selectedPortal === 'customer' ? '700' : '600',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                boxShadow: selectedPortal === 'customer' ? '0 2px 8px rgba(7,157,242,0.4)' : 'none'
+              }}
+            >
+              <Building2 size={12} />
+              <span>Customer</span>
             </button>
           </div>
 
@@ -497,6 +541,66 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
 
       {/* Right Column: Ultra-4K Hero Image */}
       <div className="login-hero-section">
+        {selectedPortal === 'customer' && (
+          <div className="manager-hero-container fade-in">
+            <img
+              src="/assets/manager-hero-4k.jpg"
+              alt="TTC Fleet360 Customer Portal"
+              className="login-hero-img-display"
+              style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
+            />
+            <div className="manager-hero-gradient-overlay" />
+            <div className="manager-hero-content">
+              <div
+                className="login-hero-tag"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  width: 'fit-content',
+                  maxWidth: 'fit-content',
+                  alignSelf: 'flex-start',
+                  background: 'rgba(7, 157, 242, 0.22)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(7, 157, 242, 0.55)',
+                  padding: '6px 14px',
+                  borderRadius: 24,
+                  marginBottom: 12,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+                }}
+              >
+                <Building2 size={15} color="#079DF2" strokeWidth={2.4} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#7DD3FC', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  CUSTOMER & SHIPPER PORTAL
+                </span>
+              </div>
+
+              <div className="manager-hero-titles">
+                <h2 className="manager-hero-h2">
+                  Book Freight Fast.<br />
+                  <span className="h2-gradient" style={{ background: 'linear-gradient(90deg, #FF7A1A, #079DF2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    Deliver Excellence.
+                  </span>
+                </h2>
+                <p className="manager-hero-p">
+                  Book end-to-end commercial freight, track live linehaul GPS satellite telemetry, verify e-POD signatures, and settle corporate invoices.
+                </p>
+              </div>
+              <div className="manager-feature-pills">
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" style={{ backgroundColor: '#079DF2' }} /> Instant Freight Booking & Order Dispatch
+                </div>
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" style={{ backgroundColor: '#FF7A1A' }} /> Real-Time Satellite GPS Vehicle Tracking
+                </div>
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" style={{ backgroundColor: '#16A36A' }} /> Verified Electronic Proof of Delivery (e-POD)
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {selectedPortal === 'logistics' && (
           <div className="manager-hero-container fade-in">
             <img

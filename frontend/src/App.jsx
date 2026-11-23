@@ -105,6 +105,32 @@ import {
 } from './components/logistics/LogisticsModals';
 import { logisticsService } from './services/logisticsService';
 
+// Customer Portal Components
+import { CustomerSidebar } from './components/customer/CustomerSidebar';
+import { CustomerHeader } from './components/customer/CustomerHeader';
+import { CustomerDashboard } from './components/customer/CustomerDashboard';
+import {
+  CreateOrderView as CustomerCreateOrderView,
+  MyOrdersView as CustomerMyOrdersView,
+  MyShipmentsView as CustomerMyShipmentsView,
+  LiveTrackingView as CustomerLiveTrackingView,
+  DeliveryHistoryView as CustomerDeliveryHistoryView,
+  PickupDeliveryView as CustomerPickupDeliveryView,
+  BillingInvoicesView as CustomerBillingInvoicesView,
+  PaymentManagementView as CustomerPaymentManagementView,
+  RefundRequestsView as CustomerRefundRequestsView,
+  NotificationsView as CustomerNotificationsView,
+  SupportComplaintsView as CustomerSupportComplaintsView,
+  MyProfileView as CustomerProfileView
+} from './components/customer/CustomerViews';
+import {
+  OrderDetailsModal as CustomerOrderDetailsModal,
+  InvoiceModal as CustomerInvoiceModal,
+  MakePaymentModal as CustomerMakePaymentModal,
+  ProofOfDeliveryModal as CustomerProofOfDeliveryModal
+} from './components/customer/CustomerModals';
+import { customerService } from './services/customerService';
+
 
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
@@ -222,11 +248,12 @@ export default function App() {
     }
   });
 
-  // Distinct Portals: 'admin' (Super Admin), 'manager' (Fleet Manager), 'driver' (Driver Portal), 'warehouse' (Warehouse Manager), 'logistics' (Logistics Manager)
+  // Distinct Portals: 'admin' (Super Admin), 'manager' (Fleet Manager), 'driver' (Driver Portal), 'warehouse' (Warehouse Manager), 'logistics' (Logistics Manager), 'customer' (Customer Portal)
   const [portal, setPortal] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const urlPortal = params.get('portal');
+      if (urlPortal === 'customer') return 'customer';
       if (urlPortal === 'driver') return 'driver';
       if (urlPortal === 'warehouse') return 'warehouse';
       if (urlPortal === 'logistics') return 'logistics';
@@ -236,6 +263,7 @@ export default function App() {
       const u = localStorage.getItem('ttc_fleet360_user') || sessionStorage.getItem('ttc_fleet360_user');
       const parsed = u ? JSON.parse(u) : null;
       if (parsed?.portal && parsed.portal !== 'maintenance') return parsed.portal;
+      if (parsed?.role === 'ROLE_CUSTOMER') return 'customer';
       if (parsed?.role === 'ROLE_DRIVER') return 'driver';
       if (parsed?.role === 'ROLE_WAREHOUSE_MANAGER') return 'warehouse';
       if (parsed?.role === 'ROLE_LOGISTICS_MANAGER') return 'logistics';
@@ -249,14 +277,24 @@ export default function App() {
   const [driverActiveTab, setDriverActiveTab] = useState('dashboard');
   const [warehouseActiveTab, setWarehouseActiveTab] = useState('dashboard');
   const [logisticsActiveTab, setLogisticsActiveTab] = useState('dashboard');
+  const [customerActiveTab, setCustomerActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
-  // Fleet state, Driver state, Warehouse state & Logistics state
+  // Fleet state, Driver state, Warehouse state, Logistics state & Customer state
   const [fleetState, setFleetState] = useState(() => fleetService.loadData());
   const [driverPortalData, setDriverPortalData] = useState(() => fleetService.getDriverPortalData());
   const [warehouseData, setWarehouseData] = useState(() => warehouseService.getData());
   const [logisticsData, setLogisticsData] = useState(() => logisticsService.getData());
+  const [customerData, setCustomerData] = useState(() => customerService.getData());
+
+  // Customer Modal & Active State
+  const [selectedCustomerOrder, setSelectedCustomerOrder] = useState(null);
+  const [selectedCustomerInvoice, setSelectedCustomerInvoice] = useState(null);
+  const [isMakePaymentModalOpen, setIsMakePaymentModalOpen] = useState(false);
+  const [payingInvoice, setPayingInvoice] = useState(null);
+  const [selectedCustomerPod, setSelectedCustomerPod] = useState(null);
+  const [trackingShipmentId, setTrackingShipmentId] = useState(null);
 
   // Manager Modal open states
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
@@ -289,7 +327,7 @@ export default function App() {
   const [isLogisticsPodOpen, setIsLogisticsPodOpen] = useState(false);
   const [selectedPodDelivery, setSelectedPodDelivery] = useState(null);
 
-  // Subscribe to changes in fleetService, warehouseService & logisticsService
+  // Subscribe to changes in fleetService, warehouseService, logisticsService & customerService
   useEffect(() => {
     const unsubscribeFleet = fleetService.subscribe((updatedData) => {
       setFleetState({ ...updatedData });
@@ -301,10 +339,14 @@ export default function App() {
     const unsubscribeLogistics = logisticsService.subscribe((updatedLogisticsData) => {
       setLogisticsData({ ...updatedLogisticsData });
     });
+    const unsubscribeCustomer = customerService.subscribe((updatedCustData) => {
+      setCustomerData({ ...updatedCustData });
+    });
     return () => {
       unsubscribeFleet();
       unsubscribeWarehouse();
       unsubscribeLogistics();
+      unsubscribeCustomer();
     };
   }, []);
 
@@ -319,13 +361,16 @@ export default function App() {
     setCurrentUser(userData);
     setIsAuthenticated(true);
     const targetPortal = userData.portal || (
+      userData.role === 'ROLE_CUSTOMER' ? 'customer' :
       userData.role === 'ROLE_DRIVER' ? 'driver' :
       userData.role === 'ROLE_WAREHOUSE_MANAGER' ? 'warehouse' :
       userData.role === 'ROLE_LOGISTICS_MANAGER' ? 'logistics' :
       userData.role === 'ROLE_MANAGER' ? 'manager' : 'admin'
     );
     setPortal(targetPortal);
-    if (targetPortal === 'driver') {
+    if (targetPortal === 'customer') {
+      setCustomerActiveTab('dashboard');
+    } else if (targetPortal === 'driver') {
       setDriverActiveTab('dashboard');
     } else if (targetPortal === 'warehouse') {
       setWarehouseActiveTab('dashboard');
@@ -516,6 +561,24 @@ export default function App() {
     : activeLogisticsSubItem
       ? activeLogisticsSubItem.label
       : (activeLogisticsNavItem?.label || 'Logistics Operations');
+
+  // Page title mapping for Customer
+  const customerTabTitles = {
+    'dashboard': 'Customer Dashboard',
+    'create-order': 'Create Transportation Order',
+    'orders': 'My Orders',
+    'shipments': 'My Shipments',
+    'live-tracking': 'Live GPS Tracking & Telemetry',
+    'delivery-history': 'Delivery History & Proof of Delivery',
+    'pickup-delivery': 'Pickup & Delivery Address Book',
+    'billing': 'Billing & Invoices',
+    'payments': 'Payment Management',
+    'refunds': 'Refund Requests & Claims',
+    'notifications': 'Customer Notifications',
+    'support': 'Support & Dispatch Inquiries',
+    'profile': 'My Customer Profile'
+  };
+  const customerPageTitle = customerTabTitles[customerActiveTab] || 'Customer Portal';
 
   // If not authenticated or login tab selected, render dedicated LoginPage
   if (!isAuthenticated || activeTab === 'login') {
@@ -1019,6 +1082,250 @@ export default function App() {
           />
 
           {/* Toast Feedback Notification Banner */}
+          {toastMessage && (
+            <div className="toast-banner">
+              <CheckCircle size={18} color="#16A36A" />
+              <span>{toastMessage}</span>
+            </div>
+          )}
+        </div>
+      </ErrorBoundary>
+    );
+  }
+
+  // =========================================================================
+  // 2.7 RENDER CUSTOMER PORTAL
+  // =========================================================================
+  if (portal === 'customer') {
+    const customerMetrics = customerService.getSummaryMetrics();
+
+    return (
+      <ErrorBoundary>
+        <div className="app-container customer-portal-theme">
+          {/* Left Sidebar Navigation (Customer) */}
+          <CustomerSidebar
+            activeTab={customerActiveTab}
+            onSelectTab={(tabId) => {
+              setCustomerActiveTab(tabId);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            profile={customerData.profile}
+            onLogout={handleLogout}
+            unreadNotificationsCount={customerData.notifications?.filter(n => n.unread).length || 0}
+          />
+
+          {/* Main Content Wrapper */}
+          <div className="main-wrapper">
+            {/* Top Navigation Bar (Customer) */}
+            <CustomerHeader
+              activeTabTitle={customerPageTitle}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              notifications={customerData.notifications || []}
+              onMarkNotificationRead={(id) => customerService.markNotificationRead(id)}
+              onMarkAllNotificationsRead={() => {
+                customerService.markAllNotificationsRead();
+                showToast('All notifications marked as read.');
+              }}
+              profile={customerData.profile}
+              onSelectTab={(tabId) => {
+                setCustomerActiveTab(tabId);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onLogout={handleLogout}
+            />
+
+            {/* Dynamic Customer Page Views */}
+            <main className="dashboard-content" style={{ padding: 0 }}>
+              <ErrorBoundary>
+                {customerActiveTab === 'dashboard' && (
+                  <CustomerDashboard
+                    data={customerData}
+                    metrics={customerMetrics}
+                    onNavigate={(tabId) => {
+                      setCustomerActiveTab(tabId);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    onViewOrderDetails={(order) => setSelectedCustomerOrder(order)}
+                    onViewInvoice={(invoice) => setSelectedCustomerInvoice(invoice)}
+                    onMakePayment={(invoice) => {
+                      setPayingInvoice(invoice);
+                      setIsMakePaymentModalOpen(true);
+                    }}
+                    onTrackShipment={(shipmentId) => {
+                      setTrackingShipmentId(shipmentId);
+                      setCustomerActiveTab('live-tracking');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    onViewPod={(delivery) => setSelectedCustomerPod(delivery)}
+                  />
+                )}
+
+                {customerActiveTab === 'create-order' && (
+                  <CustomerCreateOrderView
+                    profile={customerData.profile}
+                    onCreateOrder={(orderData) => {
+                      const newOrder = customerService.createOrder(orderData);
+                      showToast(`Order ${newOrder.id} submitted for logistics dispatch approval!`);
+                      return newOrder;
+                    }}
+                    onCancel={() => setCustomerActiveTab('orders')}
+                  />
+                )}
+
+                {customerActiveTab === 'orders' && (
+                  <CustomerMyOrdersView
+                    orders={customerData.orders || []}
+                    onViewDetails={(order) => setSelectedCustomerOrder(order)}
+                    onCancelOrder={(orderId) => {
+                      customerService.cancelOrder(orderId);
+                      showToast(`Order ${orderId} has been cancelled.`);
+                    }}
+                    onCreateNewOrder={() => setCustomerActiveTab('create-order')}
+                  />
+                )}
+
+                {customerActiveTab === 'shipments' && (
+                  <CustomerMyShipmentsView
+                    shipments={customerData.shipments || []}
+                    onTrackShipment={(shipmentId) => {
+                      setTrackingShipmentId(shipmentId);
+                      setCustomerActiveTab('live-tracking');
+                    }}
+                  />
+                )}
+
+                {customerActiveTab === 'live-tracking' && (
+                  <CustomerLiveTrackingView
+                    shipments={customerData.shipments || []}
+                    initialShipmentId={trackingShipmentId}
+                  />
+                )}
+
+                {customerActiveTab === 'delivery-history' && (
+                  <CustomerDeliveryHistoryView
+                    onViewPod={(del) => setSelectedCustomerPod(del)}
+                  />
+                )}
+
+                {customerActiveTab === 'pickup-delivery' && (
+                  <CustomerPickupDeliveryView
+                    profile={customerData.profile}
+                    onSaveAddress={(addr) => {
+                      customerService.saveShippingAddress(addr);
+                      showToast('Facility address saved to address book.');
+                    }}
+                  />
+                )}
+
+                {customerActiveTab === 'billing' && (
+                  <CustomerBillingInvoicesView
+                    invoices={customerData.invoices || []}
+                    onViewInvoice={(inv) => setSelectedCustomerInvoice(inv)}
+                    onMakePayment={(inv) => {
+                      setPayingInvoice(inv);
+                      setIsMakePaymentModalOpen(true);
+                    }}
+                  />
+                )}
+
+                {customerActiveTab === 'payments' && (
+                  <CustomerPaymentManagementView
+                    payments={customerData.payments || []}
+                  />
+                )}
+
+                {customerActiveTab === 'refunds' && (
+                  <CustomerRefundRequestsView
+                    refunds={customerData.refunds || []}
+                    onRequestRefund={(refundPayload) => {
+                      customerService.requestRefund(refundPayload);
+                      showToast('Refund claim submitted to claims auditor.');
+                    }}
+                  />
+                )}
+
+                {customerActiveTab === 'notifications' && (
+                  <CustomerNotificationsView
+                    notifications={customerData.notifications || []}
+                    onMarkRead={(id) => customerService.markNotificationRead(id)}
+                    onMarkAllRead={() => {
+                      customerService.markAllNotificationsRead();
+                      showToast('All notifications marked as read.');
+                    }}
+                  />
+                )}
+
+                {customerActiveTab === 'support' && (
+                  <CustomerSupportComplaintsView
+                    tickets={customerData.tickets || []}
+                    onCreateTicket={(ticketPayload) => {
+                      customerService.createSupportTicket(ticketPayload);
+                      showToast('Support ticket logged with dispatch desk.');
+                    }}
+                  />
+                )}
+
+                {customerActiveTab === 'profile' && (
+                  <CustomerProfileView
+                    profile={customerData.profile}
+                    onUpdateProfile={(profileData) => {
+                      customerService.updateProfile(profileData);
+                      showToast('Profile information updated.');
+                    }}
+                  />
+                )}
+              </ErrorBoundary>
+            </main>
+          </div>
+
+          {/* Customer Interactive Modals */}
+          <CustomerOrderDetailsModal
+            order={selectedCustomerOrder}
+            isOpen={!!selectedCustomerOrder}
+            onClose={() => setSelectedCustomerOrder(null)}
+            onCancelOrder={(orderId) => {
+              customerService.cancelOrder(orderId);
+              showToast(`Order ${orderId} cancelled.`);
+              setSelectedCustomerOrder(null);
+            }}
+            onTrackShipment={(shipmentId) => {
+              setTrackingShipmentId(shipmentId);
+              setCustomerActiveTab('live-tracking');
+            }}
+          />
+
+          <CustomerInvoiceModal
+            invoice={selectedCustomerInvoice}
+            isOpen={!!selectedCustomerInvoice}
+            onClose={() => setSelectedCustomerInvoice(null)}
+            onMakePayment={(inv) => {
+              setSelectedCustomerInvoice(null);
+              setPayingInvoice(inv);
+              setIsMakePaymentModalOpen(true);
+            }}
+          />
+
+          <CustomerMakePaymentModal
+            invoice={payingInvoice}
+            isOpen={isMakePaymentModalOpen}
+            onClose={() => {
+              setIsMakePaymentModalOpen(false);
+              setPayingInvoice(null);
+            }}
+            onSubmitPayment={(invId, payDetails) => {
+              customerService.makePayment(invId, payDetails);
+              showToast(`Payment for ${invId} successfully authorized!`);
+            }}
+          />
+
+          <CustomerProofOfDeliveryModal
+            delivery={selectedCustomerPod}
+            isOpen={!!selectedCustomerPod}
+            onClose={() => setSelectedCustomerPod(null)}
+          />
+
+          {/* Toast Notification Banner */}
           {toastMessage && (
             <div className="toast-banner">
               <CheckCircle size={18} color="#16A36A" />

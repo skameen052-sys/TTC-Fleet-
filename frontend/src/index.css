@@ -4206,6 +4206,17 @@ body {
   color: #FFB37C;
 }
 
+/* =========================================================================
+   CUSTOMER PORTAL THEME & NAVIGATION
+   ========================================================================= */
+.customer-portal-theme {
+  background-color: var(--bg-dashboard);
+}
+
+.customer-sidebar {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .logistics-manager-badge {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
