@@ -27,8 +27,10 @@ export const DriverHeader = ({
   const [currentDateTime, setCurrentDateTime] = useState('');
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showPortalDropdown, setShowPortalDropdown] = useState(false);
   const notifRef = useRef(null);
   const profileRef = useRef(null);
+  const portalRef = useRef(null);
 
   useEffect(() => {
     const updateTime = () => {
@@ -51,6 +53,9 @@ export const DriverHeader = ({
       }
       if (profileRef.current && !profileRef.current.contains(e.target)) {
         setShowProfileDropdown(false);
+      }
+      if (portalRef.current && !portalRef.current.contains(e.target)) {
+        setShowPortalDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
