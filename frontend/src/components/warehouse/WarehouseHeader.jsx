@@ -215,44 +215,6 @@ export const WarehouseHeader = ({
                 >
                   <Warehouse size={15} /> Facilities Overview
                 </button>
-                {onSwitchPortal && (
-                  <button
-                    className="dropdown-menu-btn"
-                    onClick={() => {
-                      setShowProfileDropdown(false);
-                      onSwitchPortal('admin');
-                    }}
-                    style={{ color: '#FF7A1A', fontWeight: '600' }}
-                  >
-                    <ShieldCheck size={15} color="#FF7A1A" /> Switch to Admin Dashboard
-                  </button>
-                )}
-                {(onSwitchPortal || onSwitchToManager) && (
-                  <button
-                    className="dropdown-menu-btn"
-                    onClick={() => {
-                      setShowProfileDropdown(false);
-                      if (onSwitchPortal) onSwitchPortal('manager');
-                      else if (onSwitchToManager) onSwitchToManager();
-                    }}
-                    style={{ color: '#3478F6', fontWeight: '600' }}
-                  >
-                    <Truck size={15} color="#3478F6" /> Switch to Fleet Manager
-                  </button>
-                )}
-                {(onSwitchPortal || onSwitchToDriver) && (
-                  <button
-                    className="dropdown-menu-btn"
-                    onClick={() => {
-                      setShowProfileDropdown(false);
-                      if (onSwitchPortal) onSwitchPortal('driver');
-                      else if (onSwitchToDriver) onSwitchToDriver();
-                    }}
-                    style={{ color: '#16A36A', fontWeight: '600' }}
-                  >
-                    <User size={15} color="#16A36A" /> Switch to Driver Portal
-                  </button>
-                )}
                 <button
                   className="dropdown-menu-btn logout"
                   onClick={() => {

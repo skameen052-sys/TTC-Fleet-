@@ -222,50 +222,6 @@ export const LogisticsHeader = ({
                 >
                   <User size={15} /> My Profile
                 </button>
-                {onSwitchPortal && (
-                  <>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#FF7A1A', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('admin');
-                      }}
-                    >
-                      <Shield size={15} color="#FF7A1A" /> Switch to Admin Dashboard
-                    </button>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#3478F6', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('manager');
-                      }}
-                    >
-                      <Truck size={15} color="#3478F6" /> Switch to Fleet Manager
-                    </button>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#16A36A', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('driver');
-                      }}
-                    >
-                      <User size={15} color="#16A36A" /> Switch to Driver Portal
-                    </button>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#FF7A1A', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('warehouse');
-                      }}
-                    >
-                      <Warehouse size={15} color="#FF7A1A" /> Switch to Warehouse OS
-                    </button>
-                  </>
-                )}
                 <button
                   className="dropdown-menu-btn logout"
                   onClick={() => {

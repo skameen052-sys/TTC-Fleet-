@@ -335,29 +335,6 @@ export const WarehouseSidebar = ({
           <Radio size={16} color="#16A36A" />
         </div>
 
-        {/* Switchers to Other Portals */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {onSwitchToManager && (
-            <button
-              className="portal-switch-action-btn"
-              onClick={onSwitchToManager}
-              title="Switch to Fleet Manager Portal"
-            >
-              <span>Switch to Fleet Manager</span>
-            </button>
-          )}
-          {onSwitchToDriver && (
-            <button
-              className="portal-switch-action-btn"
-              style={{ marginTop: 0 }}
-              onClick={onSwitchToDriver}
-              title="Switch to Driver Portal"
-            >
-              <span>Switch to Driver Portal</span>
-            </button>
-          )}
-        </div>
-
         {/* Logout Action */}
         <button
           className="sidebar-logout-btn"

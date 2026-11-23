@@ -165,40 +165,6 @@ export const DriverHeader = ({
                 <span className="profile-tag">CDL-A Pilot ({driver?.assignedVehicleReg || 'TTC-8492-HD'})</span>
               </div>
               <div className="dropdown-menu-list">
-                {onSwitchPortal && (
-                  <>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#FF7A1A', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('admin');
-                      }}
-                    >
-                      <Shield size={15} color="#FF7A1A" /> Switch to Admin Dashboard
-                    </button>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#00a3ff', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('manager');
-                      }}
-                    >
-                      <Truck size={15} color="#00a3ff" /> Switch to Fleet Manager
-                    </button>
-                    <button
-                      className="dropdown-menu-btn"
-                      style={{ color: '#EA580C', fontWeight: 600 }}
-                      onClick={() => {
-                        setShowProfileDropdown(false);
-                        onSwitchPortal('warehouse');
-                      }}
-                    >
-                      <Building2 size={15} color="#EA580C" /> Switch to Warehouse OS
-                    </button>
-                  </>
-                )}
                 <button
                   className="dropdown-menu-btn"
                   onClick={() => {

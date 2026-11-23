@@ -317,30 +317,6 @@ export const LogisticsSidebar = ({
         <Radio size={16} color="#FF7A1A" />
       </div>
 
-      {/* Quick Portal Switcher */}
-      {onSwitchPortal && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', margin: '4px 12px' }}>
-          <button
-            className="sidebar-switcher-btn"
-            style={{ background: 'rgba(0,163,255,0.1)', border: '1px solid rgba(0,163,255,0.25)', color: '#00d2ff', fontSize: '11px', padding: '6px 10px' }}
-            onClick={() => onSwitchPortal('manager')}
-            title="Switch to Fleet Manager"
-          >
-            <Truck size={13} color="#00d2ff" />
-            <span>Switch to Fleet Manager</span>
-          </button>
-          <button
-            className="sidebar-switcher-btn"
-            style={{ background: 'rgba(255,122,26,0.1)', border: '1px solid rgba(255,122,26,0.25)', color: '#FF9E4A', fontSize: '11px', padding: '6px 10px' }}
-            onClick={() => onSwitchPortal('warehouse')}
-            title="Switch to Warehouse OS"
-          >
-            <Warehouse size={13} color="#FF9E4A" />
-            <span>Switch to Warehouse OS</span>
-          </button>
-        </div>
-      )}
-
       {/* Bottom Profile Summary & Logout */}
       <div className="sidebar-footer-profile" style={{ padding: '8px 14px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>

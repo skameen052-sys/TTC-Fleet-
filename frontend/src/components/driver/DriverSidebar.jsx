@@ -112,43 +112,6 @@ export const DriverSidebar = ({
         <Radio size={16} color="#16A36A" />
       </div>
 
-      {/* Switch Portal Buttons */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
-        {onSwitchPortal && (
-          <button
-            className="sidebar-switcher-btn"
-            style={{ background: 'rgba(255,122,26,0.12)', border: '1px solid rgba(255,122,26,0.3)', color: '#FF9E4A' }}
-            onClick={() => onSwitchPortal('admin')}
-            title="Switch to Admin Dashboard"
-          >
-            <Shield size={14} color="#FF7A1A" />
-            <span>Switch to Admin Dashboard</span>
-          </button>
-        )}
-        {(onSwitchPortal || onSwitchToManager) && (
-          <button
-            className="sidebar-switcher-btn"
-            style={{ background: 'rgba(0,163,255,0.12)', border: '1px solid rgba(0,163,255,0.3)', color: '#00d2ff' }}
-            onClick={() => onSwitchPortal ? onSwitchPortal('manager') : onSwitchToManager()}
-            title="Switch to Fleet Manager"
-          >
-            <Truck size={14} color="#00d2ff" />
-            <span>Switch to Fleet Manager</span>
-          </button>
-        )}
-        {(onSwitchPortal || onSwitchToWarehouse) && (
-          <button
-            className="sidebar-switcher-btn"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#cbd5e1' }}
-            onClick={() => onSwitchPortal ? onSwitchPortal('warehouse') : onSwitchToWarehouse()}
-            title="Switch to Warehouse OS"
-          >
-            <Warehouse size={14} />
-            <span>Switch to Warehouse OS</span>
-          </button>
-        )}
-      </div>
-
       {/* Logout Action */}
       <button
         className="sidebar-logout-btn"
