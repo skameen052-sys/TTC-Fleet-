@@ -110,27 +110,6 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
         };
       }
 
-      // Backend API validation
-      try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: email.includes('@') ? userData.username : email,
-            password: password
-          })
-        });
-
-        if (response.ok) {
-          const resData = await response.json();
-          if (resData.success && resData.data) {
-            userData = { ...userData, ...resData.data };
-          }
-        }
-      } catch (networkErr) {
-        console.info('Backend authentication fallback active:', networkErr);
-      }
-
       if (password.length >= 6) {
         if (rememberMe) {
           localStorage.setItem('ttc_fleet360_user', JSON.stringify(userData));
