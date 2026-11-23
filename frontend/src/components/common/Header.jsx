@@ -11,7 +11,9 @@ import {
   Shield,
   User,
   ArrowRightLeft,
-  Building2
+  Building2,
+  Wrench,
+  Package
 } from 'lucide-react';
 
 export const Header = ({
@@ -94,6 +96,89 @@ export const Header = ({
 
       {/* Middle & Right Navigation Elements */}
       <div className="header-right-col">
+        {/* Quick Portal Switcher Pill */}
+        {onSwitchPortal && (
+          <div className="header-portal-switcher-container" style={{ position: 'relative' }} ref={portalRef}>
+            <button
+              onClick={() => setShowPortalDropdown(!showPortalDropdown)}
+              className="header-portal-switcher-btn"
+              title="Current: Fleet Manager Portal"
+            >
+              <Truck size={14} color="#1D4ED8" />
+              <span>Fleet Manager</span>
+              <ChevronDown size={13} color="#1D4ED8" />
+            </button>
+
+            {showPortalDropdown && (
+              <div className="header-portal-dropdown">
+                <div className="header-portal-dropdown-title">
+                  Switch Workspace Portal
+                </div>
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('admin');
+                  }}
+                  className="header-portal-dropdown-item"
+                  style={{ color: '#FF7A1A' }}
+                >
+                  <Shield size={14} color="#FF7A1A" />
+                  <span>Admin Dashboard</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('manager');
+                  }}
+                  className="header-portal-dropdown-item"
+                  style={{ color: '#1D4ED8', background: '#EFF6FF', fontWeight: 700 }}
+                >
+                  <Truck size={14} color="#1D4ED8" />
+                  <span style={{ flex: 1, textAlign: 'left' }}>Fleet Manager</span>
+                  <span className="portal-badge-active">Active</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('driver');
+                  }}
+                  className="header-portal-dropdown-item"
+                  style={{ color: '#16A34A' }}
+                >
+                  <User size={14} color="#16A34A" />
+                  <span>Driver Portal</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('maintenance');
+                  }}
+                  className="header-portal-dropdown-item"
+                  style={{ color: '#f59e0b' }}
+                >
+                  <Wrench size={14} color="#f59e0b" />
+                  <span>Maintenance Dashboard</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('warehouse');
+                  }}
+                  className="header-portal-dropdown-item"
+                  style={{ color: '#EA580C' }}
+                >
+                  <Building2 size={14} color="#EA580C" />
+                  <span>Warehouse Portal</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Live Fleet Telemetry Pill */}
         <div
           className="driver-trip-telemetry-pill fleet-telemetry-pill"

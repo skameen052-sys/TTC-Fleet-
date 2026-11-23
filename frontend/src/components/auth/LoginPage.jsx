@@ -16,15 +16,17 @@ import {
   BarChart3,
   Warehouse,
   Forklift,
-  Boxes
+  Boxes,
+  Wrench
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
-  // 5 distinct portals: 'admin', 'manager', 'driver', 'warehouse', 'logistics'
+  // Distinct portals: 'admin', 'manager', 'driver', 'maintenance', 'warehouse', 'logistics'
   const [selectedPortal, setSelectedPortal] = useState(initialPortal);
   const [email, setEmail] = useState(() => {
     if (initialPortal === 'manager') return 'manager@ttcfleet360.com';
     if (initialPortal === 'driver') return 'm.vance@fleet360.ttc.com';
+    if (initialPortal === 'maintenance') return 'maintenance@ttcfleet360.com';
     if (initialPortal === 'warehouse') return 'ethan.cole@fleet360.ttc.com';
     if (initialPortal === 'logistics') return 'elena.rostova@fleet360.ttc.com';
     return 'admin@ttcfleet360.com';
@@ -39,6 +41,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
   const isDriver = selectedPortal === 'driver';
   const isWarehouse = selectedPortal === 'warehouse';
   const isLogistics = selectedPortal === 'logistics';
+  const isMaintenance = selectedPortal === 'maintenance';
 
   const handlePortalSwitch = (portal) => {
     setSelectedPortal(portal);
@@ -51,6 +54,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
       setPassword('password123');
     } else if (portal === 'driver') {
       setEmail('m.vance@fleet360.ttc.com');
+      setPassword('password123');
+    } else if (portal === 'maintenance') {
+      setEmail('maintenance@ttcfleet360.com');
       setPassword('password123');
     } else if (portal === 'warehouse') {
       setEmail('ethan.cole@fleet360.ttc.com');
@@ -84,6 +90,17 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
           staffId: 'LM-DIR-094',
           hubId: 'HQ-CENTRAL',
           token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_logistics_fleet360'
+        };
+      } else if (selectedPortal === 'maintenance' || email.includes('maint') || email.includes('kowalski')) {
+        userData = {
+          username: 'maint_lead',
+          email: email || 'maintenance@ttcfleet360.com',
+          fullName: 'Dave Kowalski',
+          role: 'ROLE_MAINTENANCE_MANAGER',
+          portal: 'maintenance',
+          staffId: 'M-LEAD-01',
+          shopLocation: 'Gary Service Facility',
+          token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_maintenance_fleet360'
         };
       } else if (selectedPortal === 'warehouse' || email.includes('ethan') || email.includes('warehouse')) {
         userData = {
@@ -152,6 +169,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
   const getPortalTitle = () => {
     if (selectedPortal === 'admin') return 'Admin Dashboard';
     if (selectedPortal === 'manager') return 'Fleet Manager Dashboard';
+    if (selectedPortal === 'maintenance') return 'Maintenance & Diagnostics OS';
     if (selectedPortal === 'warehouse') return 'Warehouse OS';
     if (selectedPortal === 'logistics') return 'Logistics Operations';
     return 'Driver Portal';
@@ -160,6 +178,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
   const getPortalSubtitle = () => {
     if (selectedPortal === 'admin') return 'Sign in to access Executive Overview, System Control & Subscriptions.';
     if (selectedPortal === 'manager') return 'Sign in to manage 16 Fleet Modules, Live Telemetry & Dispatches.';
+    if (selectedPortal === 'maintenance') return 'Sign in to access Service Overhauls, Telematics & Bay Diagnostics.';
     if (selectedPortal === 'warehouse') return 'Sign in to manage Inventory, Goods Receiving, Dispatches & Stock.';
     if (selectedPortal === 'logistics') return 'Sign in to access your logistics operations dashboard.';
     return 'Sign in to access assigned trips, turn-by-turn navigation & electronic POD.';
@@ -187,12 +206,12 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
             </div>
           </div>
 
-          {/* 5-WAY ROLE / PORTAL SELECTOR */}
+          {/* 6-WAY ROLE / PORTAL SELECTOR */}
           <div
             className={`portal-switcher-pill-box ${isDriver || isWarehouse || isLogistics ? 'box-light' : 'box-dark'}`}
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
+              gridTemplateColumns: 'repeat(6, 1fr)',
               gap: '3px',
               padding: '3px'
             }}
@@ -272,7 +291,32 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               <span>Driver</span>
             </button>
 
-            {/* 4. Warehouse */}
+            {/* 4. Maintenance */}
+            <button
+              type="button"
+              className="portal-pill-btn"
+              onClick={() => handlePortalSwitch('maintenance')}
+              style={{
+                background: selectedPortal === 'maintenance' ? '#f59e0b' : 'transparent',
+                color: selectedPortal === 'maintenance' ? '#FFFFFF' : isDriver || isWarehouse ? '#475569' : '#94A3B8',
+                fontWeight: selectedPortal === 'maintenance' ? '700' : '600',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                boxShadow: selectedPortal === 'maintenance' ? '0 2px 8px rgba(245,158,11,0.4)' : 'none'
+              }}
+            >
+              <Wrench size={12} />
+              <span>Maint</span>
+            </button>
+
+            {/* 5. Warehouse */}
             <button
               type="button"
               className="portal-pill-btn"
@@ -549,6 +593,42 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
                 </div>
                 <div className="manager-feature-pill">
                   <span className="pill-dot" /> Live Satellite GPS Fleet Telemetry
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {selectedPortal === 'maintenance' && (
+          <div className="manager-hero-container fade-in">
+            <img
+              src="/assets/manager-hero-4k.jpg"
+              alt="TTC Fleet360 Fleet Maintenance & Asset Health"
+              className="login-hero-img-display"
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+            />
+            <div className="manager-hero-gradient-overlay" />
+            <div className="manager-hero-content">
+              <div className="manager-hero-titles">
+                <h2 className="manager-hero-h2">
+                  Predictive Maintenance.<br />
+                  <span className="h2-gradient" style={{ background: 'linear-gradient(90deg, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    Zero-Downtime Operations.
+                  </span>
+                </h2>
+                <p className="manager-hero-p">
+                  Continuous OBD-II telematics diagnostics, bay overhauls, and driver defect ticket resolution.
+                </p>
+              </div>
+              <div className="manager-feature-pills">
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" style={{ backgroundColor: '#f59e0b' }} /> Real-time OBD-II Diagnostics
+                </div>
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" style={{ backgroundColor: '#f59e0b' }} /> Preventative Overhaul Cycles
+                </div>
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" style={{ backgroundColor: '#f59e0b' }} /> Fleet Bay & Technician Roster
                 </div>
               </div>
             </div>

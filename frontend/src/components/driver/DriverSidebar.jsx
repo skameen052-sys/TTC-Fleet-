@@ -16,7 +16,8 @@ import {
   Radio,
   LogOut,
   Warehouse,
-  Shield
+  Shield,
+  Wrench
 } from 'lucide-react';
 
 export const driverNavItems = [

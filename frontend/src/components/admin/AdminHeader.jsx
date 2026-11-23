@@ -9,7 +9,9 @@ import {
   Truck,
   ArrowRightLeft,
   LogOut,
-  Sparkles
+  Sparkles,
+  Wrench,
+  Package
 } from 'lucide-react';
 
 export const AdminHeader = ({
@@ -157,6 +159,33 @@ export const AdminHeader = ({
               >
                 <User size={15} color="#10b981" />
                 <span style={{ flex: 1, textAlign: 'left' }}>Driver Portal</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowPortalMenu(false);
+                  onSwitchPortal('maintenance');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '9px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#cbd5e1',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <Wrench size={15} color="#f59e0b" />
+                <span style={{ flex: 1, textAlign: 'left' }}>Maintenance Dashboard</span>
               </button>
 
               <button

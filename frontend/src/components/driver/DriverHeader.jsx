@@ -10,7 +10,9 @@ import {
   Shield,
   Truck,
   User,
-  Building2
+  Building2,
+  Wrench,
+  Package
 } from 'lucide-react';
 
 export const DriverHeader = ({
@@ -72,6 +74,185 @@ export const DriverHeader = ({
 
       {/* Middle & Right Navigation Elements */}
       <div className="header-right-col">
+        {/* Quick Portal Switcher Pill */}
+        {onSwitchPortal && (
+          <div style={{ position: 'relative' }} ref={portalRef}>
+            <button
+              onClick={() => setShowPortalDropdown(!showPortalDropdown)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.2))',
+                border: '1.5px solid #10b981',
+                color: '#10b981',
+                padding: '6px 14px',
+                borderRadius: '20px',
+                fontSize: '12px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 0 12px rgba(16, 185, 129, 0.2)'
+              }}
+            >
+              <User size={14} color="#10b981" />
+              <span>Driver Portal</span>
+              <ChevronDown size={13} />
+            </button>
+
+            {showPortalDropdown && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  right: 0,
+                  width: '240px',
+                  background: '#0d121f',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '12px',
+                  padding: '8px',
+                  boxShadow: '0 16px 32px rgba(0,0,0,0.6)',
+                  zIndex: 100
+                }}
+              >
+                <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, padding: '6px 10px', textTransform: 'uppercase' }}>
+                  Switch Workspace Portal
+                </div>
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('admin');
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '9px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#FF9E4A',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    marginBottom: '4px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,122,26,0.15)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <Shield size={15} color="#FF7A1A" />
+                  <span style={{ flex: 1, textAlign: 'left' }}>Admin Dashboard</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('manager');
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '9px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#00d2ff',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    marginBottom: '4px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,163,255,0.15)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <Truck size={15} color="#00d2ff" />
+                  <span style={{ flex: 1, textAlign: 'left' }}>Fleet Manager Dashboard</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('driver');
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '9px 12px',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    borderRadius: '8px',
+                    color: '#10b981',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    marginBottom: '4px'
+                  }}
+                >
+                  <User size={15} color="#10b981" />
+                  <span style={{ flex: 1, textAlign: 'left' }}>Driver Portal (Active)</span>
+                  <span style={{ fontSize: '10px', background: '#10b981', color: '#fff', padding: '1px 5px', borderRadius: '4px' }}>Active</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('maintenance');
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '9px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#cbd5e1',
+                    fontSize: '12.5px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    marginBottom: '4px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <Wrench size={15} color="#f59e0b" />
+                  <span style={{ flex: 1, textAlign: 'left' }}>Maintenance Dashboard</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPortalDropdown(false);
+                    onSwitchPortal('warehouse');
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '9px 12px',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#cbd5e1',
+                    fontSize: '12.5px',
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                >
+                  <Package size={15} color="#8b5cf6" />
+                  <span style={{ flex: 1, textAlign: 'left' }}>Warehouse OS</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
         {/* Active Trip Telemetry Pill */}
         <div
           className="driver-trip-telemetry-pill"

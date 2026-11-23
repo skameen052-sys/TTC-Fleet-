@@ -4221,5 +4221,55 @@ body {
   }
 }
 
+/* ==========================================================================
+   MAINTENANCE PORTAL STYLES (MAINTENANCE & ASSET HEALTH OS)
+   ========================================================================== */
+.maintenance-portal-theme {
+  background-color: var(--bg-dashboard);
+}
+
+.maintenance-sidebar {
+  border-right: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.maintenance-sidebar .brand-sub-badge {
+  color: #fbbf24;
+}
+
+.maintenance-sidebar .nav-item-btn.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-left: 3px solid #f59e0b;
+  color: #fbbf24;
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT FIXES FOR ALL PORTALS
+   ========================================================================== */
+@media (max-width: 900px) {
+  .fleet-sidebar {
+    width: 68px;
+  }
+  .fleet-sidebar .brand-text-wrap,
+  .fleet-sidebar .nav-item-label,
+  .fleet-sidebar .nav-badge-pill,
+  .fleet-sidebar .sidebar-system-status,
+  .fleet-sidebar .telemetry-sidebar-card,
+  .fleet-sidebar .sidebar-switcher-btn span,
+  .fleet-sidebar .sidebar-logout-btn span {
+    display: none !important;
+  }
+  .fleet-sidebar .nav-item-btn,
+  .fleet-sidebar .sidebar-switcher-btn,
+  .fleet-sidebar .sidebar-logout-btn {
+    justify-content: center !important;
+    padding: 10px 0 !important;
+  }
+  .main-wrapper {
+    margin-left: 68px !important;
+    width: calc(100vw - 68px) !important;
+    max-width: calc(100vw - 68px) !important;
+  }
+}
+
 
 

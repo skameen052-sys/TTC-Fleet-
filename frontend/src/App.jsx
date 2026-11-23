@@ -105,6 +105,11 @@ import {
 } from './components/logistics/LogisticsModals';
 import { logisticsService } from './services/logisticsService';
 
+// Maintenance Portal Components
+import { MaintenanceSidebar, maintenanceNavItems } from './components/maintenance/MaintenanceSidebar';
+import { MaintenanceHeader } from './components/maintenance/MaintenanceHeader';
+import { MaintenanceDashboard } from './components/maintenance/MaintenanceDashboard';
+
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -221,11 +226,12 @@ export default function App() {
     }
   });
 
-  // 5 Distinct Portals: 'admin' (Super Admin), 'manager' (Fleet Manager), 'driver' (Driver Portal), 'warehouse' (Warehouse Manager), 'logistics' (Logistics Manager)
+  // Distinct Portals: 'admin' (Super Admin), 'manager' (Fleet Manager), 'driver' (Driver Portal), 'maintenance' (Maintenance Dashboard), 'warehouse' (Warehouse Manager), 'logistics' (Logistics Manager)
   const [portal, setPortal] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const urlPortal = params.get('portal');
+      if (urlPortal === 'maintenance' || urlPortal === 'maint') return 'maintenance';
       if (urlPortal === 'driver') return 'driver';
       if (urlPortal === 'warehouse') return 'warehouse';
       if (urlPortal === 'logistics') return 'logistics';
@@ -235,6 +241,7 @@ export default function App() {
       const u = localStorage.getItem('ttc_fleet360_user') || sessionStorage.getItem('ttc_fleet360_user');
       const parsed = u ? JSON.parse(u) : null;
       if (parsed?.portal) return parsed.portal;
+      if (parsed?.role === 'ROLE_MAINTENANCE_MANAGER') return 'maintenance';
       if (parsed?.role === 'ROLE_DRIVER') return 'driver';
       if (parsed?.role === 'ROLE_WAREHOUSE_MANAGER') return 'warehouse';
       if (parsed?.role === 'ROLE_LOGISTICS_MANAGER') return 'logistics';
@@ -248,6 +255,7 @@ export default function App() {
   const [driverActiveTab, setDriverActiveTab] = useState('dashboard');
   const [warehouseActiveTab, setWarehouseActiveTab] = useState('dashboard');
   const [logisticsActiveTab, setLogisticsActiveTab] = useState('dashboard');
+  const [maintenanceActiveTab, setMaintenanceActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
@@ -318,13 +326,16 @@ export default function App() {
     setCurrentUser(userData);
     setIsAuthenticated(true);
     const targetPortal = userData.portal || (
+      userData.role === 'ROLE_MAINTENANCE_MANAGER' ? 'maintenance' :
       userData.role === 'ROLE_DRIVER' ? 'driver' :
       userData.role === 'ROLE_WAREHOUSE_MANAGER' ? 'warehouse' :
       userData.role === 'ROLE_LOGISTICS_MANAGER' ? 'logistics' :
       userData.role === 'ROLE_MANAGER' ? 'manager' : 'admin'
     );
     setPortal(targetPortal);
-    if (targetPortal === 'driver') {
+    if (targetPortal === 'maintenance') {
+      setMaintenanceActiveTab('dashboard');
+    } else if (targetPortal === 'driver') {
       setDriverActiveTab('dashboard');
     } else if (targetPortal === 'warehouse') {
       setWarehouseActiveTab('dashboard');
@@ -542,7 +553,8 @@ export default function App() {
           onLogout={handleLogout}
           onSwitchPortal={(targetPortal) => {
             setPortal(targetPortal);
-            if (targetPortal === 'driver') setDriverActiveTab('dashboard');
+            if (targetPortal === 'maintenance') setMaintenanceActiveTab('dashboard');
+            else if (targetPortal === 'driver') setDriverActiveTab('dashboard');
             else if (targetPortal === 'warehouse') setWarehouseActiveTab('dashboard');
             else setActiveTab('dashboard');
           }}
@@ -553,6 +565,157 @@ export default function App() {
             <span>{toastMessage}</span>
           </div>
         )}
+      </ErrorBoundary>
+    );
+  }
+
+  // =========================================================================
+  // 1.5. RENDER MAINTENANCE & ASSET HEALTH DASHBOARD
+  // =========================================================================
+  if (portal === 'maintenance') {
+    return (
+      <ErrorBoundary>
+        <div className="app-container maintenance-portal-theme">
+          <MaintenanceSidebar
+            activeTab={maintenanceActiveTab}
+            onSelectTab={setMaintenanceActiveTab}
+            metrics={fleetState.summaryCards}
+            unreadAlertsCount={3}
+            onLogout={handleLogout}
+            onSwitchPortal={(targetPortal) => {
+              setPortal(targetPortal);
+              if (targetPortal === 'maintenance') setMaintenanceActiveTab('dashboard');
+              else if (targetPortal === 'driver') setDriverActiveTab('dashboard');
+              else if (targetPortal === 'warehouse') setWarehouseActiveTab('dashboard');
+              else setActiveTab('dashboard');
+            }}
+          />
+
+          <div className="main-wrapper">
+            {/* Quick Portal Switcher Banner */}
+            <div style={{
+              backgroundColor: '#0F172A',
+              color: '#E2E8F0',
+              padding: '10px 24px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: '13px',
+              borderBottom: '1px solid #334155',
+              zIndex: 10
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
+                <strong style={{ color: '#f59e0b' }}>Maintenance & Asset Health Portal</strong>
+                <span style={{ color: '#94A3B8' }}>(Dave Kowalski - Master Diagnostic Chief)</span>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => {
+                    setPortal('admin');
+                    setActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#FF7A1A',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  👑 Open Admin Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    setPortal('manager');
+                    setActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#00a3ff',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  🚚 Open Fleet Manager
+                </button>
+                <button
+                  onClick={() => {
+                    setPortal('driver');
+                    setDriverActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#10b981',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  🧑‍✈️ Open Driver Portal
+                </button>
+              </div>
+            </div>
+
+            <MaintenanceHeader
+              activeTabTitle={
+                maintenanceActiveTab === 'dashboard' ? 'Maintenance & Asset Health Dashboard' :
+                maintenanceActiveTab === 'schedules' ? 'Maintenance Schedules & Overhauls' :
+                maintenanceActiveTab === 'history' ? 'Historical Service & Repair Logs' :
+                maintenanceActiveTab === 'requests' ? 'Driver Defect & Repair Requests' :
+                maintenanceActiveTab === 'health' ? 'Vehicle Health & Telematics Diagnostics' :
+                maintenanceActiveTab === 'compliance' ? 'Compliance, PUC & Fitness Certificates' :
+                maintenanceActiveTab === 'technicians' ? 'Technician Bay & Duty Roster' :
+                'Maintenance Profile'
+              }
+              unreadAlertsCount={3}
+              onScheduleService={() => setIsScheduleMaintOpen(true)}
+              onLogout={handleLogout}
+              onSwitchPortal={(targetPortal) => {
+                setPortal(targetPortal);
+                if (targetPortal === 'maintenance') setMaintenanceActiveTab('dashboard');
+                else if (targetPortal === 'driver') setDriverActiveTab('dashboard');
+                else if (targetPortal === 'warehouse') setWarehouseActiveTab('dashboard');
+                else setActiveTab('dashboard');
+              }}
+              currentUser={currentUser}
+            />
+
+            <main className="dashboard-content">
+              <MaintenanceDashboard
+                maintenanceData={maintenanceData}
+                vehicles={fleetState.vehicles || []}
+                activeSubTab={maintenanceActiveTab}
+                onSelectTab={setMaintenanceActiveTab}
+                onScheduleService={() => setIsScheduleMaintOpen(true)}
+              />
+            </main>
+          </div>
+
+          <ScheduleMaintenanceModal
+            isOpen={isScheduleMaintOpen}
+            onClose={() => setIsScheduleMaintOpen(false)}
+            onScheduleMaintenance={handleScheduleMaintenance}
+            vehicles={fleetState.vehicles || []}
+          />
+
+          {toastMessage && (
+            <div className="toast-banner">
+              <CheckCircle size={18} color="#16A36A" />
+              <span>{toastMessage}</span>
+            </div>
+          )}
+        </div>
       </ErrorBoundary>
     );
   }
@@ -582,6 +745,99 @@ export default function App() {
 
           {/* Main Content Wrapper */}
           <div className="main-wrapper">
+            {/* Quick Portal Switcher Banner */}
+            <div style={{
+              backgroundColor: '#0F172A',
+              color: '#E2E8F0',
+              padding: '10px 24px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              fontSize: '13px',
+              borderBottom: '1px solid #334155',
+              zIndex: 10
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
+                <strong style={{ color: '#8b5cf6' }}>Warehouse Management OS</strong>
+                <span style={{ color: '#94A3B8' }}>(Ethan Cole - Logistics Depot Chief)</span>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => {
+                    setPortal('admin');
+                    setActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#FF7A1A',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  👑 Open Admin Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    setPortal('manager');
+                    setActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#00a3ff',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  🚚 Open Fleet Manager
+                </button>
+                <button
+                  onClick={() => {
+                    setPortal('driver');
+                    setDriverActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#10b981',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  🧑‍✈️ Open Driver Portal
+                </button>
+                <button
+                  onClick={() => {
+                    setPortal('maintenance');
+                    setMaintenanceActiveTab('dashboard');
+                  }}
+                  style={{
+                    backgroundColor: '#f59e0b',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  🔧 Open Maintenance
+                </button>
+              </div>
+            </div>
+
             {/* Top Navigation Bar (Warehouse Manager) */}
             <WarehouseHeader
               activeTabTitle={warehousePageTitle}
@@ -1050,6 +1306,79 @@ export default function App() {
 
         {/* Main Content Wrapper */}
         <div className="main-wrapper">
+          {/* Quick Portal Switcher Banner */}
+          <div style={{
+            backgroundColor: '#0F172A',
+            color: '#E2E8F0',
+            padding: '10px 24px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '13px',
+            borderBottom: '1px solid #334155',
+            zIndex: 10
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
+              <strong style={{ color: '#10B981' }}>Driver Portal</strong>
+              <span style={{ color: '#94A3B8' }}>(Marcus Vance - Commercial CDL Pilot)</span>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => {
+                  setPortal('admin');
+                  setActiveTab('dashboard');
+                }}
+                style={{
+                  backgroundColor: '#FF7A1A',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '6px 14px',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                👑 Open Admin Dashboard
+              </button>
+              <button
+                onClick={() => {
+                  setPortal('manager');
+                  setActiveTab('dashboard');
+                }}
+                style={{
+                  backgroundColor: '#00a3ff',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '6px 14px',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                🚚 Open Fleet Manager
+              </button>
+              <button
+                onClick={() => {
+                  setPortal('maintenance');
+                }}
+                style={{
+                  backgroundColor: '#f59e0b',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '6px 14px',
+                  borderRadius: '6px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                🔧 Open Maintenance Dashboard
+              </button>
+            </div>
+          </div>
           {/* Top Navigation Bar (Driver) */}
           <DriverHeader
             activeTabTitle={driverPageTitle}
@@ -1234,6 +1563,98 @@ export default function App() {
 
       {/* Main Content Wrapper */}
       <div className="main-wrapper">
+        {/* Quick Portal Switcher Banner */}
+        <div style={{
+          backgroundColor: '#0d121f',
+          color: '#E2E8F0',
+          padding: '10px 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: '13px',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          zIndex: 10
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#94A3B8' }}>Viewing Mode:</span>
+            <strong style={{ color: '#00d2ff' }}>Fleet Operations Manager Portal</strong>
+            <span style={{ color: '#94A3B8' }}>(16 Logistics Modules & 3D Cruising Telemetry)</span>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={() => {
+                setPortal('admin');
+                setActiveTab('dashboard');
+              }}
+              style={{
+                backgroundColor: '#FF7A1A',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              👑 Open Admin Dashboard
+            </button>
+            <button
+              onClick={() => {
+                setPortal('driver');
+                setDriverActiveTab('dashboard');
+              }}
+              style={{
+                backgroundColor: '#10b981',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              🧑‍✈️ Open Driver Portal
+            </button>
+            <button
+              onClick={() => {
+                setPortal('warehouse');
+                setWarehouseActiveTab('dashboard');
+              }}
+              style={{
+                backgroundColor: '#8b5cf6',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              🏭 Open Warehouse OS
+            </button>
+            <button
+              onClick={() => {
+                setPortal('maintenance');
+                setMaintenanceActiveTab('dashboard');
+              }}
+              style={{
+                backgroundColor: '#f59e0b',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontWeight: '700',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
+            >
+              🔧 Open Maintenance
+            </button>
+          </div>
+        </div>
         {/* Top Navigation Bar (Fleet Manager) */}
         <Header
           pageTitle={managerPageTitle}

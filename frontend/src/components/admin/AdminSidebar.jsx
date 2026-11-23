@@ -11,7 +11,11 @@ import {
   Settings,
   LogOut,
   Truck,
-  ArrowRight
+  ArrowRight,
+  UserCheck,
+  Wrench,
+  Package,
+  Shield
 } from 'lucide-react';
 
 export const adminNavItems = [
@@ -106,6 +110,99 @@ export const AdminSidebar = ({ activeTab, onSelectTab, onLogout, onSwitchPortal 
             <ArrowRight size={12} />
           </button>
         </div>
+
+        {/* Quick Portal Switcher Buttons */}
+        {onSwitchPortal && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', margin: '8px 0' }}>
+            <button
+              className="sidebar-switcher-btn"
+              style={{
+                background: 'rgba(0,163,255,0.12)',
+                border: '1px solid rgba(0,163,255,0.3)',
+                color: '#00d2ff',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: '600'
+              }}
+              onClick={() => onSwitchPortal('manager')}
+              title="Switch to Fleet Manager"
+            >
+              <Truck size={14} color="#00d2ff" />
+              <span>Fleet Manager</span>
+            </button>
+
+            <button
+              className="sidebar-switcher-btn"
+              style={{
+                background: 'rgba(16,185,129,0.12)',
+                border: '1px solid rgba(16,185,129,0.3)',
+                color: '#10B981',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: '600'
+              }}
+              onClick={() => onSwitchPortal('driver')}
+              title="Switch to Driver Portal"
+            >
+              <UserCheck size={14} color="#10B981" />
+              <span>Driver Portal</span>
+            </button>
+
+            <button
+              className="sidebar-switcher-btn"
+              style={{
+                background: 'rgba(245,158,11,0.12)',
+                border: '1px solid rgba(245,158,11,0.3)',
+                color: '#f59e0b',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: '600'
+              }}
+              onClick={() => onSwitchPortal('maintenance')}
+              title="Switch to Maintenance Dashboard"
+            >
+              <Wrench size={14} color="#f59e0b" />
+              <span>Maintenance OS</span>
+            </button>
+
+            <button
+              className="sidebar-switcher-btn"
+              style={{
+                background: 'rgba(139,92,246,0.12)',
+                border: '1px solid rgba(139,92,246,0.3)',
+                color: '#8b5cf6',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: '600'
+              }}
+              onClick={() => onSwitchPortal('warehouse')}
+              title="Switch to Warehouse OS"
+            >
+              <Package size={14} color="#8b5cf6" />
+              <span>Warehouse OS</span>
+            </button>
+          </div>
+        )}
 
         <button
           className="sidebar-logout-btn"
