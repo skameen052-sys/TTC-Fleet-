@@ -79,6 +79,32 @@ import {
 } from './components/warehouse/WarehouseViews';
 import { warehouseService } from './services/warehouseService';
 
+// Logistics Manager Portal Components
+import { LogisticsSidebar, logisticsNavItems } from './components/logistics/LogisticsSidebar';
+import { LogisticsHeader } from './components/logistics/LogisticsHeader';
+import { LogisticsDashboard } from './components/logistics/LogisticsDashboard';
+import {
+  OrderManagementView as LogisticsOrderManagementView,
+  ShipmentManagementView as LogisticsShipmentManagementView,
+  TripManagementView as LogisticsTripManagementView,
+  VehicleAssignmentView as LogisticsVehicleAssignmentView,
+  RouteManagementView as LogisticsRouteManagementView,
+  GpsTrackingView as LogisticsGpsTrackingView,
+  PickupDeliveryView as LogisticsPickupDeliveryView,
+  CustomerOrdersView as LogisticsCustomerOrdersView,
+  LogisticsReportsView,
+  LogisticsNotificationsView,
+  LogisticsProfileView
+} from './components/logistics/LogisticsViews';
+import {
+  CreateOrderModal,
+  CreateShipmentModal,
+  CreateTripModal,
+  AssignResourcesModal,
+  ProofOfDeliveryModal
+} from './components/logistics/LogisticsModals';
+import { logisticsService } from './services/logisticsService';
+
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -195,13 +221,14 @@ export default function App() {
     }
   });
 
-  // 4 Distinct Portals: 'admin' (Super Admin), 'manager' (Fleet Manager), 'driver' (Driver Portal), 'warehouse' (Warehouse Manager)
+  // 5 Distinct Portals: 'admin' (Super Admin), 'manager' (Fleet Manager), 'driver' (Driver Portal), 'warehouse' (Warehouse Manager), 'logistics' (Logistics Manager)
   const [portal, setPortal] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const urlPortal = params.get('portal');
       if (urlPortal === 'driver') return 'driver';
       if (urlPortal === 'warehouse') return 'warehouse';
+      if (urlPortal === 'logistics') return 'logistics';
       if (urlPortal === 'manager' || urlPortal === 'fleet') return 'manager';
       if (urlPortal === 'admin') return 'admin';
 
@@ -210,6 +237,7 @@ export default function App() {
       if (parsed?.portal) return parsed.portal;
       if (parsed?.role === 'ROLE_DRIVER') return 'driver';
       if (parsed?.role === 'ROLE_WAREHOUSE_MANAGER') return 'warehouse';
+      if (parsed?.role === 'ROLE_LOGISTICS_MANAGER') return 'logistics';
       if (parsed?.role === 'ROLE_MANAGER') return 'manager';
       if (parsed?.role === 'ROLE_ADMIN') return 'admin';
     } catch {}
@@ -219,13 +247,15 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [driverActiveTab, setDriverActiveTab] = useState('dashboard');
   const [warehouseActiveTab, setWarehouseActiveTab] = useState('dashboard');
+  const [logisticsActiveTab, setLogisticsActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [toastMessage, setToastMessage] = useState('');
 
-  // Fleet state, Driver state & Warehouse state
+  // Fleet state, Driver state, Warehouse state & Logistics state
   const [fleetState, setFleetState] = useState(() => fleetService.loadData());
   const [driverPortalData, setDriverPortalData] = useState(() => fleetService.getDriverPortalData());
   const [warehouseData, setWarehouseData] = useState(() => warehouseService.getData());
+  const [logisticsData, setLogisticsData] = useState(() => logisticsService.getData());
 
   // Manager Modal open states
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
@@ -250,7 +280,15 @@ export default function App() {
   const [isReportDamagedOpen, setIsReportDamagedOpen] = useState(false);
   const [isAddWarehouseOpen, setIsAddWarehouseOpen] = useState(false);
 
-  // Subscribe to changes in fleetService & warehouseService
+  // Logistics Modal open states
+  const [isLogisticsCreateOrderOpen, setIsLogisticsCreateOrderOpen] = useState(false);
+  const [isLogisticsCreateShipmentOpen, setIsLogisticsCreateShipmentOpen] = useState(false);
+  const [isLogisticsCreateTripOpen, setIsLogisticsCreateTripOpen] = useState(false);
+  const [isLogisticsAssignOpen, setIsLogisticsAssignOpen] = useState(false);
+  const [isLogisticsPodOpen, setIsLogisticsPodOpen] = useState(false);
+  const [selectedPodDelivery, setSelectedPodDelivery] = useState(null);
+
+  // Subscribe to changes in fleetService, warehouseService & logisticsService
   useEffect(() => {
     const unsubscribeFleet = fleetService.subscribe((updatedData) => {
       setFleetState({ ...updatedData });
@@ -259,9 +297,13 @@ export default function App() {
     const unsubscribeWarehouse = warehouseService.subscribe((updatedWhData) => {
       setWarehouseData({ ...updatedWhData });
     });
+    const unsubscribeLogistics = logisticsService.subscribe((updatedLogisticsData) => {
+      setLogisticsData({ ...updatedLogisticsData });
+    });
     return () => {
       unsubscribeFleet();
       unsubscribeWarehouse();
+      unsubscribeLogistics();
     };
   }, []);
 
@@ -278,6 +320,7 @@ export default function App() {
     const targetPortal = userData.portal || (
       userData.role === 'ROLE_DRIVER' ? 'driver' :
       userData.role === 'ROLE_WAREHOUSE_MANAGER' ? 'warehouse' :
+      userData.role === 'ROLE_LOGISTICS_MANAGER' ? 'logistics' :
       userData.role === 'ROLE_MANAGER' ? 'manager' : 'admin'
     );
     setPortal(targetPortal);
@@ -285,6 +328,8 @@ export default function App() {
       setDriverActiveTab('dashboard');
     } else if (targetPortal === 'warehouse') {
       setWarehouseActiveTab('dashboard');
+    } else if (targetPortal === 'logistics') {
+      setLogisticsActiveTab('dashboard');
     } else {
       setActiveTab('dashboard');
     }
@@ -461,6 +506,15 @@ export default function App() {
     : activeWarehouseSubItem
       ? activeWarehouseSubItem.label
       : (activeWarehouseNavItem?.label || 'Warehouse OS');
+
+  // Page title mapping for Logistics Manager
+  const activeLogisticsNavItem = logisticsNavItems.find(item => item.id === logisticsActiveTab || (item.subItems && item.subItems.some(sub => sub.id === logisticsActiveTab)));
+  const activeLogisticsSubItem = activeLogisticsNavItem?.subItems?.find(sub => sub.id === logisticsActiveTab);
+  const logisticsPageTitle = logisticsActiveTab === 'dashboard'
+    ? 'Logistics Dashboard'
+    : activeLogisticsSubItem
+      ? activeLogisticsSubItem.label
+      : (activeLogisticsNavItem?.label || 'Logistics Operations');
 
   // If not authenticated or login tab selected, render dedicated LoginPage
   if (!isAuthenticated || activeTab === 'login') {
@@ -749,6 +803,217 @@ export default function App() {
             isOpen={isAddWarehouseOpen}
             onClose={() => setIsAddWarehouseOpen(false)}
             onSubmit={handleAddWarehouse}
+          />
+
+          {/* Toast Feedback Notification Banner */}
+          {toastMessage && (
+            <div className="toast-banner">
+              <CheckCircle size={18} color="#16A36A" />
+              <span>{toastMessage}</span>
+            </div>
+          )}
+        </div>
+      </ErrorBoundary>
+    );
+  }
+
+  // =========================================================================
+  // 2.5 RENDER LOGISTICS MANAGER PORTAL
+  // =========================================================================
+  if (portal === 'logistics') {
+    return (
+      <ErrorBoundary>
+        <div className="app-container logistics-portal-theme">
+          {/* Left Sidebar Navigation (Logistics Manager) */}
+          <LogisticsSidebar
+            activeTab={logisticsActiveTab}
+            onSelectTab={setLogisticsActiveTab}
+            user={currentUser}
+            onLogout={handleLogout}
+            metrics={logisticsData.metrics}
+            onSwitchPortal={(p) => setPortal(p)}
+          />
+
+          {/* Main Content Wrapper */}
+          <div className="main-wrapper">
+            {/* Top Navigation Bar (Logistics Manager) */}
+            <LogisticsHeader
+              activeTabTitle={logisticsPageTitle}
+              user={currentUser}
+              alerts={logisticsData.alerts || []}
+              notifications={logisticsData.notifications || []}
+              onSelectTab={setLogisticsActiveTab}
+              onLogout={handleLogout}
+              onSwitchPortal={(p) => setPortal(p)}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+
+            {/* Dynamic Logistics Page Views */}
+            <main className="dashboard-content">
+              <ErrorBoundary>
+                {logisticsActiveTab === 'dashboard' && (
+                  <LogisticsDashboard
+                    data={logisticsData}
+                    onSelectTab={setLogisticsActiveTab}
+                    onOpenCreateOrder={() => setIsLogisticsCreateOrderOpen(true)}
+                    onOpenCreateShipment={() => setIsLogisticsCreateShipmentOpen(true)}
+                    onOpenCreateTrip={() => setIsLogisticsCreateTripOpen(true)}
+                    onOpenAssignModal={() => setIsLogisticsAssignOpen(true)}
+                    onOpenPodModal={(del) => {
+                      setSelectedPodDelivery(del);
+                      setIsLogisticsPodOpen(true);
+                    }}
+                  />
+                )}
+
+                {['orders', 'all-orders', 'create-order', 'pending-orders', 'approved-orders', 'cancelled-orders'].includes(logisticsActiveTab) && (
+                  <LogisticsOrderManagementView
+                    orders={logisticsData.orders || []}
+                    activeSubTab={logisticsActiveTab}
+                    onSelectTab={setLogisticsActiveTab}
+                    onOpenCreateOrder={() => setIsLogisticsCreateOrderOpen(true)}
+                    onOpenCreateShipment={() => setIsLogisticsCreateShipmentOpen(true)}
+                    onOpenAssignModal={() => setIsLogisticsAssignOpen(true)}
+                  />
+                )}
+
+                {['shipments', 'all-shipments', 'shipments-processing', 'shipments-in-transit', 'shipments-delivered'].includes(logisticsActiveTab) && (
+                  <LogisticsShipmentManagementView
+                    shipments={logisticsData.shipments || []}
+                    activeSubTab={logisticsActiveTab}
+                    onSelectTab={setLogisticsActiveTab}
+                    onOpenCreateShipment={() => setIsLogisticsCreateShipmentOpen(true)}
+                  />
+                )}
+
+                {['trips', 'all-trips', 'create-trip', 'active-trips', 'completed-trips'].includes(logisticsActiveTab) && (
+                  <LogisticsTripManagementView
+                    trips={logisticsData.trips || []}
+                    activeSubTab={logisticsActiveTab}
+                    onSelectTab={setLogisticsActiveTab}
+                    onOpenCreateTrip={() => setIsLogisticsCreateTripOpen(true)}
+                  />
+                )}
+
+                {['vehicles', 'available-vehicles', 'assign-vehicles', 'drivers', 'available-drivers', 'assign-drivers', 'vehicle-assignment', 'driver-assignment'].includes(logisticsActiveTab) && (
+                  <LogisticsVehicleAssignmentView
+                    vehicles={logisticsData.vehicles || []}
+                    drivers={logisticsData.drivers || []}
+                    activeSubTab={logisticsActiveTab}
+                    onSelectTab={setLogisticsActiveTab}
+                    onOpenAssignModal={() => setIsLogisticsAssignOpen(true)}
+                  />
+                )}
+
+                {['routes', 'create-route', 'route-planning', 'route-optimization', 'route-management'].includes(logisticsActiveTab) && (
+                  <LogisticsRouteManagementView
+                    routes={logisticsData.routes || []}
+                  />
+                )}
+
+                {['gps', 'live-tracking', 'trip-tracking', 'gps-tracking'].includes(logisticsActiveTab) && (
+                  <LogisticsGpsTrackingView
+                    trips={logisticsData.trips || []}
+                  />
+                )}
+
+                {['pickups', 'pickup-schedule', 'pickup-confirmation', 'deliveries', 'delivery-schedule', 'delivery-status', 'proof-of-delivery', 'pickup-management', 'delivery-management'].includes(logisticsActiveTab) && (
+                  <LogisticsPickupDeliveryView
+                    pickups={logisticsData.pickups || []}
+                    deliveries={logisticsData.deliveries || []}
+                    activeSubTab={logisticsActiveTab}
+                    onSelectTab={setLogisticsActiveTab}
+                    onOpenPodModal={(del) => {
+                      setSelectedPodDelivery(del);
+                      setIsLogisticsPodOpen(true);
+                    }}
+                  />
+                )}
+
+                {['customer-orders', 'customer-requests', 'order-history'].includes(logisticsActiveTab) && (
+                  <LogisticsCustomerOrdersView
+                    customerRequests={logisticsData.customerRequests || []}
+                  />
+                )}
+
+                {['reports', 'order-reports', 'shipment-reports', 'trip-reports', 'logistics-reports'].includes(logisticsActiveTab) && (
+                  <LogisticsReportsView
+                    analytics={logisticsData.analytics || {}}
+                  />
+                )}
+
+                {['notifications', 'delayed-orders', 'trip-alerts'].includes(logisticsActiveTab) && (
+                  <LogisticsNotificationsView
+                    notifications={logisticsData.notifications || []}
+                    alerts={logisticsData.alerts || []}
+                  />
+                )}
+
+                {['profile', 'profile-info', 'change-password', 'my-profile'].includes(logisticsActiveTab) && (
+                  <LogisticsProfileView
+                    manager={logisticsData.manager || currentUser}
+                    onSignOut={handleLogout}
+                  />
+                )}
+              </ErrorBoundary>
+            </main>
+          </div>
+
+          {/* Logistics Modals */}
+          <CreateOrderModal
+            isOpen={isLogisticsCreateOrderOpen}
+            onClose={() => setIsLogisticsCreateOrderOpen(false)}
+            onSubmit={(ord) => {
+              logisticsService.addOrder(ord);
+              showToast(`Order created successfully for ${ord.customerName}!`);
+            }}
+          />
+
+          <CreateShipmentModal
+            isOpen={isLogisticsCreateShipmentOpen}
+            onClose={() => setIsLogisticsCreateShipmentOpen(false)}
+            onSubmit={(shp) => {
+              logisticsService.createShipment(shp);
+              showToast(`Shipment dispatched for Order #${shp.orderId}!`);
+            }}
+            vehicles={logisticsData.vehicles || []}
+            drivers={logisticsData.drivers || []}
+          />
+
+          <CreateTripModal
+            isOpen={isLogisticsCreateTripOpen}
+            onClose={() => setIsLogisticsCreateTripOpen(false)}
+            onSubmit={(trip) => {
+              logisticsService.createTrip(trip);
+              showToast(`Trip dispatched on ${trip.route}!`);
+            }}
+            vehicles={logisticsData.vehicles || []}
+            drivers={logisticsData.drivers || []}
+          />
+
+          <AssignResourcesModal
+            isOpen={isLogisticsAssignOpen}
+            onClose={() => setIsLogisticsAssignOpen(false)}
+            onSubmit={({ vehicleReg, driverId, tripRoute }) => {
+              logisticsService.assignVehicleAndDriver(vehicleReg, driverId, tripRoute);
+              showToast(`Allocated Rig ${vehicleReg} with Pilot for route ${tripRoute}!`);
+            }}
+            vehicles={logisticsData.vehicles || []}
+            drivers={logisticsData.drivers || []}
+          />
+
+          <ProofOfDeliveryModal
+            isOpen={isLogisticsPodOpen}
+            onClose={() => {
+              setIsLogisticsPodOpen(false);
+              setSelectedPodDelivery(null);
+            }}
+            delivery={selectedPodDelivery}
+            onConfirm={(delId, recipientName) => {
+              logisticsService.confirmDelivery(delId, recipientName);
+              showToast(`ePOD archived successfully with signature of ${recipientName}!`);
+            }}
           />
 
           {/* Toast Feedback Notification Banner */}

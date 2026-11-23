@@ -15,16 +15,18 @@ import {
   MapPin,
   BarChart3,
   Warehouse,
-  Forklift
+  Forklift,
+  Boxes
 } from 'lucide-react';
 
 export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
-  // 4 distinct portals: 'admin', 'manager', 'driver', 'warehouse'
+  // 5 distinct portals: 'admin', 'manager', 'driver', 'warehouse', 'logistics'
   const [selectedPortal, setSelectedPortal] = useState(initialPortal);
   const [email, setEmail] = useState(() => {
     if (initialPortal === 'manager') return 'manager@ttcfleet360.com';
     if (initialPortal === 'driver') return 'm.vance@fleet360.ttc.com';
     if (initialPortal === 'warehouse') return 'ethan.cole@fleet360.ttc.com';
+    if (initialPortal === 'logistics') return 'elena.rostova@fleet360.ttc.com';
     return 'admin@ttcfleet360.com';
   });
   const [password, setPassword] = useState('password123');
@@ -36,6 +38,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
 
   const isDriver = selectedPortal === 'driver';
   const isWarehouse = selectedPortal === 'warehouse';
+  const isLogistics = selectedPortal === 'logistics';
 
   const handlePortalSwitch = (portal) => {
     setSelectedPortal(portal);
@@ -51,6 +54,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
       setPassword('password123');
     } else if (portal === 'warehouse') {
       setEmail('ethan.cole@fleet360.ttc.com');
+      setPassword('password123');
+    } else if (portal === 'logistics') {
+      setEmail('elena.rostova@fleet360.ttc.com');
       setPassword('password123');
     }
   };
@@ -68,7 +74,18 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
 
     try {
       let userData;
-      if (selectedPortal === 'warehouse' || email.includes('ethan') || email.includes('warehouse')) {
+      if (selectedPortal === 'logistics' || email.includes('elena') || email.includes('rostova') || email.includes('logistics')) {
+        userData = {
+          username: 'logistics_dir01',
+          email: email || 'elena.rostova@fleet360.ttc.com',
+          fullName: 'Elena Rostova',
+          role: 'ROLE_LOGISTICS_MANAGER',
+          portal: 'logistics',
+          staffId: 'LM-DIR-094',
+          hubId: 'HQ-CENTRAL',
+          token: 'eyJhbGciOiJIUzUxMiJ9.simulated_jwt_logistics_fleet360'
+        };
+      } else if (selectedPortal === 'warehouse' || email.includes('ethan') || email.includes('warehouse')) {
         userData = {
           username: 'warehouse_dir01',
           email: email || 'ethan.cole@fleet360.ttc.com',
@@ -136,6 +153,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
     if (selectedPortal === 'admin') return 'Admin Dashboard';
     if (selectedPortal === 'manager') return 'Fleet Manager Dashboard';
     if (selectedPortal === 'warehouse') return 'Warehouse OS';
+    if (selectedPortal === 'logistics') return 'Logistics Operations';
     return 'Driver Portal';
   };
 
@@ -143,37 +161,38 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
     if (selectedPortal === 'admin') return 'Sign in to access Executive Overview, System Control & Subscriptions.';
     if (selectedPortal === 'manager') return 'Sign in to manage 16 Fleet Modules, Live Telemetry & Dispatches.';
     if (selectedPortal === 'warehouse') return 'Sign in to manage Inventory, Goods Receiving, Dispatches & Stock.';
+    if (selectedPortal === 'logistics') return 'Sign in to access your logistics operations dashboard.';
     return 'Sign in to access assigned trips, turn-by-turn navigation & electronic POD.';
   };
 
   return (
-    <div className={`login-page-container ${isDriver || isWarehouse ? 'theme-driver-light' : 'theme-manager-dark'}`}>
+    <div className={`login-page-container ${isDriver || isWarehouse || isLogistics ? 'theme-driver-light' : 'theme-manager-dark'}`}>
       {/* Left Column: Interactive Form */}
-      <div className={`login-form-section ${isDriver || isWarehouse ? 'form-light' : 'form-dark'}`}>
-        {!isDriver && !isWarehouse && <div className="dark-theme-wave-glow" />}
+      <div className={`login-form-section ${isDriver || isWarehouse || isLogistics ? 'form-light' : 'form-dark'}`}>
+        {!isDriver && !isWarehouse && !isLogistics && <div className="dark-theme-wave-glow" />}
 
         <div className="login-form-inner">
           {/* Brand Header */}
           <div className="login-brand-header">
-            <div className={`login-logo-box ${isDriver || isWarehouse ? 'logo-box-light' : 'logo-box-dark'}`}>
+            <div className={`login-logo-box ${isDriver || isWarehouse || isLogistics ? 'logo-box-light' : 'logo-box-dark'}`}>
               <Truck size={22} color="#FFFFFF" strokeWidth={2.4} />
             </div>
             <div className="login-brand-text">
-              <span className={`login-app-name ${isDriver || isWarehouse ? 'text-navy' : 'text-white'}`}>
+              <span className={`login-app-name ${isDriver || isWarehouse || isLogistics ? 'text-navy' : 'text-white'}`}>
                 TTC FLEET<span className="orange-highlight">360</span>
               </span>
-              <span className={`login-app-subtitle ${isDriver || isWarehouse ? 'sub-blue' : 'sub-light-blue'}`}>
+              <span className={`login-app-subtitle ${isDriver || isWarehouse || isLogistics ? 'sub-blue' : 'sub-light-blue'}`}>
                 ENTERPRISE LOGISTICS OS
               </span>
             </div>
           </div>
 
-          {/* 4-WAY ROLE / PORTAL SELECTOR */}
+          {/* 5-WAY ROLE / PORTAL SELECTOR */}
           <div
-            className={`portal-switcher-pill-box ${isDriver || isWarehouse ? 'box-light' : 'box-dark'}`}
+            className={`portal-switcher-pill-box ${isDriver || isWarehouse || isLogistics ? 'box-light' : 'box-dark'}`}
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: 'repeat(5, 1fr)',
               gap: '3px',
               padding: '3px'
             }}
@@ -185,7 +204,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               onClick={() => handlePortalSwitch('admin')}
               style={{
                 background: selectedPortal === 'admin' ? '#FF7A1A' : 'transparent',
-                color: selectedPortal === 'admin' ? '#FFFFFF' : isDriver || isWarehouse ? '#475569' : '#94A3B8',
+                color: selectedPortal === 'admin' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'admin' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
@@ -210,7 +229,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               onClick={() => handlePortalSwitch('manager')}
               style={{
                 background: selectedPortal === 'manager' ? '#00a3ff' : 'transparent',
-                color: selectedPortal === 'manager' ? '#FFFFFF' : isDriver || isWarehouse ? '#475569' : '#94A3B8',
+                color: selectedPortal === 'manager' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'manager' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
@@ -235,7 +254,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               onClick={() => handlePortalSwitch('driver')}
               style={{
                 background: selectedPortal === 'driver' ? '#10b981' : 'transparent',
-                color: selectedPortal === 'driver' ? '#FFFFFF' : isDriver || isWarehouse ? '#475569' : '#94A3B8',
+                color: selectedPortal === 'driver' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'driver' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
@@ -260,7 +279,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               onClick={() => handlePortalSwitch('warehouse')}
               style={{
                 background: selectedPortal === 'warehouse' ? '#a855f7' : 'transparent',
-                color: selectedPortal === 'warehouse' ? '#FFFFFF' : isDriver || isWarehouse ? '#475569' : '#94A3B8',
+                color: selectedPortal === 'warehouse' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
                 fontWeight: selectedPortal === 'warehouse' ? '700' : '600',
                 border: 'none',
                 borderRadius: '6px',
@@ -277,15 +296,40 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               <Warehouse size={12} />
               <span>WMS</span>
             </button>
+
+            {/* 5. Logistics Manager */}
+            <button
+              type="button"
+              className="portal-pill-btn"
+              onClick={() => handlePortalSwitch('logistics')}
+              style={{
+                background: selectedPortal === 'logistics' ? '#FF7A1A' : 'transparent',
+                color: selectedPortal === 'logistics' ? '#FFFFFF' : isDriver || isWarehouse || isLogistics ? '#475569' : '#94A3B8',
+                fontWeight: selectedPortal === 'logistics' ? '700' : '600',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '6px 2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                cursor: 'pointer',
+                fontSize: '11px',
+                boxShadow: selectedPortal === 'logistics' ? '0 2px 8px rgba(255,122,26,0.4)' : 'none'
+              }}
+            >
+              <Boxes size={12} />
+              <span>Logistics</span>
+            </button>
           </div>
 
           {/* Welcome Heading */}
           <div className="login-welcome-wrap">
-            <h1 className={`login-welcome-title ${isDriver || isWarehouse ? 'text-navy' : 'text-white'}`}>
+            <h1 className={`login-welcome-title ${isDriver || isWarehouse || isLogistics ? 'text-navy' : 'text-white'}`}>
               Welcome Back!
             </h1>
             <div className="orange-title-underline" />
-            <p className={`login-welcome-subtitle ${isDriver || isWarehouse ? 'sub-light' : 'sub-dark'}`}>
+            <p className={`login-welcome-subtitle ${isDriver || isWarehouse || isLogistics ? 'sub-light' : 'sub-dark'}`}>
               {getPortalSubtitle()}
             </p>
           </div>
@@ -317,14 +361,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
           <form className="login-form-element" onSubmit={handleSubmit}>
             {/* Email Field */}
             <div className="login-field-group">
-              <label className={`login-field-label ${isDriver || isWarehouse ? 'label-light' : 'label-dark'}`}>
+              <label className={`login-field-label ${isDriver || isWarehouse || isLogistics ? 'label-light' : 'label-dark'}`}>
                 Email Address
               </label>
-              <div className={`login-input-wrap ${isDriver || isWarehouse ? 'wrap-light' : 'wrap-dark'}`}>
-                <Mail className="login-input-icon" size={16} color={isDriver || isWarehouse ? '#718096' : '#94A3B8'} />
+              <div className={`login-input-wrap ${isDriver || isWarehouse || isLogistics ? 'wrap-light' : 'wrap-dark'}`}>
+                <Mail className="login-input-icon" size={16} color={isDriver || isWarehouse || isLogistics ? '#718096' : '#94A3B8'} />
                 <input
                   type="email"
-                  className={`login-text-input ${isDriver || isWarehouse ? 'input-light' : 'input-dark'}`}
+                  className={`login-text-input ${isDriver || isWarehouse || isLogistics ? 'input-light' : 'input-dark'}`}
                   placeholder="Enter email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -335,14 +379,14 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
 
             {/* Password Field */}
             <div className="login-field-group">
-              <label className={`login-field-label ${isDriver || isWarehouse ? 'label-light' : 'label-dark'}`}>
+              <label className={`login-field-label ${isDriver || isWarehouse || isLogistics ? 'label-light' : 'label-dark'}`}>
                 Password
               </label>
-              <div className={`login-input-wrap ${isDriver || isWarehouse ? 'wrap-light' : 'wrap-dark'}`}>
-                <Lock className="login-input-icon" size={16} color={isDriver || isWarehouse ? '#718096' : '#94A3B8'} />
+              <div className={`login-input-wrap ${isDriver || isWarehouse || isLogistics ? 'wrap-light' : 'wrap-dark'}`}>
+                <Lock className="login-input-icon" size={16} color={isDriver || isWarehouse || isLogistics ? '#718096' : '#94A3B8'} />
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  className={`login-text-input ${isDriver || isWarehouse ? 'input-light' : 'input-dark'}`}
+                  className={`login-text-input ${isDriver || isWarehouse || isLogistics ? 'input-light' : 'input-dark'}`}
                   placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -355,9 +399,9 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
                   title={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? (
-                    <EyeOff size={16} color={isDriver || isWarehouse ? '#718096' : '#94A3B8'} />
+                    <EyeOff size={16} color={isDriver || isWarehouse || isLogistics ? '#718096' : '#94A3B8'} />
                   ) : (
-                    <Eye size={16} color={isDriver || isWarehouse ? '#718096' : '#94A3B8'} />
+                    <Eye size={16} color={isDriver || isWarehouse || isLogistics ? '#718096' : '#94A3B8'} />
                   )}
                 </button>
               </div>
@@ -371,7 +415,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
-                <span className={isDriver || isWarehouse ? 'text-gray-dark' : 'text-gray-light'}>Remember Me</span>
+                <span className={isDriver || isWarehouse || isLogistics ? 'text-gray-dark' : 'text-gray-light'}>Remember Me</span>
               </label>
               <button
                 type="button"
@@ -406,7 +450,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               marginTop: '10px',
               padding: '6px 12px',
               borderRadius: '8px',
-              background: isDriver || isWarehouse ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)',
+              background: isDriver || isWarehouse || isLogistics ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)',
               border: '1px dashed rgba(255,122,26,0.3)',
               display: 'flex',
               alignItems: 'center',
@@ -414,7 +458,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
               fontSize: '11.5px'
             }}
           >
-            <span style={{ color: isDriver || isWarehouse ? '#64748b' : '#94A3B8' }}>
+            <span style={{ color: isDriver || isWarehouse || isLogistics ? '#64748b' : '#94A3B8' }}>
               Autofill: <strong>{getPortalTitle()}</strong>
             </span>
             <button
@@ -435,15 +479,15 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
           </div>
 
           {/* Security Information Footer Card */}
-          <div className={`login-security-card ${isDriver || isWarehouse ? 'sec-light' : 'sec-dark'}`}>
-            <div className={`sec-icon-circle ${isDriver || isWarehouse ? 'icon-circle-green' : 'icon-circle-orange'}`}>
-              <ShieldCheck size={18} color={isDriver || isWarehouse ? '#16A36A' : '#FF7A1A'} />
+          <div className={`login-security-card ${isDriver || isWarehouse || isLogistics ? 'sec-light' : 'sec-dark'}`}>
+            <div className={`sec-icon-circle ${isDriver || isWarehouse || isLogistics ? 'icon-circle-green' : 'icon-circle-orange'}`}>
+              <ShieldCheck size={18} color={isDriver || isWarehouse || isLogistics ? '#16A36A' : '#FF7A1A'} />
             </div>
             <div className="sec-text-box">
-              <div className={`sec-title ${isDriver || isWarehouse ? 'title-light' : 'title-dark'}`}>
+              <div className={`sec-title ${isDriver || isWarehouse || isLogistics ? 'title-light' : 'title-dark'}`}>
                 Enterprise Security Protected
               </div>
-              <div className={`sec-desc ${isDriver || isWarehouse ? 'desc-light' : 'desc-dark'}`}>
+              <div className={`sec-desc ${isDriver || isWarehouse || isLogistics ? 'desc-light' : 'desc-dark'}`}>
                 Role-based access control (RBAC) with JWT session authorization.
               </div>
             </div>
@@ -453,6 +497,63 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
 
       {/* Right Column: Ultra-4K Hero Image */}
       <div className="login-hero-section">
+        {selectedPortal === 'logistics' && (
+          <div className="manager-hero-container fade-in">
+            <img
+              src="/assets/manager-hero-4k.jpg"
+              alt="TTC Fleet360 Logistics Operations"
+              className="login-hero-img-display"
+              style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+            />
+            <div className="manager-hero-gradient-overlay" />
+            <div className="manager-hero-content">
+              <div
+                className="login-hero-tag"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  width: 'fit-content',
+                  maxWidth: 'fit-content',
+                  alignSelf: 'flex-start',
+                  background: 'rgba(255, 122, 26, 0.22)',
+                  backdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 122, 26, 0.55)',
+                  padding: '6px 14px',
+                  borderRadius: 24,
+                  marginBottom: 12,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+                }}
+              >
+                <Boxes size={15} color="#FF7A1A" strokeWidth={2.4} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#FFB37C', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  LOGISTICS OPERATIONS SYSTEM (LOS)
+                </span>
+              </div>
+
+              <div className="manager-hero-titles">
+                <h2 className="manager-hero-h2">
+                  Manage Logistics.<br />
+                  <span className="h2-gradient">Deliver Excellence.</span>
+                </h2>
+                <p className="manager-hero-p">
+                  Streamline orders, shipments, transportation, and delivery operations from one centralized platform.
+                </p>
+              </div>
+              <div className="manager-feature-pills">
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" /> End-to-End Freight & Order Pipeline
+                </div>
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" /> Linehaul Route Planning & Optimization
+                </div>
+                <div className="manager-feature-pill">
+                  <span className="pill-dot" /> Live Satellite GPS Fleet Telemetry
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {selectedPortal === 'warehouse' && (
           <div className="manager-hero-container fade-in">
             <img

@@ -149,13 +149,67 @@ export const AdminHeader = ({
                   color: '#cbd5e1',
                   fontSize: '12.5px',
                   fontWeight: 500,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  marginBottom: '4px'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 <User size={15} color="#10b981" />
                 <span style={{ flex: 1, textAlign: 'left' }}>Driver Portal</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowPortalMenu(false);
+                  onSwitchPortal('warehouse');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '9px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#cbd5e1',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  marginBottom: '4px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <Truck size={15} color="#a855f7" />
+                <span style={{ flex: 1, textAlign: 'left' }}>Warehouse Manager (WMS)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowPortalMenu(false);
+                  onSwitchPortal('logistics');
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '9px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#cbd5e1',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                <Sparkles size={15} color="#FF7A1A" />
+                <span style={{ flex: 1, textAlign: 'left' }}>Logistics Manager (LOS)</span>
               </button>
             </div>
           )}

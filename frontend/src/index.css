@@ -4177,4 +4177,49 @@ body {
   margin-bottom: 16px;
 }
 
+/* =========================================================================
+   LOGISTICS MANAGER PORTAL THEME & NAVIGATION
+   ========================================================================= */
+.logistics-portal-theme {
+  background-color: var(--bg-dashboard);
+}
+
+.logistics-sidebar .brand-sub-badge {
+  color: #FFB37C;
+}
+
+.logistics-manager-badge {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logistics-sidebar .sidebar-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.logistics-sidebar .nav-item-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.logistics-header .driver-trip-telemetry-pill {
+  transition: all 0.2s ease;
+}
+
+.logistics-header .driver-trip-telemetry-pill:hover {
+  background: rgba(255, 122, 26, 0.12) !important;
+  border-color: rgba(255, 122, 26, 0.45) !important;
+}
+
+@media (max-width: 960px) {
+  .logistics-header .driver-trip-telemetry-pill {
+    display: none;
+  }
+}
+
+
 
