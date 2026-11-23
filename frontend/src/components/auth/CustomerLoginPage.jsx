@@ -265,55 +265,122 @@ export const CustomerLoginPage = ({ onLoginSuccess, onSwitchPortal }) => {
         className="login-hero-section"
         style={{
           flex: '1.2',
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #14213D 100%)',
+          position: 'relative',
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           padding: '60px',
           color: '#FFFFFF',
-          position: 'relative'
+          backgroundColor: '#0a1426'
         }}
       >
-        <div style={{ maxWidth: '520px' }}>
+        {/* Background Courier Delivery Image */}
+        <img
+          src="/assets/customer-hero.jpg"
+          alt="TTC Fleet360 Customer Delivery Courier"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center 20%',
+            opacity: 0.45
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(10, 20, 38, 0.72) 0%, rgba(10, 20, 38, 0.82) 50%, rgba(6, 12, 24, 0.95) 100%)',
+            backdropFilter: 'blur(1px)'
+          }}
+        />
+
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '520px' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: 'rgba(255, 122, 26, 0.2)',
-              border: '1px solid rgba(255, 122, 26, 0.4)',
+              backgroundColor: 'rgba(7, 157, 242, 0.25)',
+              border: '1px solid rgba(56, 189, 248, 0.5)',
               padding: '6px 14px',
               borderRadius: '20px',
               fontSize: '11.5px',
               fontWeight: 800,
-              color: '#FFB37C',
-              marginBottom: '16px'
+              color: '#bae6fd',
+              marginBottom: '16px',
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 4px 14px rgba(7, 157, 242, 0.3)'
             }}
           >
-            <Building2 size={16} color="#FF7A1A" />
+            <Building2 size={16} color="#38bdf8" />
             <span>ENTERPRISE SHIPPER & CUSTOMER PORTAL</span>
           </div>
 
-          <h2 style={{ fontSize: '32px', fontWeight: 800, lineHeight: '1.2', margin: '0 0 16px', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '32px', fontWeight: 800, lineHeight: '1.2', margin: '0 0 16px', letterSpacing: '-0.02em', textShadow: '0 2px 14px rgba(0,0,0,0.85)' }}>
             Book Freight Fast.<br />
-            <span style={{ color: '#079DF2' }}>Track Linehaul In Real-Time.</span>
+            <span style={{ background: 'linear-gradient(90deg, #38bdf8, #0ea5e9, #93c5fd)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Track Shipments To Your Door.
+            </span>
           </h2>
 
-          <p style={{ fontSize: '14.5px', color: '#94A3B8', lineHeight: '1.6', margin: '0 0 24px' }}>
+          <p style={{ fontSize: '14.5px', color: '#cbd5e1', lineHeight: '1.6', margin: '0 0 24px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
             A dedicated customer operating portal for commercial shipping partners. Book end-to-end transportation, monitor live vehicle telemetry, download verified e-POD receipts, and automate freight invoice settlements.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#CBD5E1' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#FF7A1A' }} />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '13px',
+                color: '#e2e8f0',
+                background: 'rgba(15, 23, 42, 0.75)',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                backdropFilter: 'blur(6px)'
+              }}
+            >
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#38bdf8' }} />
               <span>Direct Carrier Dispatch Booking & Instant Order Confirmation</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#CBD5E1' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#079DF2' }} />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '13px',
+                color: '#e2e8f0',
+                background: 'rgba(15, 23, 42, 0.75)',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                backdropFilter: 'blur(6px)'
+              }}
+            >
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
               <span>Real-Time Satellite GPS Linehaul Telemetry & Milestone HUD</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: '#CBD5E1' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#16A36A' }} />
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '13px',
+                color: '#e2e8f0',
+                background: 'rgba(15, 23, 42, 0.75)',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                backdropFilter: 'blur(6px)'
+              }}
+            >
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f59e0b' }} />
               <span>Verified Electronic Proof of Delivery (e-POD) & Settlement Vault</span>
             </div>
           </div>

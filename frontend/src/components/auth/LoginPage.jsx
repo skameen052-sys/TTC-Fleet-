@@ -602,13 +602,31 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
         {selectedPortal === 'customer' && (
           <div className="manager-hero-container fade-in">
             <img
-              src="/assets/manager-hero-4k.jpg"
-              alt="TTC Fleet360 Customer Portal"
+              src="/assets/customer-hero.jpg"
+              alt="TTC Fleet360 Customer & Shipper Portal"
               className="login-hero-img-display"
-              style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
+              style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/assets/manager-hero-4k.jpg';
+              }}
             />
-            <div className="manager-hero-gradient-overlay" />
-            <div className="manager-hero-content">
+            <div
+              className="manager-hero-gradient-overlay"
+              style={{
+                background: 'linear-gradient(180deg, rgba(8, 15, 30, 0.15) 0%, rgba(10, 20, 40, 0.45) 45%, rgba(5, 10, 22, 0.94) 100%)'
+              }}
+            />
+            <div
+              className="manager-hero-content"
+              style={{
+                background: 'linear-gradient(180deg, rgba(10, 16, 32, 0) 0%, rgba(8, 14, 28, 0.75) 25%, rgba(6, 12, 24, 0.92) 100%)',
+                backdropFilter: 'blur(4px)',
+                borderRadius: '16px',
+                padding: '20px 24px',
+                boxShadow: '0 -10px 25px rgba(0,0,0,0.3)'
+              }}
+            >
               <div
                 className="login-hero-tag"
                 style={{
@@ -618,41 +636,77 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
                   width: 'fit-content',
                   maxWidth: 'fit-content',
                   alignSelf: 'flex-start',
-                  background: 'rgba(7, 157, 242, 0.22)',
-                  backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(7, 157, 242, 0.55)',
+                  background: 'rgba(7, 157, 242, 0.28)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(56, 189, 248, 0.65)',
                   padding: '6px 14px',
                   borderRadius: 24,
-                  marginBottom: 12,
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+                  marginBottom: 10,
+                  boxShadow: '0 4px 16px rgba(7, 157, 242, 0.35)'
                 }}
               >
-                <Building2 size={15} color="#079DF2" strokeWidth={2.4} />
-                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#7DD3FC', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
-                  CUSTOMER & SHIPPER PORTAL
+                <Building2 size={15} color="#38bdf8" strokeWidth={2.4} />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: '#bae6fd', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  CUSTOMER & SHIPPER PORTAL (CSP)
                 </span>
               </div>
 
               <div className="manager-hero-titles">
-                <h2 className="manager-hero-h2">
+                <h2
+                  className="manager-hero-h2"
+                  style={{ textShadow: '0 2px 14px rgba(0, 0, 0, 0.9)' }}
+                >
                   Book Freight Fast.<br />
-                  <span className="h2-gradient" style={{ background: 'linear-gradient(90deg, #FF7A1A, #079DF2)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                    Deliver Excellence.
+                  <span
+                    className="h2-gradient"
+                    style={{
+                      background: 'linear-gradient(90deg, #38bdf8, #0ea5e9, #93c5fd)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      textShadow: '0 2px 20px rgba(56, 189, 248, 0.3)'
+                    }}
+                  >
+                    Track Shipments To Your Door.
                   </span>
                 </h2>
-                <p className="manager-hero-p">
-                  Book end-to-end commercial freight, track live linehaul GPS satellite telemetry, verify e-POD signatures, and settle corporate invoices.
+                <p
+                  className="manager-hero-p"
+                  style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.85)', color: '#cbd5e1' }}
+                >
+                  On-demand commercial freight booking, live satellite linehaul GPS tracking, verified electronic proof of delivery (e-POD), and transparent invoicing.
                 </p>
               </div>
+
               <div className="manager-feature-pills">
-                <div className="manager-feature-pill">
-                  <span className="pill-dot" style={{ backgroundColor: '#079DF2' }} /> Instant Freight Booking & Order Dispatch
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(56, 189, 248, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#38bdf8' }} /> Instant Freight Booking & Order Dispatch
                 </div>
-                <div className="manager-feature-pill">
-                  <span className="pill-dot" style={{ backgroundColor: '#FF7A1A' }} /> Real-Time Satellite GPS Vehicle Tracking
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(16, 185, 129, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#10b981' }} /> Live GPS Telemetry & Accurate ETA Tracking
                 </div>
-                <div className="manager-feature-pill">
-                  <span className="pill-dot" style={{ backgroundColor: '#16A36A' }} /> Verified Electronic Proof of Delivery (e-POD)
+                <div
+                  className="manager-feature-pill"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)'
+                  }}
+                >
+                  <span className="pill-dot" style={{ backgroundColor: '#f59e0b' }} /> Verified Electronic Proof of Delivery (e-POD)
                 </div>
               </div>
             </div>
