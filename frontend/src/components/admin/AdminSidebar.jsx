@@ -161,28 +161,6 @@ export const AdminSidebar = ({ activeTab, onSelectTab, onLogout, onSwitchPortal 
             <button
               className="sidebar-switcher-btn"
               style={{
-                background: 'rgba(245,158,11,0.12)',
-                border: '1px solid rgba(245,158,11,0.3)',
-                color: '#f59e0b',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 10px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '11px',
-                fontWeight: '600'
-              }}
-              onClick={() => onSwitchPortal('maintenance')}
-              title="Switch to Maintenance Dashboard"
-            >
-              <Wrench size={14} color="#f59e0b" />
-              <span>Maintenance OS</span>
-            </button>
-
-            <button
-              className="sidebar-switcher-btn"
-              style={{
                 background: 'rgba(139,92,246,0.12)',
                 border: '1px solid rgba(139,92,246,0.3)',
                 color: '#8b5cf6',

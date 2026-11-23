@@ -154,18 +154,6 @@ export const Header = ({
                 <button
                   onClick={() => {
                     setShowPortalDropdown(false);
-                    onSwitchPortal('maintenance');
-                  }}
-                  className="header-portal-dropdown-item"
-                  style={{ color: '#f59e0b' }}
-                >
-                  <Wrench size={14} color="#f59e0b" />
-                  <span>Maintenance Dashboard</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowPortalDropdown(false);
                     onSwitchPortal('warehouse');
                   }}
                   className="header-portal-dropdown-item"

@@ -4239,26 +4239,6 @@ body {
   }
 }
 
-/* ==========================================================================
-   MAINTENANCE PORTAL STYLES (MAINTENANCE & ASSET HEALTH OS)
-   ========================================================================== */
-.maintenance-portal-theme {
-  background-color: var(--bg-dashboard);
-}
-
-.maintenance-sidebar {
-  border-right: 1px solid rgba(245, 158, 11, 0.15);
-}
-
-.maintenance-sidebar .brand-sub-badge {
-  color: #fbbf24;
-}
-
-.maintenance-sidebar .nav-item-btn.active {
-  background: rgba(245, 158, 11, 0.15);
-  border-left: 3px solid #f59e0b;
-  color: #fbbf24;
-}
 
 /* ==========================================================================
    RESPONSIVE LAYOUT FIXES FOR ALL PORTALS

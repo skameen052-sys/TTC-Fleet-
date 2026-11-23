@@ -4,48 +4,111 @@ SCREENSHOTS_DIR = r"C:\Users\acer\.gemini\antigravity\brain\c6a63ca7-c81d-4eb9-9
 
 portals_to_test = [
     {
+        'portal': 'login',
+        'name': 'Login Page (5 Portals Only)',
+        'setup': """
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'http://localhost:3000/';
+        """,
+        'inspect': """
+            (() => {
+                const pills = Array.from(document.querySelectorAll('.portal-pill-btn')).map(b => b.innerText.trim());
+                return JSON.stringify({
+                    pills: pills,
+                    hasMaint: pills.some(p => p.toLowerCase().includes('maint')),
+                    bodyTextSnippet: document.body.innerText.slice(0, 300)
+                });
+            })()
+        """,
+        'screenshot': 'login_page_no_maint.png'
+    },
+    {
         'portal': 'admin',
         'name': 'Admin Dashboard',
-        'user': {
-            'fullName': 'Admin',
-            'role': 'ROLE_ADMIN',
-            'email': 'admin@ttcfleet360.com',
-            'portal': 'admin'
-        },
+        'setup': """
+            localStorage.setItem('ttc_auth_token', 'jwt_verified_test_token');
+            localStorage.setItem('ttc_fleet360_user', JSON.stringify({
+                fullName: 'Admin', role: 'ROLE_ADMIN', email: 'admin@ttcfleet360.com', portal: 'admin'
+            }));
+            window.location.href = 'http://localhost:3000/?portal=admin';
+        """,
+        'inspect': """
+            (() => {
+                const sidebar = document.querySelector('.fleet-sidebar, .dashboard-sidebar');
+                const mainWrapper = document.querySelector('.main-wrapper, .dashboard-main');
+                return JSON.stringify({
+                    sidebarFound: Boolean(sidebar),
+                    sidebarRect: sidebar ? {
+                        x: Math.round(sidebar.getBoundingClientRect().x),
+                        width: Math.round(sidebar.getBoundingClientRect().width)
+                    } : null,
+                    mainRect: mainWrapper ? {
+                        x: Math.round(mainWrapper.getBoundingClientRect().x),
+                        width: Math.round(mainWrapper.getBoundingClientRect().width)
+                    } : null
+                });
+            })()
+        """,
         'screenshot': 'admin_dashboard_verified.png'
     },
     {
         'portal': 'manager',
         'name': 'Fleet Manager Dashboard',
-        'user': {
-            'fullName': 'Vikram Malhotra',
-            'role': 'ROLE_MANAGER',
-            'email': 'manager@ttcfleet360.com',
-            'portal': 'manager'
-        },
+        'setup': """
+            localStorage.setItem('ttc_auth_token', 'jwt_verified_test_token');
+            localStorage.setItem('ttc_fleet360_user', JSON.stringify({
+                fullName: 'Vikram Malhotra', role: 'ROLE_MANAGER', email: 'manager@ttcfleet360.com', portal: 'manager'
+            }));
+            window.location.href = 'http://localhost:3000/?portal=manager';
+        """,
+        'inspect': """
+            (() => {
+                const sidebar = document.querySelector('.fleet-sidebar, .dashboard-sidebar');
+                const mainWrapper = document.querySelector('.main-wrapper, .dashboard-main');
+                return JSON.stringify({
+                    sidebarFound: Boolean(sidebar),
+                    sidebarRect: sidebar ? {
+                        x: Math.round(sidebar.getBoundingClientRect().x),
+                        width: Math.round(sidebar.getBoundingClientRect().width)
+                    } : null,
+                    mainRect: mainWrapper ? {
+                        x: Math.round(mainWrapper.getBoundingClientRect().x),
+                        width: Math.round(mainWrapper.getBoundingClientRect().width)
+                    } : null
+                });
+            })()
+        """,
         'screenshot': 'fleet_manager_dashboard_verified.png'
     },
     {
         'portal': 'driver',
         'name': 'Driver Portal Dashboard',
-        'user': {
-            'fullName': 'Marcus Vance',
-            'role': 'ROLE_DRIVER',
-            'email': 'm.vance@fleet360.ttc.com',
-            'portal': 'driver'
-        },
+        'setup': """
+            localStorage.setItem('ttc_auth_token', 'jwt_verified_test_token');
+            localStorage.setItem('ttc_fleet360_user', JSON.stringify({
+                fullName: 'Marcus Vance', role: 'ROLE_DRIVER', email: 'm.vance@fleet360.ttc.com', portal: 'driver'
+            }));
+            window.location.href = 'http://localhost:3000/?portal=driver';
+        """,
+        'inspect': """
+            (() => {
+                const sidebar = document.querySelector('.fleet-sidebar, .dashboard-sidebar');
+                const mainWrapper = document.querySelector('.main-wrapper, .dashboard-main');
+                return JSON.stringify({
+                    sidebarFound: Boolean(sidebar),
+                    sidebarRect: sidebar ? {
+                        x: Math.round(sidebar.getBoundingClientRect().x),
+                        width: Math.round(sidebar.getBoundingClientRect().width)
+                    } : null,
+                    mainRect: mainWrapper ? {
+                        x: Math.round(mainWrapper.getBoundingClientRect().x),
+                        width: Math.round(mainWrapper.getBoundingClientRect().width)
+                    } : null
+                });
+            })()
+        """,
         'screenshot': 'driver_dashboard_verified.png'
-    },
-    {
-        'portal': 'maintenance',
-        'name': 'Maintenance & Asset Health Dashboard',
-        'user': {
-            'fullName': 'Dave Kowalski',
-            'role': 'ROLE_MAINTENANCE_MANAGER',
-            'email': 'maintenance@ttcfleet360.com',
-            'portal': 'maintenance'
-        },
-        'screenshot': 'maintenance_dashboard_verified.png'
     }
 ]
 
@@ -54,13 +117,13 @@ async def run_verification():
         r'C:\Program Files\Google\Chrome\Application\chrome.exe',
         '--headless=new',
         '--window-size=1440,900',
-        '--remote-debugging-port=9254',
+        '--remote-debugging-port=9255',
         'http://localhost:3000/'
     ])
     await asyncio.sleep(2.5)
 
     try:
-        tabs = json.loads(urllib.request.urlopen('http://127.0.0.1:9254/json').read())
+        tabs = json.loads(urllib.request.urlopen('http://127.0.0.1:9255/json').read())
         ws_url = tabs[0]['webSocketDebuggerUrl']
         
         async with websockets.connect(ws_url, max_size=20*1024*1024) as ws:
@@ -71,76 +134,45 @@ async def run_verification():
             
             for item in portals_to_test:
                 print(f"\n==========================================")
-                print(f"VERIFYING: {item['name']} (portal={item['portal']})")
+                print(f"VERIFYING: {item['name']}")
                 print(f"==========================================")
                 
-                # Setup session and navigate
-                setup_script = f"""
-                localStorage.setItem('ttc_auth_token', 'jwt_verified_test_token');
-                localStorage.setItem('ttc_fleet360_user', JSON.stringify({json.dumps(item['user'])}));
-                window.location.href = 'http://localhost:3000/?portal={item['portal']}';
-                """
                 cmd_id += 1
-                await ws.send(json.dumps({'id': cmd_id, 'method': 'Runtime.evaluate', 'params': {'expression': setup_script}}))
+                await ws.send(json.dumps({'id': cmd_id, 'method': 'Runtime.evaluate', 'params': {'expression': item['setup']}}))
                 
-                await asyncio.sleep(3.0)
+                await asyncio.sleep(2.5)
                 
-                # Evaluate DOM layout and elements
-                inspect_script = """
-                (() => {
-                    const body = document.body;
-                    const sidebar = document.querySelector('.fleet-sidebar, .dashboard-sidebar');
-                    const mainWrapper = document.querySelector('.main-wrapper, .dashboard-main');
-                    const text = body.innerText;
-                    
-                    return JSON.stringify({
-                        url: window.location.href,
-                        sidebarFound: Boolean(sidebar),
-                        sidebarRect: sidebar ? {
-                            x: Math.round(sidebar.getBoundingClientRect().x),
-                            width: Math.round(sidebar.getBoundingClientRect().width)
-                        } : null,
-                        mainWrapperFound: Boolean(mainWrapper),
-                        mainWrapperRect: mainWrapper ? {
-                            x: Math.round(mainWrapper.getBoundingClientRect().x),
-                            width: Math.round(mainWrapper.getBoundingClientRect().width)
-                        } : null,
-                        textSnippet: text.substring(0, 200).replace(/\\n/g, ' ')
-                    });
-                })()
-                """
                 cmd_id += 1
-                req_id = cmd_id
-                await ws.send(json.dumps({'id': req_id, 'method': 'Runtime.evaluate', 'params': {'expression': inspect_script}}))
+                await ws.send(json.dumps({'id': cmd_id, 'method': 'Runtime.evaluate', 'params': {'expression': item['inspect'], 'returnByValue': True}}))
                 
                 while True:
-                    msg = await asyncio.wait_for(ws.recv(), timeout=8.0)
-                    data = json.loads(msg)
-                    if data.get('id') == req_id:
-                        val = json.loads(data['result']['result']['value'])
-                        print(f"URL: {val['url']}")
-                        print(f"Sidebar: {val['sidebarRect']}")
-                        print(f"Main Area: {val['mainWrapperRect']}")
-                        print(f"Text Snippet: {val['textSnippet'][:120]}...")
+                    resp = json.loads(await ws.recv())
+                    if resp.get('id') == cmd_id:
+                        res_val = resp.get('result', {}).get('result', {}).get('value', '{}')
+                        data = json.loads(res_val) if isinstance(res_val, str) else res_val
+                        print("Inspection result:", json.dumps(data, indent=2))
                         break
-                
-                # Capture screenshot
+                        
+                # Take screenshot
                 cmd_id += 1
-                shot_id = cmd_id
-                await ws.send(json.dumps({'id': shot_id, 'method': 'Page.captureScreenshot', 'params': {'format': 'png'}}))
+                await ws.send(json.dumps({'id': cmd_id, 'method': 'Page.captureScreenshot', 'params': {'format': 'png'}}))
                 
                 while True:
-                    msg = await asyncio.wait_for(ws.recv(), timeout=10.0)
-                    data = json.loads(msg)
-                    if data.get('id') == shot_id:
-                        img_bytes = base64.b64decode(data['result']['data'])
-                        filepath = os.path.join(SCREENSHOTS_DIR, item['screenshot'])
-                        with open(filepath, 'wb') as f:
+                    resp = json.loads(await ws.recv())
+                    if resp.get('id') == cmd_id:
+                        img_bytes = base64.b64decode(resp['result']['data'])
+                        target_file = os.path.join(SCREENSHOTS_DIR, item['screenshot'])
+                        with open(target_file, 'wb') as f:
                             f.write(img_bytes)
-                        print(f"Saved Screenshot: {filepath}")
+                        print(f"Saved screenshot: {target_file} ({len(img_bytes)} bytes)")
                         break
                         
     finally:
         proc.terminate()
+        try:
+            proc.wait(timeout=3)
+        except:
+            proc.kill()
 
-asyncio.run(run_verification())
+if __name__ == '__main__':
+    asyncio.run(run_verification())
