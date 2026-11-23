@@ -371,10 +371,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  flex-shrink: 1;
-  min-width: 0;
-  max-width: 40%;
-  overflow: hidden;
+  flex-shrink: 0;
+  min-width: max-content;
 }
 
 .fleet-header .header-page-title {
@@ -383,8 +381,6 @@ body {
   color: var(--primary-navy);
   letter-spacing: -0.02em;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   line-height: 1.2;
 }
 
@@ -403,7 +399,9 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 0;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 /* Header Portal Switcher Pill */

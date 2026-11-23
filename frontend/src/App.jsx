@@ -920,12 +920,21 @@ export default function App() {
                 {logisticsActiveTab === 'dashboard' && (
                   <LogisticsDashboard
                     data={logisticsData}
+                    metrics={logisticsData.metrics || logisticsService.getSummaryMetrics()}
                     onSelectTab={setLogisticsActiveTab}
                     onOpenCreateOrder={() => setIsLogisticsCreateOrderOpen(true)}
                     onOpenCreateShipment={() => setIsLogisticsCreateShipmentOpen(true)}
                     onOpenCreateTrip={() => setIsLogisticsCreateTripOpen(true)}
                     onOpenAssignModal={() => setIsLogisticsAssignOpen(true)}
                     onOpenPodModal={(del) => {
+                      setSelectedPodDelivery(del);
+                      setIsLogisticsPodOpen(true);
+                    }}
+                    onUpdateOrderStatus={(orderId, status) => {
+                      logisticsService.updateOrderStatus(orderId, status);
+                      showToast(`Order ${orderId} updated to ${status}.`);
+                    }}
+                    onViewPod={(del) => {
                       setSelectedPodDelivery(del);
                       setIsLogisticsPodOpen(true);
                     }}

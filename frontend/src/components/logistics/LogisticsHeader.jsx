@@ -77,8 +77,8 @@ export const LogisticsHeader = ({
   return (
     <header className="fleet-header logistics-header">
       {/* Page Title & Breadcrumb */}
-      <div className="header-left-col" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0, flexShrink: 1, overflow: 'hidden' }}>
-        <h1 className="header-page-title" style={{ fontSize: '17px', fontWeight: 800, margin: 0, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <div className="header-left-col" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flexShrink: 0, minWidth: 'max-content' }}>
+        <h1 className="header-page-title" style={{ fontSize: '17px', fontWeight: 800, margin: 0, lineHeight: 1.2, whiteSpace: 'nowrap', color: '#14213D' }}>
           {activeTabTitle}
         </h1>
         <div className="driver-header-badge" style={{ color: '#7955E8', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '11px', fontWeight: 600, marginTop: 2, whiteSpace: 'nowrap' }}>
@@ -88,44 +88,45 @@ export const LogisticsHeader = ({
       </div>
 
       {/* Middle & Right Navigation Elements */}
-      <div className="header-right-col">
+      <div className="header-right-col" style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
         {/* Live Logistics Telemetry Pill */}
         <div
           className="driver-trip-telemetry-pill logistics-telemetry-pill"
           onClick={() => onSelectTab && onSelectTab('shipments')}
           title="Click to view Shipments in Transit"
-          style={{ background: '#F5F3FF', borderColor: '#DDD6FE' }}
+          style={{ background: '#F5F3FF', borderColor: '#DDD6FE', padding: '4px 10px', flexShrink: 0 }}
         >
-          <div className="pill-icon-circle" style={{ background: '#EDE9FE' }}>
-            <Boxes size={13} color="#7955E8" strokeWidth={2.5} />
+          <div className="pill-icon-circle" style={{ background: '#EDE9FE', width: 22, height: 22 }}>
+            <Boxes size={12} color="#7955E8" strokeWidth={2.5} />
           </div>
-          <span className="pill-trip-id">48 Active</span>
+          <span className="pill-trip-id" style={{ fontSize: '12px' }}>48 Active</span>
           <span className="pill-dot">•</span>
-          <span className="pill-status-text" style={{ color: '#16A36A' }}>
+          <span className="pill-status-text" style={{ color: '#16A36A', fontSize: '11px' }}>
             <span className="live-dot-pulse" />
             98.4% On-Time
           </span>
-          <span className="pill-eta-badge" style={{ background: '#7955E8' }}>Optimal</span>
+          <span className="pill-eta-badge" style={{ background: '#7955E8', fontSize: '10px', padding: '1px 6px' }}>Optimal</span>
         </div>
 
         {/* Global Search Pill */}
-        <div className="header-search-wrapper">
-          <Search className="header-search-icon" size={16} />
+        <div className="header-search-wrapper" style={{ maxWidth: '210px', width: '100%', minWidth: '130px', flexShrink: 1 }}>
+          <Search className="header-search-icon" size={15} />
           <input
             ref={searchInputRef}
             type="text"
             className="header-search-input"
-            placeholder="Search orders, shipments, trips..."
+            placeholder="Search orders, shipments..."
             value={searchQuery || ''}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            style={{ fontSize: '12px' }}
           />
           <kbd className="header-search-kbd">/</kbd>
         </div>
 
         {/* Live Date & Time pill */}
-        <div className="header-datetime-pill">
-          <Calendar size={15} color="#3478F6" />
-          <span>{currentDateTime || 'Mon, Nov 23, 2026 • 10:49 AM'}</span>
+        <div className="header-datetime-pill" style={{ flexShrink: 0, padding: '4px 8px', fontSize: '11.5px' }}>
+          <Calendar size={13} color="#3478F6" />
+          <span>{currentDateTime || 'Mon, Nov 23, 2026 • 01:28 PM'}</span>
         </div>
 
         {/* Notification Bell Button */}

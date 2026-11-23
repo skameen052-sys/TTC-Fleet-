@@ -29,9 +29,10 @@ import {
   Layers
 } from 'lucide-react';
 import { InteractiveAreaChart, InteractiveBarChart, InteractiveDonutChart } from '../common/Charts';
+import { logisticsService } from '../../services/logisticsService';
 
 export const LogisticsDashboard = ({
-  data,
+  data = {},
   metrics,
   onOpenCreateOrder,
   onOpenCreateShipment,
@@ -54,6 +55,20 @@ export const LogisticsDashboard = ({
   const activities = data.activities || [];
   const alerts = data.alerts || [];
   const analytics = data.analytics || {};
+
+  // Safe fallback metrics calculation to guarantee 100% crash-free rendering
+  const m = metrics || data.metrics || (typeof logisticsService !== 'undefined' ? logisticsService.getSummaryMetrics() : null) || {
+    totalOrders: orders.length,
+    newOrders: orders.filter(o => o.status === 'Pending').length,
+    pendingOrders: orders.filter(o => o.status === 'Pending' || o.status === 'Processing').length,
+    approvedOrders: orders.filter(o => o.status === 'Approved').length,
+    totalShipments: shipments.length,
+    shipmentsInTransit: shipments.filter(s => s.status === 'In Transit').length,
+    activeTrips: trips.filter(t => t.status === 'Active').length,
+    completedTrips: trips.filter(t => t.status === 'Completed').length,
+    delayedDeliveries: shipments.filter(s => s.status === 'Delayed').length,
+    pendingPickups: pickups.filter(p => p.status === 'Pending' || p.status === 'Scheduled').length
+  };
 
   const filteredOrders = orders.filter(o => {
     if (orderFilter === 'pending') return o.status === 'Pending' || o.status === 'Processing';
@@ -147,7 +162,7 @@ export const LogisticsDashboard = ({
                 <PackageCheck size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.totalOrders}</div>
+            <div className="metric-card-val">{m.totalOrders}</div>
             <div className="metric-card-sub" style={{ color: '#16A36A' }}>
               <span>↑ +12.4%</span> vs last week
             </div>
@@ -161,7 +176,7 @@ export const LogisticsDashboard = ({
                 <Clock size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.newOrders}</div>
+            <div className="metric-card-val">{m.newOrders}</div>
             <div className="metric-card-sub" style={{ color: '#FF7A1A' }}>
               Awaiting review
             </div>
@@ -175,7 +190,7 @@ export const LogisticsDashboard = ({
                 <AlertCircle size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.pendingOrders}</div>
+            <div className="metric-card-val">{m.pendingOrders}</div>
             <div className="metric-card-sub" style={{ color: '#D97706' }}>
               In prep queue
             </div>
@@ -189,7 +204,7 @@ export const LogisticsDashboard = ({
                 <CheckCircle2 size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.approvedOrders}</div>
+            <div className="metric-card-val">{m.approvedOrders}</div>
             <div className="metric-card-sub" style={{ color: '#16A36A' }}>
               Ready for dispatch
             </div>
@@ -203,7 +218,7 @@ export const LogisticsDashboard = ({
                 <Boxes size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.totalShipments}</div>
+            <div className="metric-card-val">{m.totalShipments}</div>
             <div className="metric-card-sub" style={{ color: '#7955E8' }}>
               Active pipeline
             </div>
@@ -217,7 +232,7 @@ export const LogisticsDashboard = ({
                 <Truck size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.shipmentsInTransit}</div>
+            <div className="metric-card-val">{m.shipmentsInTransit}</div>
             <div className="metric-card-sub" style={{ color: '#3B82F6' }}>
               On regional highways
             </div>
@@ -231,7 +246,7 @@ export const LogisticsDashboard = ({
                 <Route size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.activeTrips}</div>
+            <div className="metric-card-val">{m.activeTrips}</div>
             <div className="metric-card-sub" style={{ color: '#0284C7' }}>
               Cruising telemetry on
             </div>
@@ -245,7 +260,7 @@ export const LogisticsDashboard = ({
                 <CheckSquare size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.completedTrips}</div>
+            <div className="metric-card-val">{m.completedTrips}</div>
             <div className="metric-card-sub" style={{ color: '#15803D' }}>
               100% verified POD
             </div>
@@ -259,7 +274,7 @@ export const LogisticsDashboard = ({
                 <AlertTriangle size={18} />
               </div>
             </div>
-            <div className="metric-card-val" style={{ color: '#DC2626' }}>{metrics.delayedDeliveries}</div>
+            <div className="metric-card-val" style={{ color: '#DC2626' }}>{m.delayedDeliveries}</div>
             <div className="metric-card-sub" style={{ color: '#DC2626' }}>
               Traffic bottlenecks
             </div>
@@ -273,7 +288,7 @@ export const LogisticsDashboard = ({
                 <CalendarCheck size={18} />
               </div>
             </div>
-            <div className="metric-card-val">{metrics.pendingPickups}</div>
+            <div className="metric-card-val">{m.pendingPickups}</div>
             <div className="metric-card-sub" style={{ color: '#B45309' }}>
               Scheduled for loading
             </div>
@@ -475,9 +490,9 @@ export const LogisticsDashboard = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div className="filter-tabs">
               <button className={`filter-tab ${orderFilter === 'all' ? 'active' : ''}`} onClick={() => setOrderFilter('all')}>All ({orders.length})</button>
-              <button className={`filter-tab ${orderFilter === 'pending' ? 'active' : ''}`} onClick={() => setOrderFilter('pending')}>Pending ({metrics.pendingOrders})</button>
-              <button className={`filter-tab ${orderFilter === 'approved' ? 'active' : ''}`} onClick={() => setOrderFilter('approved')}>Approved ({metrics.approvedOrders})</button>
-              <button className={`filter-tab ${orderFilter === 'transit' ? 'active' : ''}`} onClick={() => setOrderFilter('transit')}>In Transit ({metrics.shipmentsInTransit})</button>
+              <button className={`filter-tab ${orderFilter === 'pending' ? 'active' : ''}`} onClick={() => setOrderFilter('pending')}>Pending ({m.pendingOrders})</button>
+              <button className={`filter-tab ${orderFilter === 'approved' ? 'active' : ''}`} onClick={() => setOrderFilter('approved')}>Approved ({m.approvedOrders})</button>
+              <button className={`filter-tab ${orderFilter === 'transit' ? 'active' : ''}`} onClick={() => setOrderFilter('transit')}>In Transit ({m.shipmentsInTransit})</button>
             </div>
             <button className="btn-primary" onClick={onOpenCreateOrder} style={{ backgroundColor: '#FF7A1A', padding: '6px 12px', fontSize: 12 }}>
               <Plus size={14} /> New Order
@@ -522,8 +537,8 @@ export const LogisticsDashboard = ({
                       {o.priority}
                     </span>
                   </td>
-                  <td>{o.totalWeightKg.toLocaleString()} kg</td>
-                  <td><strong>${o.amount.toLocaleString()}</strong></td>
+                  <td>{(o.totalWeightKg || 0).toLocaleString()} kg</td>
+                  <td><strong>${(o.amount || 0).toLocaleString()}</strong></td>
                   <td>
                     <span className={`status-pill status-${o.status.toLowerCase().replace(/\s+/g, '-')}`}>
                       {o.status}
@@ -682,8 +697,8 @@ export const LogisticsDashboard = ({
                 </div>
 
                 <div style={{ fontSize: 11, color: '#64748B', display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #E2E8F0', paddingTop: 6 }}>
-                  <span>Departed: {t.departureTime.split(' ')[1] || '08:00'}</span>
-                  <span>Est. Arrival: <strong>{t.expectedArrival.split(' ')[1] || '16:00'} ({t.etaHours})</strong></span>
+                  <span>Departed: {t.departureTime?.includes(' ') ? t.departureTime.split(' ')[1] : t.departureTime || '08:00'}</span>
+                  <span>Est. Arrival: <strong>{t.expectedArrival?.includes(' ') ? t.expectedArrival.split(' ')[1] : t.expectedArrival || '16:00'} ({t.etaHours || '4h'})</strong></span>
                 </div>
               </div>
             ))}
