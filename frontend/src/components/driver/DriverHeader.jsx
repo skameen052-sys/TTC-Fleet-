@@ -330,15 +330,13 @@ export const DriverHeader = ({
         {/* Driver Profile Pill */}
         <div className="header-profile-container" ref={profileRef}>
           <div
-            className="user-profile-menu driver-profile-menu"
+            className="user-profile-menu driver-profile-menu user-profile-avatar-pill"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+            title={driver?.fullName || 'Marcus Vance'}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px 3px 3px', borderRadius: 20 }}
           >
             <div className="user-avatar-circle driver-avatar" style={{ backgroundColor: '#16A36A', color: '#FFFFFF', fontWeight: '800' }}>
               <span>{driver?.fullName ? driver.fullName.split(' ').map(n=>n[0]).join('').slice(0,2) : 'MV'}</span>
-            </div>
-            <div className="user-text-info">
-              <span className="user-display-name">{driver?.fullName || 'Marcus Vance'}</span>
-              <span className="user-role-text" style={{ color: '#16A36A' }}>Commercial CDL • {driver?.assignedVehicleReg || 'TTC-8492-HD'}</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>

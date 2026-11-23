@@ -69,17 +69,17 @@ export const WarehouseDashboard = ({
       {/* ===================================================================
           1. HERO BANNER - WAREHOUSE LOGISTICS THEME
           =================================================================== */}
-      <section className="fleet-hero-container warehouse-hero-container" style={{ minHeight: '200px', marginBottom: '22px' }}>
-        <div className="hero-content-left" style={{ flex: '1.1', minWidth: 0, zIndex: 3, padding: '24px 28px' }}>
-          <div className="hero-badge-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255, 122, 26, 0.22)', border: '1px solid rgba(255, 122, 26, 0.5)', padding: '4px 12px', borderRadius: 20, marginBottom: 10, width: 'fit-content' }}>
+      <section className="fleet-hero-container warehouse-hero-container" style={{ minHeight: '140px', marginBottom: '14px' }}>
+        <div className="hero-content-left" style={{ flex: '1.1', minWidth: 0, zIndex: 3, padding: '16px 22px' }}>
+          <div className="hero-badge-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255, 122, 26, 0.22)', border: '1px solid rgba(255, 122, 26, 0.5)', padding: '3px 10px', borderRadius: 20, marginBottom: 6, width: 'fit-content' }}>
             <Warehouse size={13} color="#FF7A1A" />
             <span style={{ color: '#FFB37C', fontWeight: '800', fontSize: '11px', letterSpacing: '0.04em' }}>TTC WAREHOUSE OS • ENTERPRISE LOGISTICS</span>
           </div>
           <div className="hero-heading-wrap">
-            <h1 className="hero-welcome-title" style={{ fontSize: '24px', lineHeight: 1.15 }}>Welcome back,</h1>
-            <h2 className="hero-manager-title" style={{ fontSize: '26px', color: '#FF7A1A', lineHeight: 1.15 }}>Warehouse Manager!</h2>
+            <h1 className="hero-welcome-title" style={{ fontSize: '20px', lineHeight: 1.15 }}>Welcome back,</h1>
+            <h2 className="hero-manager-title" style={{ fontSize: '22px', color: '#FF7A1A', lineHeight: 1.15 }}>Warehouse Manager!</h2>
           </div>
-          <p className="hero-description" style={{ fontSize: '13px', marginTop: '6px' }}>
+          <p className="hero-description" style={{ fontSize: '12px', marginTop: '4px' }}>
             Optimize storage. Accelerate dispatch. Master inventory operations across all regional distribution hubs.
           </p>
         </div>

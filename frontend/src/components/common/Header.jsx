@@ -276,15 +276,13 @@ export const Header = ({
         {/* User Profile Pill */}
         <div className="header-profile-container" ref={profileRef}>
           <div
-            className="user-profile-menu"
+            className="user-profile-menu user-profile-avatar-pill"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+            title={currentUser?.fullName || 'Vikram Malhotra'}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px 3px 3px', borderRadius: 20 }}
           >
             <div className="user-avatar-circle" style={{ backgroundColor: '#2563EB', color: '#FFFFFF', fontWeight: '800' }}>
               <span>{currentUser?.fullName ? currentUser.fullName.split(' ').map(n=>n[0]).join('').slice(0,2) : 'VM'}</span>
-            </div>
-            <div className="user-text-info">
-              <span className="user-display-name">{currentUser?.fullName || 'Vikram Malhotra'}</span>
-              <span className="user-role-text" style={{ color: '#2563EB' }}>Fleet Operations Manager</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>

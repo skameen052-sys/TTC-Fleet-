@@ -63,41 +63,41 @@ export const LogisticsDashboard = ({
   });
 
   return (
-    <div className="logistics-dashboard-container" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="logistics-dashboard-container" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* 1. Hero Logistics Command Banner */}
       <div
         className="logistics-hero-banner"
         style={{
           background: 'linear-gradient(135deg, #14213D 0%, #1E3155 55%, #253A68 100%)',
           borderRadius: 16,
-          padding: '24px 30px',
+          padding: '16px 24px',
           color: '#FFFFFF',
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(20, 33, 61, 0.12)',
+          boxShadow: '0 4px 18px rgba(20, 33, 61, 0.1)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}
       >
         <div style={{ maxWidth: '65%', zIndex: 2 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255, 122, 26, 0.18)', border: '1px solid rgba(255, 122, 26, 0.4)', padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700, color: '#FF9E4A', marginBottom: 12 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255, 122, 26, 0.18)', border: '1px solid rgba(255, 122, 26, 0.4)', padding: '3px 9px', borderRadius: 20, fontSize: 10.5, fontWeight: 700, color: '#FF9E4A', marginBottom: 8 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#FF7A1A' }} />
             TTC LOGISTICS COMMAND & FREIGHT DISPATCH OS
           </div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 8px 0', letterSpacing: '-0.02em', color: '#FFFFFF' }}>
+          <h1 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 4px 0', letterSpacing: '-0.02em', color: '#FFFFFF' }}>
             Manage Logistics. <span style={{ color: '#FF7A1A' }}>Deliver Excellence.</span>
           </h1>
-          <p style={{ fontSize: 13, color: '#CBD5E1', margin: 0, lineHeight: 1.6 }}>
+          <p style={{ fontSize: 12, color: '#CBD5E1', margin: 0, lineHeight: 1.45 }}>
             Streamline customer orders, shipments, cross-border corridors, and last-mile proof-of-delivery operations from one centralized intermodal platform.
           </p>
 
-          <div style={{ display: 'flex', gap: 14, marginTop: 18, flexWrap: 'wrap' }}>
-            <div style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '6px 14px', borderRadius: 10, fontSize: 12 }}>
+          <div style={{ display: 'flex', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '4px 12px', borderRadius: 8, fontSize: 11.5 }}>
               <span style={{ color: '#94A3B8' }}>On-Time Delivery: </span>
               <strong style={{ color: '#10B981' }}>98.4%</strong>
             </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '6px 14px', borderRadius: 10, fontSize: 12 }}>
+            <div style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '4px 12px', borderRadius: 8, fontSize: 11.5 }}>
               <span style={{ color: '#94A3B8' }}>Active Corridors: </span>
               <strong style={{ color: '#38BDF8' }}>14 Regional Routes</strong>
             </div>

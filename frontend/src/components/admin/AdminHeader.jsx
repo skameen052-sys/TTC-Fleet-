@@ -255,9 +255,10 @@ export const AdminHeader = ({
           <div
             className="profile-pill"
             onClick={() => setShowProfileMenu(!showProfileMenu)}
+            title={currentUser?.fullName || 'Super Admin'}
+            style={{ cursor: 'pointer', padding: '3px 8px 3px 3px' }}
           >
             <div className="avatar-circle">A</div>
-            <span className="profile-name">{currentUser?.fullName || 'Admin'}</span>
             <ChevronDown size={13} color="#94a3b8" />
           </div>
 

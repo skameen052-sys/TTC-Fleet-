@@ -189,15 +189,13 @@ export const LogisticsHeader = ({
         {/* User Profile Pill */}
         <div className="header-profile-container" ref={profileRef}>
           <div
-            className="user-profile-menu"
+            className="user-profile-menu user-profile-avatar-pill"
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+            title={manager?.name || 'Elena Rostova'}
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px 3px 3px', borderRadius: 20 }}
           >
             <div className="user-avatar-circle" style={{ backgroundColor: '#7955E8', color: '#FFFFFF', fontWeight: '800' }}>
               <span>{manager?.name ? manager.name.split(' ').map(n => n[0]).join('').slice(0, 2) : 'ER'}</span>
-            </div>
-            <div className="user-text-info">
-              <span className="user-display-name">{manager?.name || 'Elena Rostova'}</span>
-              <span className="user-role-text" style={{ color: '#7955E8' }}>Director of Logistics</span>
             </div>
             <ChevronDown size={14} color="#718096" />
           </div>

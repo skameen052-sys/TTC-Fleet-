@@ -160,17 +160,17 @@ export const DriverDashboard = ({
       {/* ===================================================================
           1. HERO BANNER - DRIVER COMMERCIAL DISPATCH THEME
           =================================================================== */}
-      <section className="fleet-hero-container driver-hero-container" style={{ minHeight: '155px', marginBottom: '16px' }}>
-        <div className="hero-content-left" style={{ flex: '1.1', minWidth: 0, zIndex: 3, padding: '20px 24px' }}>
-          <div className="hero-badge-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(22, 163, 106, 0.22)', border: '1px solid rgba(22, 163, 106, 0.5)', padding: '4px 12px', borderRadius: 20, marginBottom: 8, width: 'fit-content' }}>
+      <section className="fleet-hero-container driver-hero-container" style={{ minHeight: '135px', marginBottom: '12px' }}>
+        <div className="hero-content-left" style={{ flex: '1.1', minWidth: 0, zIndex: 3, padding: '14px 20px' }}>
+          <div className="hero-badge-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(22, 163, 106, 0.22)', border: '1px solid rgba(22, 163, 106, 0.5)', padding: '3px 10px', borderRadius: 20, marginBottom: 6, width: 'fit-content' }}>
             <Truck size={13} color="#16A36A" />
             <span style={{ color: '#86EFAC', fontWeight: '800', fontSize: '11px', letterSpacing: '0.04em' }}>TTC DRIVER OS • COMMERCIAL CDL DISPATCH</span>
           </div>
           <div className="hero-heading-wrap">
-            <h1 className="hero-welcome-title" style={{ fontSize: '22px', lineHeight: 1.15, margin: 0, color: '#FFFFFF' }}>Welcome back,</h1>
-            <h2 className="hero-manager-title" style={{ fontSize: '24px', color: '#FF7A1A', lineHeight: 1.15, margin: 0 }}>{driver?.fullName || 'Marcus Vance'}!</h2>
+            <h1 className="hero-welcome-title" style={{ fontSize: '20px', lineHeight: 1.15, margin: 0, color: '#FFFFFF' }}>Welcome back,</h1>
+            <h2 className="hero-manager-title" style={{ fontSize: '22px', color: '#FF7A1A', lineHeight: 1.15, margin: 0 }}>{driver?.fullName || 'Marcus Vance'}!</h2>
           </div>
-          <p className="hero-description" style={{ fontSize: '13px', marginTop: '6px', color: '#94A3B8' }}>
+          <p className="hero-description" style={{ fontSize: '12px', marginTop: '4px', color: '#94A3B8' }}>
             Assigned Vehicle: <strong style={{ color: '#FFFFFF' }}>{vehicle?.regNumber || 'TTC-8492-HD'}</strong> ({vehicle?.make || 'Freightliner'} {vehicle?.model || 'Cascadia'}) • Active Route: <strong style={{ color: '#FF7A1A' }}>Chicago to Cleveland</strong> (ETA: 1h 45m)
           </p>
         </div>
