@@ -75,6 +75,59 @@ public class WorkflowController {
         return ResponseEntity.ok(state);
     }
 
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getStatus() {
+        Map<String, Object> status = new HashMap<>();
+        status.put("success", true);
+        status.put("status", "UP");
+        status.put("service", "TTC FLEET360 Central Workflow API");
+        status.put("timestamp", LocalDateTime.now().format(ISO_FMT));
+        status.put("activeOrders", orderRepository.count());
+        status.put("activeShipments", shipmentRepository.count());
+        status.put("activeTrips", tripRepository.count());
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<CustomerOrder>> getAllOrders() {
+        return ResponseEntity.ok(orderRepository.findAll());
+    }
+
+    @GetMapping("/shipments")
+    public ResponseEntity<List<Shipment>> getAllShipments() {
+        return ResponseEntity.ok(shipmentRepository.findAll());
+    }
+
+    @GetMapping("/trips")
+    public ResponseEntity<List<Trip>> getAllTrips() {
+        return ResponseEntity.ok(tripRepository.findAll());
+    }
+
+    @GetMapping("/allocation-requests")
+    public ResponseEntity<List<AllocationRequest>> getAllAllocationRequests() {
+        return ResponseEntity.ok(allocationRequestRepository.findAll());
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<List<SystemNotification>> getAllNotifications() {
+        return ResponseEntity.ok(systemNotificationRepository.findAll());
+    }
+
+    @GetMapping("/audit-logs")
+    public ResponseEntity<List<WorkflowAuditLog>> getAuditLogs() {
+        return ResponseEntity.ok(workflowAuditLogRepository.findTop50ByOrderByRecordedAtDesc());
+    }
+
+    @GetMapping("/invoices")
+    public ResponseEntity<List<BillingInvoice>> getAllInvoices() {
+        return ResponseEntity.ok(billingInvoiceRepository.findAll());
+    }
+
+    @GetMapping("/payments")
+    public ResponseEntity<List<PaymentTransaction>> getAllPayments() {
+        return ResponseEntity.ok(paymentTransactionRepository.findAll());
+    }
+
     // ==========================================
     // 2. CREATE CUSTOMER ORDER
     // ==========================================
