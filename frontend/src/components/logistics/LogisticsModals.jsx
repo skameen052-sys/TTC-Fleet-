@@ -19,144 +19,384 @@ export const CreateOrderModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     customerName: '',
     customerContact: '',
-    pickupLocation: 'Chicago Hub (CHI-01)',
+    customerEmail: '',
+    pickupLocation: 'Chicago Hub (CHI-01) - Gate 4B, 4200 S Pulaski Rd',
     deliveryLocation: '',
     priority: 'Standard',
-    itemsCount: 10,
-    totalWeightKg: 1500,
-    amount: 5400,
-    type: 'General Industrial Freight'
+    expectedDelivery: new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0],
+    itemsCount: 12,
+    pallets: 12,
+    totalWeightKg: 1850,
+    amount: 6200,
+    type: 'Industrial Automation & Machinery Spares',
+    specialInstructions: 'Handle with care. Liftgate service required at delivery destination.'
   });
+
+  const [validationError, setValidationError] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.customerName || !formData.deliveryLocation) {
-      alert('Please fill out customer name and delivery location.');
+    setValidationError('');
+    if (!formData.customerName.trim()) {
+      setValidationError('Customer / Company name is required.');
       return;
     }
-    onSubmit(formData);
+    if (!formData.pickupLocation.trim()) {
+      setValidationError('Pickup origin location is required.');
+      return;
+    }
+    if (!formData.deliveryLocation.trim()) {
+      setValidationError('Delivery destination address is required.');
+      return;
+    }
+    if (!formData.expectedDelivery) {
+      setValidationError('Expected delivery date is required.');
+      return;
+    }
+    onSubmit({
+      ...formData,
+      itemsCount: Number(formData.pallets) || Number(formData.itemsCount) || 1,
+      pallets: Number(formData.pallets) || 1,
+      totalWeightKg: Number(formData.totalWeightKg) || 100,
+      amount: Number(formData.amount) || 1000
+    });
     onClose();
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={e => e.stopPropagation()} style={{ maxWidth: 580 }}>
-        <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', backgroundColor: '#FFF0E5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <PackageCheck size={20} color="#FF7A1A" />
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(15, 23, 42, 0.72)',
+        backdropFilter: 'blur(5px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999,
+        padding: '16px'
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '18px',
+          width: '100%',
+          maxWidth: '680px',
+          maxHeight: '92vh',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.35)',
+          border: '1px solid #E2E8F0',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Header */}
+        <div
+          style={{
+            padding: '20px 24px',
+            borderBottom: '1px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'linear-gradient(to right, #F8FAFC, #FFFFFF)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(255, 122, 26, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FF7A1A',
+                border: '1px solid rgba(255, 122, 26, 0.25)'
+              }}
+            >
+              <PackageCheck size={22} strokeWidth={2.4} />
             </div>
             <div>
-              <h2 className="modal-title">Create Logistics Customer Order</h2>
-              <p className="modal-subtitle">Log new freight transportation consignment into TTC dispatch pipeline</p>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                Book New Customer Consignment
+              </h2>
+              <p style={{ fontSize: '12px', color: '#64748B', margin: '2px 0 0' }}>
+                Create and register a verified freight order into the TTC dispatch queue
+              </p>
             </div>
           </div>
-          <button className="modal-close-btn" onClick={onClose}><X size={18} /></button>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: '#F1F5F9',
+              border: 'none',
+              borderRadius: '8px',
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#64748B'
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label className="form-label">Customer / Company Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Apex Industrial Solutions"
-                  value={formData.customerName}
-                  onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                  className="modal-input"
-                />
-              </div>
-              <div>
-                <label className="form-label">Customer Contact Phone</label>
-                <input
-                  type="text"
-                  placeholder="+1 (555) 000-0000"
-                  value={formData.customerContact}
-                  onChange={e => setFormData({ ...formData, customerContact: e.target.value })}
-                  className="modal-input"
-                />
-              </div>
-            </div>
+        {/* Validation Error Banner */}
+        {validationError && (
+          <div
+            style={{
+              margin: '16px 24px 0',
+              padding: '10px 14px',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FCA5A5',
+              borderRadius: '10px',
+              color: '#B91C1C',
+              fontSize: '12.5px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <AlertTriangle size={16} />
+            <span>{validationError}</span>
+          </div>
+        )}
 
-            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label className="form-label">Pickup Location (Origin)</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Chicago Hub (CHI-01)"
-                  value={formData.pickupLocation}
-                  onChange={e => setFormData({ ...formData, pickupLocation: e.target.value })}
-                  className="modal-input"
-                />
-              </div>
-              <div>
-                <label className="form-label">Delivery Destination</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Detroit Automotive Depot"
-                  value={formData.deliveryLocation}
-                  onChange={e => setFormData({ ...formData, deliveryLocation: e.target.value })}
-                  className="modal-input"
-                />
-              </div>
-            </div>
-
-            <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-              <div>
-                <label className="form-label">Priority Level</label>
-                <select
-                  value={formData.priority}
-                  onChange={e => setFormData({ ...formData, priority: e.target.value })}
-                  className="modal-select"
-                >
-                  <option value="Standard">Standard</option>
-                  <option value="High">High Priority</option>
-                  <option value="Urgent">Urgent / Critical</option>
-                </select>
-              </div>
-              <div>
-                <label className="form-label">Total Weight (kg)</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={formData.totalWeightKg}
-                  onChange={e => setFormData({ ...formData, totalWeightKg: Number(e.target.value) })}
-                  className="modal-input"
-                />
-              </div>
-              <div>
-                <label className="form-label">Order Value ($)</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={formData.amount}
-                  onChange={e => setFormData({ ...formData, amount: Number(e.target.value) })}
-                  className="modal-input"
-                />
-              </div>
-            </div>
-
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflowY: 'auto' }}>
+          <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Section 1: Customer Details */}
             <div>
-              <label className="form-label">Cargo Classification / Item Description</label>
-              <input
-                type="text"
-                placeholder="e.g. Palletized Aerospace Hydraulic Cylinders"
-                value={formData.type}
-                onChange={e => setFormData({ ...formData, type: e.target.value })}
-                className="modal-input"
-              />
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                1. Customer & Shipper Details
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Customer / Company Name <span style={{ color: '#EF4444' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Apex Industrial Solutions"
+                    value={formData.customerName}
+                    onChange={e => setFormData({ ...formData, customerName: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Contact Phone
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="+1 (555) 234-5678"
+                    value={formData.customerContact}
+                    onChange={e => setFormData({ ...formData, customerContact: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Billing / Dispatch Email
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="ops@apex.com"
+                    value={formData.customerEmail}
+                    onChange={e => setFormData({ ...formData, customerEmail: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Origin, Destination & Schedule */}
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                2. Routing & Schedule
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Pickup Location / Hub Origin <span style={{ color: '#EF4444' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Chicago Hub (CHI-01) - Gate 4B"
+                    value={formData.pickupLocation}
+                    onChange={e => setFormData({ ...formData, pickupLocation: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Delivery Destination <span style={{ color: '#EF4444' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Detroit Automotive Depot (DET-03)"
+                    value={formData.deliveryLocation}
+                    onChange={e => setFormData({ ...formData, deliveryLocation: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Expected Delivery Date <span style={{ color: '#EF4444' }}>*</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.expectedDelivery}
+                    onChange={e => setFormData({ ...formData, expectedDelivery: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Priority Level
+                  </label>
+                  <select
+                    value={formData.priority}
+                    onChange={e => setFormData({ ...formData, priority: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none', backgroundColor: '#FFFFFF' }}
+                  >
+                    <option value="Standard">Standard (Regular Freight)</option>
+                    <option value="High">High Priority (Next-Day Linehaul)</option>
+                    <option value="Urgent">Urgent / Critical (Same-Day Direct)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Cargo & Commercial Details */}
+            <div>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
+                3. Cargo & Financial Details
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', gap: '12px', marginBottom: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Cargo Classification
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Industrial Automation Parts"
+                    value={formData.type}
+                    onChange={e => setFormData({ ...formData, type: e.target.value })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Pallets / Packages
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.pallets}
+                    onChange={e => setFormData({ ...formData, pallets: Number(e.target.value), itemsCount: Number(e.target.value) })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Weight (kg)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.totalWeightKg}
+                    onChange={e => setFormData({ ...formData, totalWeightKg: Number(e.target.value) })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                    Freight Tariff ($)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.amount}
+                    onChange={e => setFormData({ ...formData, amount: Number(e.target.value) })}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '9px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                  Special Dispatch Notes / Delivery Instructions
+                </label>
+                <textarea
+                  rows="2"
+                  placeholder="e.g. Temperature controlled cargo, dock bay 4 access, call site contact upon arrival"
+                  value={formData.specialInstructions}
+                  onChange={e => setFormData({ ...formData, specialInstructions: e.target.value })}
+                  style={{ width: '100%', boxSizing: 'border-box', padding: '8px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '13px', outline: 'none', resize: 'vertical' }}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 20 }}>
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn-primary" style={{ backgroundColor: '#FF7A1A' }}>
+          {/* Footer Actions */}
+          <div
+            style={{
+              padding: '16px 24px',
+              borderTop: '1px solid #E2E8F0',
+              backgroundColor: '#F8FAFC',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              alignItems: 'center'
+            }}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                padding: '9px 18px',
+                borderRadius: '9px',
+                border: '1px solid #CBD5E1',
+                backgroundColor: '#FFFFFF',
+                color: '#475569',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              style={{
+                padding: '9px 22px',
+                borderRadius: '9px',
+                border: 'none',
+                background: 'linear-gradient(135deg, #FF7A1A 0%, #EA580C 100%)',
+                color: '#FFFFFF',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(255, 122, 26, 0.35)'
+              }}
+            >
               Confirm & Book Order
             </button>
           </div>

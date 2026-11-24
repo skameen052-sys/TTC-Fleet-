@@ -875,13 +875,23 @@ class LogisticsService {
 
   // Order Actions
   addOrder(order) {
-    const newId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newId = order.id || `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder = {
       id: newId,
       status: 'Pending',
-      orderDate: new Date().toISOString().split('T')[0],
+      orderDate: order.orderDate || new Date().toISOString().split('T')[0],
+      expectedDelivery: order.expectedDelivery || new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0],
       assignedTripId: null,
       assignedShipmentId: null,
+      history: [
+        {
+          timestamp: new Date().toISOString().slice(0, 16).replace('T', ' '),
+          fromStatus: 'Initiated',
+          toStatus: 'Pending',
+          updatedBy: this.data.manager?.name || 'Customer Dispatch Desk',
+          reason: 'Initial consignment booking placed'
+        }
+      ],
       ...order
     };
     const updated = {
@@ -902,16 +912,50 @@ class LogisticsService {
     };
     this.saveData(updated);
 
-    // Sync to centralized workflowService
+    // Sync to centralized workflowService & backend API
     try {
-      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+      workflowService.createOrder({
+        orderId: newId,
+        customerId: order.customerId || 'CUST-AUTO',
+        customerName: order.customerName,
+        customerContact: order.customerContact,
+        pickupAddress: order.pickupLocation,
+        deliveryAddress: order.deliveryLocation,
+        pickupDate: newOrder.orderDate,
+        expectedDeliveryDate: newOrder.expectedDelivery,
+        goodsCategory: order.type || 'Commercial Freight',
+        goodsDescription: order.description || order.type || 'General Industrial Cargo',
+        packageQuantity: parseInt(order.itemsCount || order.pallets || 10, 10),
+        weightKg: parseFloat(order.totalWeightKg || 1500),
+        amount: parseFloat(order.amount || 5400),
+        priority: order.priority || 'Standard',
+        specialInstructions: order.specialInstructions || ''
+      });
     } catch (_) {}
     return newOrder;
   }
 
-  updateOrderStatus(orderId, newStatus) {
-    const updatedOrders = this.data.orders.map(o => (o.id === orderId ? { ...o, status: newStatus } : o));
+  updateOrderStatus(orderId, newStatus, reason = '') {
     const targetOrder = this.data.orders.find(o => o.id === orderId);
+    if (!targetOrder) return null;
+
+    // Prevent duplicate status updates
+    if (targetOrder.status === newStatus) return targetOrder;
+
+    const historyEntry = {
+      timestamp: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      fromStatus: targetOrder.status,
+      toStatus: newStatus,
+      updatedBy: this.data.manager?.name || 'Elena Rostova (Logistics Director)',
+      reason: reason || (newStatus === 'Approved' ? 'Order validated and approved for linehaul dispatch' : `Status transitioned to ${newStatus}`)
+    };
+
+    const updatedOrders = this.data.orders.map(o => (o.id === orderId ? {
+      ...o,
+      status: newStatus,
+      history: [...(o.history || []), historyEntry]
+    } : o));
+
     const updated = {
       ...this.data,
       orders: updatedOrders,
@@ -920,10 +964,10 @@ class LogisticsService {
           id: `ACT-${Date.now()}`,
           type: 'order_status_updated',
           title: `Order ${orderId} Status: ${newStatus}`,
-          description: `${targetOrder?.customerName || 'Customer'} order transitioned to ${newStatus}.`,
+          description: `${targetOrder?.customerName || 'Customer'} order transitioned from ${targetOrder.status} to ${newStatus}.${reason ? ` (${reason})` : ''}`,
           time: 'Just now',
           timestamp: new Date().toISOString().slice(0, 16).replace('T', ' '),
-          status: newStatus === 'Approved' ? 'success' : newStatus === 'Cancelled' ? 'error' : 'info'
+          status: newStatus === 'Approved' ? 'success' : (newStatus === 'Cancelled' || newStatus === 'Rejected') ? 'error' : 'info'
         },
         ...this.data.activities
       ]
@@ -932,8 +976,9 @@ class LogisticsService {
 
     // Sync to centralized workflowService
     try {
-      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova', reason);
     } catch (_) {}
+    return updatedOrders.find(o => o.id === orderId);
   }
 
   // Shipment Actions

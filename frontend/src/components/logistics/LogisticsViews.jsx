@@ -1,5 +1,5 @@
 // frontend/src/components/logistics/LogisticsViews.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Boxes,
   Truck,
@@ -34,17 +34,25 @@ import {
   Mail,
   Zap,
   ChevronRight,
+  ChevronLeft,
+  ChevronDown,
   TrendingUp,
   BarChart2,
   PieChart,
   Radio,
   Share2,
-  Key
+  Key,
+  Building2,
+  Package,
+  ArrowUpDown,
+  CheckCircle,
+  RotateCcw
 } from 'lucide-react';
 import { logisticsService } from '../../services/logisticsService';
+import { workflowService } from '../../services/workflowService';
 
 /* =========================================================================
-   1. ORDER MANAGEMENT VIEW
+   1. ORDER MANAGEMENT VIEW (Enterprise Logistics Hub)
    ========================================================================= */
 export const OrderManagementView = ({
   orders = [],
@@ -52,288 +60,1491 @@ export const OrderManagementView = ({
   onSelectTab,
   onOpenCreateOrder,
   onOpenCreateShipment,
-  onOpenAssignModal
+  onOpenAssignModal,
+  onUpdateOrderStatus
 }) => {
-  const [currentSubTab, setCurrentSubTab] = useState(activeSubTab || 'all-orders');
+  const [ordersList, setOrdersList] = useState(() => (orders.length ? orders : (logisticsService.getData()?.orders || [])));
+  const [currentSubTab, setCurrentSubTab] = useState(() => {
+    if (activeSubTab === 'pending-orders') return 'pending-orders';
+    if (activeSubTab === 'approved-orders') return 'approved-orders';
+    if (activeSubTab === 'cancelled-orders') return 'cancelled-orders';
+    return 'all-orders';
+  });
+
   const [search, setSearch] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  useEffect(() => {
-    if (activeSubTab) setCurrentSubTab(activeSubTab);
-  }, [activeSubTab]);
+  // Cancellation modal state
+  const [rejectingOrder, setRejectingOrder] = useState(null);
+  const [rejectReason, setRejectReason] = useState('Customer requested cancellation');
+  const [customRejectReason, setCustomRejectReason] = useState('');
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Subscribe to real-time changes
+  useEffect(() => {
+    const unsub = logisticsService.subscribe((updated) => {
+      if (updated?.orders) setOrdersList(updated.orders);
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    if (orders && orders.length) setOrdersList(orders);
+  }, [orders]);
+
+  useEffect(() => {
+    if (activeSubTab) {
+      if (activeSubTab === 'create-order') {
+        if (onOpenCreateOrder) onOpenCreateOrder();
+      } else {
+        setCurrentSubTab(activeSubTab);
+      }
+    }
+  }, [activeSubTab, onOpenCreateOrder]);
+
+  // Tab counts
+  const counts = useMemo(() => {
+    const all = ordersList.length;
+    const pending = ordersList.filter(o => o.status === 'Pending' || o.status === 'Pending Approval').length;
+    const approved = ordersList.filter(o => ['Approved', 'In Transit', 'Processing', 'Delivered'].includes(o.status)).length;
+    const cancelled = ordersList.filter(o => o.status === 'Cancelled' || o.status === 'Rejected').length;
+    const totalFreightVal = ordersList.reduce((acc, o) => acc + (Number(o.amount) || 0), 0);
+    return { all, pending, approved, cancelled, totalFreightVal };
+  }, [ordersList]);
+
+  // Filtering & Sorting
+  const filteredOrders = useMemo(() => {
+    return ordersList.filter(ord => {
+      // Sub-tab filter
+      if (currentSubTab === 'pending-orders') {
+        if (ord.status !== 'Pending' && ord.status !== 'Pending Approval') return false;
+      } else if (currentSubTab === 'approved-orders') {
+        if (!['Approved', 'In Transit', 'Processing', 'Delivered'].includes(ord.status)) return false;
+      } else if (currentSubTab === 'cancelled-orders') {
+        if (ord.status !== 'Cancelled' && ord.status !== 'Rejected') return false;
+      }
+
+      // Priority filter
+      if (priorityFilter !== 'all' && ord.priority !== priorityFilter) return false;
+
+      // Text search
+      if (search.trim()) {
+        const q = search.toLowerCase().trim();
+        const matchId = ord.id?.toLowerCase().includes(q);
+        const matchCust = ord.customerName?.toLowerCase().includes(q);
+        const matchOrigin = ord.pickupLocation?.toLowerCase().includes(q);
+        const matchDest = ord.deliveryLocation?.toLowerCase().includes(q);
+        const matchType = ord.type?.toLowerCase().includes(q);
+        const matchContact = ord.customerContact?.toLowerCase().includes(q);
+        if (!matchId && !matchCust && !matchOrigin && !matchDest && !matchType && !matchContact) {
+          return false;
+        }
+      }
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === 'newest') return (b.orderDate || '').localeCompare(a.orderDate || '');
+      if (sortBy === 'oldest') return (a.orderDate || '').localeCompare(b.orderDate || '');
+      if (sortBy === 'amount-desc') return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+      if (sortBy === 'amount-asc') return (Number(a.amount) || 0) - (Number(b.amount) || 0);
+      if (sortBy === 'id') return (a.id || '').localeCompare(b.id || '');
+      return 0;
+    });
+  }, [ordersList, currentSubTab, priorityFilter, search, sortBy]);
+
+  // Pagination slicing
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedOrders = useMemo(() => {
+    const start = (safeCurrentPage - 1) * pageSize;
+    return filteredOrders.slice(start, start + pageSize);
+  }, [filteredOrders, safeCurrentPage, pageSize]);
+
+  // Switch SubTab
   const handleSubTabChange = (tabId) => {
     setCurrentSubTab(tabId);
+    setCurrentPage(1);
     if (onSelectTab) onSelectTab(tabId);
   };
 
-  const filteredOrders = orders.filter(ord => {
-    if (currentSubTab === 'pending-orders' && ord.status !== 'Pending') return false;
-    if (currentSubTab === 'approved-orders' && ord.status !== 'Approved' && ord.status !== 'In Transit' && ord.status !== 'Delivered') return false;
-    if (currentSubTab === 'cancelled-orders' && ord.status !== 'Cancelled') return false;
-
-    if (priorityFilter !== 'all' && ord.priority !== priorityFilter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      const matchId = ord.id.toLowerCase().includes(q);
-      const matchCust = ord.customerName.toLowerCase().includes(q);
-      const matchOrigin = ord.pickupLocation.toLowerCase().includes(q);
-      const matchDest = ord.deliveryLocation.toLowerCase().includes(q);
-      if (!matchId && !matchCust && !matchOrigin && !matchDest) return false;
+  // Status Action: Approve
+  const handleApprove = (orderId) => {
+    const updated = logisticsService.updateOrderStatus(orderId, 'Approved', 'Order validated and approved for linehaul dispatch');
+    if (onUpdateOrderStatus) onUpdateOrderStatus(orderId, 'Approved');
+    setOrdersList(logisticsService.getData()?.orders || []);
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder(prev => ({ ...prev, status: 'Approved' }));
     }
-    return true;
-  });
+  };
 
-  const handleStatusChange = (orderId, newStatus) => {
-    logisticsService.updateOrderStatus(orderId, newStatus);
+  // Status Action: Reject / Cancel
+  const handleConfirmReject = () => {
+    if (!rejectingOrder) return;
+    const finalReason = rejectReason === 'Other' ? (customRejectReason || 'Rejected by Logistics Operations') : rejectReason;
+    const updated = logisticsService.updateOrderStatus(rejectingOrder.id, 'Cancelled', finalReason);
+    if (onUpdateOrderStatus) onUpdateOrderStatus(rejectingOrder.id, 'Cancelled', finalReason);
+    setOrdersList(logisticsService.getData()?.orders || []);
+    if (selectedOrder && selectedOrder.id === rejectingOrder.id) {
+      setSelectedOrder(prev => ({ ...prev, status: 'Cancelled' }));
+    }
+    setRejectingOrder(null);
+    setCustomRejectReason('');
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-orange-50 text-orange-600">
-              <Boxes className="w-5 h-5" />
-            </span>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Order Management Hub</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '4px 0', fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+      {/* 1. Header Bar */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: '#FFFFFF',
+          padding: '20px 24px',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div
+            style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '12px',
+              backgroundColor: 'rgba(255, 122, 26, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#FF7A1A',
+              border: '1px solid rgba(255, 122, 26, 0.25)'
+            }}
+          >
+            <Boxes size={22} strokeWidth={2.4} />
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Track, approve, and assign freight orders across nationwide distribution channels
-          </p>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#0F172A', margin: 0, letterSpacing: '-0.02em' }}>
+                Order Management Hub
+              </h1>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  backgroundColor: '#EFF6FF',
+                  color: '#1D4ED8',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  border: '1px solid #DBEAFE'
+                }}
+              >
+                Logistics Dispatch OS
+              </span>
+            </div>
+            <p style={{ fontSize: '12.5px', color: '#64748B', margin: '3px 0 0', lineHeight: 1.4 }}>
+              Track, approve, and assign freight orders across nationwide distribution channels
+            </p>
+          </div>
         </div>
+
+        {/* Primary CTA: New Customer Order */}
         <button
+          type="button"
           onClick={onOpenCreateOrder}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-amber-600 text-white text-xs font-semibold rounded-xl shadow-md shadow-orange-500/20 hover:from-orange-600 hover:to-amber-700 transition-all"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'linear-gradient(135deg, #FF7A1A 0%, #EA580C 100%)',
+            color: '#FFFFFF',
+            border: 'none',
+            borderRadius: '10px',
+            padding: '10px 18px',
+            fontSize: '13px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(255, 122, 26, 0.35)',
+            transition: 'all 0.15s ease'
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
+          onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
         >
-          <Plus className="w-4 h-4" />
+          <Plus size={16} strokeWidth={2.5} />
           <span>New Customer Order</span>
         </button>
       </div>
 
-      {/* Sub-tab pills */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
-        {[
-          { id: 'all-orders', label: 'All Orders', count: orders.length },
-          { id: 'pending-orders', label: 'Pending Approval', count: orders.filter(o => o.status === 'Pending').length },
-          { id: 'approved-orders', label: 'Approved & Active', count: orders.filter(o => o.status === 'Approved' || o.status === 'In Transit').length },
-          { id: 'cancelled-orders', label: 'Cancelled', count: orders.filter(o => o.status === 'Cancelled').length }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => handleSubTabChange(tab.id)}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all ${
-              currentSubTab === tab.id
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
-            }`}
-          >
-            <span>{tab.label}</span>
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-              currentSubTab === tab.id ? 'bg-orange-500 text-white' : 'bg-slate-100 text-slate-600'
-            }`}>
-              {tab.count}
-            </span>
-          </button>
-        ))}
+      {/* 2. Top Summary Metrics Cards (4 Metrics) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+        {/* Card 1: All Orders */}
+        <div
+          onClick={() => handleSubTabChange('all-orders')}
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: currentSubTab === 'all-orders' ? '2px solid #FF7A1A' : '1px solid #E2E8F0',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748B' }}>Total Consignments</span>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Package size={14} color="#0F172A" />
+            </div>
+          </div>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', marginTop: '6px' }}>
+            {counts.all}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '11.5px', color: '#64748B' }}>
+            <span>Freight Volume:</span>
+            <span style={{ fontWeight: 700, color: '#0F172A' }}>${counts.totalFreightVal.toLocaleString()}</span>
+          </div>
+        </div>
+
+        {/* Card 2: Pending Approval */}
+        <div
+          onClick={() => handleSubTabChange('pending-orders')}
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: currentSubTab === 'pending-orders' ? '2px solid #F59E0B' : '1px solid #E2E8F0',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#B45309' }}>Pending Approvals</span>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Clock size={14} color="#D97706" />
+            </div>
+          </div>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: '#B45309', marginTop: '6px' }}>
+            {counts.pending}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '11.5px', color: '#D97706' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
+            <span>Awaiting Logistics Validation</span>
+          </div>
+        </div>
+
+        {/* Card 3: Approved & Active */}
+        <div
+          onClick={() => handleSubTabChange('approved-orders')}
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: currentSubTab === 'approved-orders' ? '2px solid #10B981' : '1px solid #E2E8F0',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#047857' }}>Approved & Active</span>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: '#D1FAE5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircle2 size={14} color="#059669" />
+            </div>
+          </div>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: '#047857', marginTop: '6px' }}>
+            {counts.approved}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '11.5px', color: '#059669' }}>
+            <Truck size={12} />
+            <span>Dispatched Linehaul Consignments</span>
+          </div>
+        </div>
+
+        {/* Card 4: Cancelled Orders */}
+        <div
+          onClick={() => handleSubTabChange('cancelled-orders')}
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: currentSubTab === 'cancelled-orders' ? '2px solid #EF4444' : '1px solid #E2E8F0',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#991B1B' }}>Cancelled Orders</span>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <AlertTriangle size={14} color="#DC2626" />
+            </div>
+          </div>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: '#991B1B', marginTop: '6px' }}>
+            {counts.cancelled}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', fontSize: '11.5px', color: '#DC2626' }}>
+            <span>Archived / Rejected Bookings</span>
+          </div>
+        </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+      {/* 3. Sub-Tab Pills Navigation (Functional Tabs) */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          borderBottom: '1.5px solid #E2E8F0',
+          paddingBottom: '12px',
+          flexWrap: 'wrap'
+        }}
+      >
+        {[
+          { id: 'all-orders', label: 'All Orders', count: counts.all, color: '#0F172A' },
+          { id: 'pending-orders', label: 'Pending Approvals', count: counts.pending, color: '#D97706' },
+          { id: 'approved-orders', label: 'Approved & Active', count: counts.approved, color: '#059669' },
+          { id: 'cancelled-orders', label: 'Cancelled Orders', count: counts.cancelled, color: '#DC2626' }
+        ].map(tab => {
+          const isActive = currentSubTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleSubTabChange(tab.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: isActive ? 700 : 600,
+                backgroundColor: isActive ? '#0F172A' : '#FFFFFF',
+                color: isActive ? '#FFFFFF' : '#475569',
+                border: isActive ? '1px solid #0F172A' : '1px solid #CBD5E1',
+                cursor: 'pointer',
+                boxShadow: isActive ? '0 2px 8px rgba(15, 23, 42, 0.25)' : 'none',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <span>{tab.label}</span>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  backgroundColor: isActive ? '#FF7A1A' : '#F1F5F9',
+                  color: isActive ? '#FFFFFF' : '#475569',
+                  padding: '2px 7px',
+                  borderRadius: '10px',
+                  lineHeight: 1.2
+                }}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 4. Search, Filter, Sort and Reset Toolbar */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '14px',
+          border: '1px solid #E2E8F0',
+          padding: '14px 18px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '12px',
+          flexWrap: 'wrap'
+        }}
+      >
+        {/* Search input */}
+        <div style={{ position: 'relative', flex: '1 1 320px', maxWidth: '460px' }}>
+          <Search size={15} color="#94A3B8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search order ID, client, origin or destination..."
-            className="w-full pl-9 pr-4 py-2 bg-white text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search Order ID, client, pickup origin, destination..."
+            style={{
+              width: '100%',
+              padding: '9px 34px 9px 36px',
+              fontSize: '12.5px',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #CBD5E1',
+              borderRadius: '8px',
+              outline: 'none',
+              color: '#0F172A',
+              boxSizing: 'border-box'
+            }}
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                setCurrentPage(1);
+              }}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'transparent',
+                border: 'none',
+                color: '#94A3B8',
+                cursor: 'pointer',
+                padding: '2px'
+              }}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <Filter className="w-3.5 h-3.5 text-slate-400" />
-          <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
-            className="text-xs bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-500/20"
-          >
-            <option value="all">All Priorities</option>
-            <option value="High">High Priority</option>
-            <option value="Medium">Medium Priority</option>
-            <option value="Standard">Standard</option>
-          </select>
+
+        {/* Dropdown Filters */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          {/* Priority filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#64748B' }}>
+            <Filter size={13} color="#64748B" />
+            <select
+              value={priorityFilter}
+              onChange={(e) => {
+                setPriorityFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              style={{
+                padding: '8px 12px',
+                fontSize: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                color: '#0F172A',
+                fontWeight: 500,
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="all">All Priorities</option>
+              <option value="Urgent">Urgent</option>
+              <option value="High">High Priority</option>
+              <option value="Standard">Standard</option>
+            </select>
+          </div>
+
+          {/* Sort By */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#64748B' }}>
+            <ArrowUpDown size={13} color="#64748B" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                fontSize: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                color: '#0F172A',
+                fontWeight: 500,
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="newest">Sort: Newest Date</option>
+              <option value="oldest">Sort: Oldest Date</option>
+              <option value="amount-desc">Sort: Highest Amount</option>
+              <option value="amount-asc">Sort: Lowest Amount</option>
+              <option value="id">Sort: Order ID (A-Z)</option>
+            </select>
+          </div>
+
+          {/* Reset button if filter active */}
+          {(search || priorityFilter !== 'all' || sortBy !== 'newest') && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                setPriorityFilter('all');
+                setSortBy('newest');
+                setCurrentPage(1);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                background: 'transparent',
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                padding: '7px 12px',
+                fontSize: '12px',
+                color: '#64748B',
+                cursor: 'pointer'
+              }}
+            >
+              <RotateCcw size={12} />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+      {/* 5. Enterprise Responsive Table */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)',
+          overflow: 'hidden'
+        }}
+      >
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table
+            style={{
+              width: '100%',
+              minWidth: '1000px',
+              tableLayout: 'fixed',
+              borderCollapse: 'separate',
+              borderSpacing: 0,
+              fontSize: '12.5px',
+              color: '#1E293B'
+            }}
+          >
+            <colgroup>
+              <col style={{ width: '125px' }} /> {/* Order ID & Date */}
+              <col style={{ width: '160px' }} /> {/* Customer */}
+              <col style={{ width: '180px' }} /> {/* Origin / Pickup */}
+              <col style={{ width: '180px' }} /> {/* Destination */}
+              <col style={{ width: '110px' }} /> {/* Freight Specs */}
+              <col style={{ width: '90px' }} />  {/* Priority */}
+              <col style={{ width: '100px' }} /> {/* Amount */}
+              <col style={{ width: '100px' }} /> {/* Status */}
+              <col style={{ width: '115px' }} /> {/* Actions */}
+            </colgroup>
             <thead>
-              <tr className="bg-slate-50/75 border-b border-slate-200/80 text-[11px] font-semibold text-slate-600 uppercase tracking-wider">
-                <th className="py-3 px-4">Order ID & Date</th>
-                <th className="py-3 px-4">Customer</th>
-                <th className="py-3 px-4">Origin / Pickup</th>
-                <th className="py-3 px-4">Destination</th>
-                <th className="py-3 px-4">Weight / Pallets</th>
-                <th className="py-3 px-4">Priority</th>
-                <th className="py-3 px-4">Amount</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+              <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1.5px solid #E2E8F0' }}>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Order ID & Date
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Customer
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Origin / Pickup
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Destination
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Weight / Pallets
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Priority
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Amount
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Status
+                </th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Actions
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-normal text-slate-700">
-              {filteredOrders.length === 0 ? (
+            <tbody>
+              {paginatedOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="9" className="text-center py-10 text-slate-400">
-                    No orders found matching the filter criteria.
+                  <td colSpan={9} style={{ padding: '48px 24px', textAlign: 'center', color: '#94A3B8' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                      <Boxes size={36} color="#CBD5E1" strokeWidth={1.5} />
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}>
+                        No orders found in "{currentSubTab.replace('-', ' ').toUpperCase()}"
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#94A3B8' }}>
+                        Try clearing search terms or create a new consignment booking.
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map(ord => (
-                  <tr key={ord.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3 px-4">
-                      <div className="font-semibold text-slate-900">{ord.id}</div>
-                      <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5">
-                        <Calendar className="w-3 h-3" />
-                        {ord.orderDate}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 font-medium text-slate-900">{ord.customerName}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1.5 text-slate-700">
-                        <MapPin className="w-3.5 h-3.5 text-orange-500 shrink-0" />
-                        <span className="truncate max-w-[140px]">{ord.pickupLocation}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1.5 text-slate-700">
-                        <Navigation className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                        <span className="truncate max-w-[140px]">{ord.deliveryLocation}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="text-slate-800 font-medium">{ord.weight}</div>
-                      <div className="text-[10px] text-slate-400">{ord.pallets} pallets</div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                        ord.priority === 'High'
-                          ? 'bg-red-50 text-red-600 border border-red-200'
-                          : ord.priority === 'Medium'
-                          ? 'bg-amber-50 text-amber-600 border border-amber-200'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
-                      }`}>
-                        {ord.priority}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-semibold text-slate-900">${ord.amount.toLocaleString()}</td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold ${
-                        ord.status === 'Approved'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : ord.status === 'Pending'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                          : ord.status === 'In Transit'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                          : ord.status === 'Delivered'
-                          ? 'bg-purple-50 text-purple-700 border border-purple-200'
-                          : 'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                        {ord.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        {ord.status === 'Pending' && (
-                          <button
-                            onClick={() => handleStatusChange(ord.id, 'Approved')}
-                            title="Approve Order"
-                            className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                        {ord.status === 'Pending' && (
-                          <button
-                            onClick={() => handleStatusChange(ord.id, 'Cancelled')}
-                            title="Cancel Order"
-                            className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => setSelectedOrder(ord)}
-                          title="View Details"
-                          className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                paginatedOrders.map((ord, idx) => {
+                  const isPending = ord.status === 'Pending' || ord.status === 'Pending Approval';
+                  const isApproved = ord.status === 'Approved' || ord.status === 'In Transit' || ord.status === 'Delivered';
+                  const isCancelled = ord.status === 'Cancelled' || ord.status === 'Rejected';
+
+                  return (
+                    <tr
+                      key={ord.id || idx}
+                      style={{
+                        borderBottom: '1px solid #F1F5F9',
+                        backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA',
+                        transition: 'background-color 0.12s ease'
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA')}
+                    >
+                      {/* Col 1: Order ID & Date */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '13px', color: '#0F172A' }}>
+                            {ord.id}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#64748B', marginTop: '3px' }}>
+                          <Calendar size={11} color="#94A3B8" />
+                          <span>{ord.orderDate || '2026-11-24'}</span>
+                        </div>
+                      </td>
+
+                      {/* Col 2: Customer */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        <div
+                          style={{
+                            fontWeight: 700,
+                            fontSize: '13px',
+                            color: '#0F172A',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                          title={ord.customerName}
                         >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          {ord.customerName}
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {ord.customerContact || ord.type || 'Commercial Shipper'}
+                        </div>
+                      </td>
+
+                      {/* Col 3: Origin / Pickup */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                          <MapPin size={13} color="#FF7A1A" style={{ marginTop: '2px', flexShrink: 0 }} />
+                          <div style={{ minWidth: 0, width: '100%' }}>
+                            <div
+                              style={{
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                color: '#0F172A',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                              title={ord.pickupLocation}
+                            >
+                              {ord.pickupLocation}
+                            </div>
+                            <div style={{ fontSize: '10.5px', color: '#94A3B8', marginTop: '1px' }}>
+                              Origin Hub
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Col 4: Destination */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
+                          <Navigation size={13} color="#0284C7" style={{ marginTop: '2px', flexShrink: 0 }} />
+                          <div style={{ minWidth: 0, width: '100%' }}>
+                            <div
+                              style={{
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                color: '#0F172A',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                              title={ord.deliveryLocation}
+                            >
+                              {ord.deliveryLocation}
+                            </div>
+                            <div style={{ fontSize: '10.5px', color: '#94A3B8', marginTop: '1px' }}>
+                              Delivery Bay
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Col 5: Weight / Pallets */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        <div style={{ fontWeight: 700, fontSize: '12.5px', color: '#0F172A' }}>
+                          {(ord.totalWeightKg || ord.weight || 2500).toLocaleString()} kg
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#64748B', marginTop: '2px' }}>
+                          {ord.pallets || ord.itemsCount || 8} Pallets
+                        </div>
+                      </td>
+
+                      {/* Col 6: Priority */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        {ord.priority === 'Urgent' ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              backgroundColor: '#FEF2F2',
+                              border: '1px solid #FECACA',
+                              color: '#B91C1C',
+                              padding: '3px 8px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#DC2626' }} />
+                            Urgent
+                          </span>
+                        ) : ord.priority === 'High' ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              backgroundColor: '#FFF7ED',
+                              border: '1px solid #FFEDD5',
+                              color: '#C2410C',
+                              padding: '3px 8px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#EA580C' }} />
+                            High
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              backgroundColor: '#F1F5F9',
+                              border: '1px solid #E2E8F0',
+                              color: '#475569',
+                              padding: '3px 8px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: 600
+                            }}
+                          >
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#94A3B8' }} />
+                            Standard
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Col 7: Amount */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        <div style={{ fontWeight: 800, fontSize: '13.5px', color: '#0F172A' }}>
+                          ${Number(ord.amount || 0).toLocaleString()}
+                        </div>
+                        <div style={{ fontSize: '10.5px', color: '#16A34A', fontWeight: 600 }}>
+                          Commercial
+                        </div>
+                      </td>
+
+                      {/* Col 8: Status Badge */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle' }}>
+                        {isPending ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              backgroundColor: '#FFFBEB',
+                              border: '1px solid #FDE68A',
+                              color: '#B45309',
+                              padding: '4px 9px',
+                              borderRadius: '14px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
+                            Pending
+                          </span>
+                        ) : ord.status === 'Approved' ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              backgroundColor: '#ECFDF5',
+                              border: '1px solid #A7F3D0',
+                              color: '#047857',
+                              padding: '4px 9px',
+                              borderRadius: '14px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+                            Approved
+                          </span>
+                        ) : ord.status === 'In Transit' ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              backgroundColor: '#EFF6FF',
+                              border: '1px solid #BFDBFE',
+                              color: '#1D4ED8',
+                              padding: '4px 9px',
+                              borderRadius: '14px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#3B82F6' }} />
+                            In Transit
+                          </span>
+                        ) : ord.status === 'Delivered' ? (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              backgroundColor: '#FAF5FF',
+                              border: '1px solid #E9D5FF',
+                              color: '#6B21A8',
+                              padding: '4px 9px',
+                              borderRadius: '14px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#A855F7' }} />
+                            Delivered
+                          </span>
+                        ) : (
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              backgroundColor: '#FEF2F2',
+                              border: '1px solid #FECACA',
+                              color: '#B91C1C',
+                              padding: '4px 9px',
+                              borderRadius: '14px',
+                              fontSize: '11px',
+                              fontWeight: 700
+                            }}
+                          >
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
+                            Cancelled
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Col 9: Action Buttons */}
+                      <td style={{ padding: '14px 16px', verticalAlign: 'middle', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                          {isPending && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleApprove(ord.id)}
+                                title="Approve this consignment order"
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '6px',
+                                  backgroundColor: '#10B981',
+                                  color: '#FFFFFF',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  transition: 'background-color 0.12s ease'
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#059669')}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#10B981')}
+                              >
+                                <Check size={14} strokeWidth={2.8} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setRejectingOrder(ord)}
+                                title="Reject / Cancel this order"
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '6px',
+                                  backgroundColor: '#EF4444',
+                                  color: '#FFFFFF',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  transition: 'background-color 0.12s ease'
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#DC2626')}
+                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#EF4444')}
+                              >
+                                <X size={14} strokeWidth={2.8} />
+                              </button>
+                            </>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedOrder(ord)}
+                            title="View Full Consignment Details"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '28px',
+                              height: '28px',
+                              borderRadius: '6px',
+                              backgroundColor: '#F1F5F9',
+                              color: '#334155',
+                              border: '1px solid #CBD5E1',
+                              cursor: 'pointer',
+                              transition: 'all 0.12s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#E2E8F0';
+                              e.currentTarget.style.color = '#0F172A';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#F1F5F9';
+                              e.currentTarget.style.color = '#334155';
+                            }}
+                          >
+                            <Eye size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
+
+        {/* 6. Pagination Toolbar */}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 20px',
+            borderTop: '1px solid #E2E8F0',
+            backgroundColor: '#F8FAFC',
+            flexWrap: 'wrap',
+            gap: '12px',
+            fontSize: '12px',
+            color: '#64748B'
+          }}
+        >
+          {/* Left: Showing entries info & Page size */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span>
+              Showing <strong>{filteredOrders.length === 0 ? 0 : (safeCurrentPage - 1) * pageSize + 1}</strong> to{' '}
+              <strong>{Math.min(safeCurrentPage * pageSize, filteredOrders.length)}</strong> of{' '}
+              <strong>{filteredOrders.length}</strong> orders
+            </span>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span>Per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid #CBD5E1',
+                  backgroundColor: '#FFFFFF',
+                  fontSize: '12px',
+                  color: '#0F172A',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Right: Page Navigation Buttons */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <button
+              type="button"
+              disabled={safeCurrentPage <= 1}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                backgroundColor: safeCurrentPage <= 1 ? '#F1F5F9' : '#FFFFFF',
+                color: safeCurrentPage <= 1 ? '#94A3B8' : '#0F172A',
+                cursor: safeCurrentPage <= 1 ? 'not-allowed' : 'pointer',
+                fontSize: '12px',
+                fontWeight: 600
+              }}
+            >
+              <ChevronLeft size={13} />
+              <span>Previous</span>
+            </button>
+
+            {Array.from({ length: totalPages }).map((_, pIdx) => {
+              const pageNum = pIdx + 1;
+              const isCurrent = pageNum === safeCurrentPage;
+              return (
+                <button
+                  key={pageNum}
+                  type="button"
+                  onClick={() => setCurrentPage(pageNum)}
+                  style={{
+                    minWidth: '28px',
+                    height: '28px',
+                    borderRadius: '6px',
+                    border: isCurrent ? '1px solid #0F172A' : '1px solid #CBD5E1',
+                    backgroundColor: isCurrent ? '#0F172A' : '#FFFFFF',
+                    color: isCurrent ? '#FFFFFF' : '#475569',
+                    fontSize: '12px',
+                    fontWeight: isCurrent ? 700 : 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+
+            <button
+              type="button"
+              disabled={safeCurrentPage >= totalPages}
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '6px 10px',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                backgroundColor: safeCurrentPage >= totalPages ? '#F1F5F9' : '#FFFFFF',
+                color: safeCurrentPage >= totalPages ? '#94A3B8' : '#0F172A',
+                cursor: safeCurrentPage >= totalPages ? 'not-allowed' : 'pointer',
+                fontSize: '12px',
+                fontWeight: 600
+              }}
+            >
+              <span>Next</span>
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Order Detail Modal */}
+      {/* 7. Modal: Full Order Details Inspection & Approval */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="p-2 rounded-xl bg-orange-50 text-orange-600">
-                  <Boxes className="w-5 h-5" />
-                </span>
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setSelectedOrder(null)}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '680px',
+              width: '100%',
+              padding: '28px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              border: '1px solid #E2E8F0',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #F1F5F9', paddingBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FF7A1A' }}>
+                  <Boxes size={22} strokeWidth={2.4} />
+                </div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-base">Order Details: {selectedOrder.id}</h3>
-                  <p className="text-xs text-slate-500">{selectedOrder.customerName}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                      Order Consignment: {selectedOrder.id}
+                    </h2>
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        backgroundColor: selectedOrder.status === 'Approved' ? '#ECFDF5' : selectedOrder.status === 'Pending' ? '#FFFBEB' : '#FEF2F2',
+                        color: selectedOrder.status === 'Approved' ? '#047857' : selectedOrder.status === 'Pending' ? '#B45309' : '#B91C1C',
+                        padding: '2px 8px',
+                        borderRadius: '10px'
+                      }}
+                    >
+                      {selectedOrder.status}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#64748B', margin: '2px 0 0' }}>
+                    Customer: <strong>{selectedOrder.customerName}</strong>
+                  </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100"
+                style={{ width: '32px', height: '32px', borderRadius: '8px', border: '1px solid #E2E8F0', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748B' }}
               >
-                <X className="w-4 h-4" />
+                <X size={16} />
               </button>
             </div>
-            <div className="py-4 space-y-3 text-xs">
-              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl">
+
+            {/* Modal Body */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '18px' }}>
+              {/* Origin & Destination Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', backgroundColor: '#F8FAFC', padding: '16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Pickup Origin</span>
-                  <span className="font-semibold text-slate-800">{selectedOrder.pickupLocation}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 700, color: '#FF7A1A', textTransform: 'uppercase' }}>
+                    <MapPin size={12} />
+                    <span>Origin / Pickup Location</span>
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', marginTop: '4px' }}>
+                    {selectedOrder.pickupLocation}
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
+                    Date: {selectedOrder.orderDate || '2026-11-24'}
+                  </div>
                 </div>
+
                 <div>
-                  <span className="text-slate-400 block text-[10px]">Delivery Destination</span>
-                  <span className="font-semibold text-slate-800">{selectedOrder.deliveryLocation}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Freight Spec</span>
-                  <span className="font-semibold text-slate-800">{selectedOrder.weight} • {selectedOrder.pallets} Pallets</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Freight Value</span>
-                  <span className="font-semibold text-emerald-600">${selectedOrder.amount.toLocaleString()}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 700, color: '#0284C7', textTransform: 'uppercase' }}>
+                    <Navigation size={12} />
+                    <span>Delivery Destination</span>
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A', marginTop: '4px' }}>
+                    {selectedOrder.deliveryLocation}
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
+                    ETA: {selectedOrder.expectedDelivery || '2026-11-26'}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between p-3 border border-slate-200 rounded-xl">
-                <span className="text-slate-600 font-medium">Lifecycle Status</span>
-                <span className="font-bold text-orange-600">{selectedOrder.status}</span>
+
+              {/* Cargo Specs */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 600 }}>Total Weight</div>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+                    {(selectedOrder.totalWeightKg || selectedOrder.weight || 2500).toLocaleString()} kg
+                  </div>
+                </div>
+                <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 600 }}>Pallet Quantity</div>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A', marginTop: '2px' }}>
+                    {selectedOrder.pallets || selectedOrder.itemsCount || 8} Pallets
+                  </div>
+                </div>
+                <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 600 }}>Priority</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, color: selectedOrder.priority === 'Urgent' ? '#DC2626' : '#C2410C', marginTop: '2px' }}>
+                    {selectedOrder.priority || 'Standard'}
+                  </div>
+                </div>
+                <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                  <div style={{ fontSize: '10.5px', color: '#64748B', fontWeight: 600 }}>Freight Value</div>
+                  <div style={{ fontSize: '15px', fontWeight: 800, color: '#047857', marginTop: '2px' }}>
+                    ${Number(selectedOrder.amount || 0).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Description & Contact */}
+              <div style={{ padding: '14px', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>
+                  Cargo Classification & Special Instructions
+                </div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#0F172A', marginTop: '4px' }}>
+                  {selectedOrder.type || selectedOrder.description || 'General Industrial Consignment'}
+                </div>
+                {selectedOrder.specialInstructions && (
+                  <div style={{ fontSize: '12px', color: '#475569', marginTop: '6px', fontStyle: 'italic', backgroundColor: '#FFFBEB', padding: '6px 10px', borderRadius: '6px', border: '1px solid #FDE68A' }}>
+                    Note: {selectedOrder.specialInstructions}
+                  </div>
+                )}
+                <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '8px' }}>
+                  Customer Contact: <strong>{selectedOrder.customerContact || '+1 (555) 349-2041'}</strong>
+                </div>
+              </div>
+
+              {/* Status Audit History Trail */}
+              <div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#0F172A', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Activity size={13} color="#FF7A1A" />
+                  <span>Consignment Status History & Audit Trail</span>
+                </div>
+                <div style={{ border: '1px solid #E2E8F0', borderRadius: '10px', overflow: 'hidden' }}>
+                  {(selectedOrder.history && selectedOrder.history.length > 0) ? (
+                    selectedOrder.history.map((h, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 12px',
+                          borderBottom: i < selectedOrder.history.length - 1 ? '1px solid #F1F5F9' : 'none',
+                          backgroundColor: i % 2 === 0 ? '#FFFFFF' : '#F8FAFC',
+                          fontSize: '11.5px'
+                        }}
+                      >
+                        <div>
+                          <span style={{ fontWeight: 700, color: '#0F172A' }}>{h.toStatus}</span>
+                          <span style={{ color: '#64748B', marginLeft: '6px' }}>by {h.updatedBy || 'Logistics Operations'}</span>
+                          {h.reason && <div style={{ color: '#94A3B8', fontSize: '10.5px' }}>{h.reason}</div>}
+                        </div>
+                        <span style={{ color: '#94A3B8', fontSize: '10.5px' }}>{h.timestamp}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ padding: '10px 12px', fontSize: '11.5px', color: '#64748B' }}>
+                      Status: <strong>{selectedOrder.status}</strong> • Initialized in Logistics OS
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 pt-2">
+
+            {/* Modal Actions Footer */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '22px', borderTop: '1px solid #F1F5F9', paddingTop: '16px' }}>
+              {(selectedOrder.status === 'Pending' || selectedOrder.status === 'Pending Approval') && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRejectingOrder(selectedOrder);
+                      setSelectedOrder(null);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 16px',
+                      borderRadius: '8px',
+                      backgroundColor: '#FEE2E2',
+                      color: '#B91C1C',
+                      border: '1px solid #FECACA',
+                      fontWeight: 700,
+                      fontSize: '12.5px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <X size={14} />
+                    <span>Reject Consignment</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleApprove(selectedOrder.id);
+                      setSelectedOrder(null);
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '9px 18px',
+                      borderRadius: '8px',
+                      backgroundColor: '#10B981',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      fontSize: '12.5px',
+                      cursor: 'pointer',
+                      boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)'
+                    }}
+                  >
+                    <Check size={14} strokeWidth={2.6} />
+                    <span>Approve & Dispatch Linehaul</span>
+                  </button>
+                </>
+              )}
               <button
+                type="button"
                 onClick={() => setSelectedOrder(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-200"
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F1F5F9',
+                  color: '#475569',
+                  border: '1px solid #CBD5E1',
+                  fontWeight: 600,
+                  fontSize: '12.5px',
+                  cursor: 'pointer'
+                }}
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 8. Rejection / Cancellation Reason Modal */}
+      {rejectingOrder && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 10000,
+            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+          onClick={() => setRejectingOrder(null)}
+        >
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              maxWidth: '480px',
+              width: '100%',
+              padding: '24px',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4)',
+              border: '1px solid #FECACA'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#DC2626', marginBottom: '14px' }}>
+              <AlertTriangle size={24} />
+              <h3 style={{ fontSize: '17px', fontWeight: 800, margin: 0, color: '#0F172A' }}>
+                Cancel Consignment {rejectingOrder.id}
+              </h3>
+            </div>
+
+            <p style={{ fontSize: '13px', color: '#475569', margin: '0 0 16px', lineHeight: 1.5 }}>
+              Please specify the reason for cancelling order from <strong>{rejectingOrder.customerName}</strong>. This status and reason will be archived in the customer and operational audit trail.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
+              {[
+                'Customer requested cancellation',
+                'Credit limit exceeded / Payment verification failed',
+                'Cargo specifications outside linehaul capacity',
+                'Route or warehouse scheduling conflict',
+                'Other'
+              ].map((reasonOpt) => (
+                <label
+                  key={reasonOpt}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    fontSize: '12.5px',
+                    color: '#1E293B',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: rejectReason === reasonOpt ? '1.5px solid #EF4444' : '1px solid #E2E8F0',
+                    backgroundColor: rejectReason === reasonOpt ? '#FEF2F2' : '#FFFFFF',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="rejectReason"
+                    checked={rejectReason === reasonOpt}
+                    onChange={() => setRejectReason(reasonOpt)}
+                  />
+                  <span>{reasonOpt}</span>
+                </label>
+              ))}
+
+              {rejectReason === 'Other' && (
+                <input
+                  type="text"
+                  placeholder="Enter custom rejection reason..."
+                  value={customRejectReason}
+                  onChange={(e) => setCustomRejectReason(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    fontSize: '12.5px',
+                    borderRadius: '8px',
+                    border: '1px solid #CBD5E1',
+                    outline: 'none',
+                    marginTop: '4px'
+                  }}
+                />
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setRejectingOrder(null)}
+                style={{
+                  padding: '9px 16px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F1F5F9',
+                  color: '#475569',
+                  border: '1px solid #CBD5E1',
+                  fontWeight: 600,
+                  fontSize: '12.5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Go Back
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmReject}
+                style={{
+                  padding: '9px 18px',
+                  borderRadius: '8px',
+                  backgroundColor: '#DC2626',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  fontWeight: 700,
+                  fontSize: '12.5px',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(220, 38, 38, 0.35)'
+                }}
+              >
+                Confirm Cancellation
               </button>
             </div>
           </div>

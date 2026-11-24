@@ -1022,6 +1022,12 @@ export default function App() {
                     onOpenCreateOrder={() => setIsLogisticsCreateOrderOpen(true)}
                     onOpenCreateShipment={() => setIsLogisticsCreateShipmentOpen(true)}
                     onOpenAssignModal={() => setIsLogisticsAssignOpen(true)}
+                    onUpdateOrderStatus={(orderId, status, reason) => {
+                      logisticsService.updateOrderStatus(orderId, status, reason);
+                      setLogisticsData(logisticsService.getData());
+                      setCustomerData(customerService.getData());
+                      showToast(`Order ${orderId} updated to ${status}.`);
+                    }}
                   />
                 )}
 
