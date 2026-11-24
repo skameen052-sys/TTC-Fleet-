@@ -62,7 +62,8 @@ public class SecurityConfig {
                                 "/api/assignments/**",
                                 "/api/inspections/**",
                                 "/api/documents/**",
-                                "/api/workflow/**"
+                                "/api/workflow/**",
+                                "/api/payments/cashfree/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );
@@ -77,7 +78,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "x-webhook-signature", "x-webhook-timestamp"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

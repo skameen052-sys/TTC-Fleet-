@@ -486,6 +486,11 @@ class CustomerService {
       date: new Date().toISOString().slice(0, 16).replace('T', ' '),
       method: paymentDetails.method || 'Corporate ACH Direct',
       account: paymentDetails.account || 'Corporate Account ****4892',
+      gateway: paymentDetails.gateway || 'Manual',
+      gatewayOrderId: paymentDetails.gatewayOrderId || null,
+      gatewayPaymentId: paymentDetails.gatewayPaymentId || null,
+      bankReference: paymentDetails.bankReference || null,
+      mode: paymentDetails.mode || null,
       status: 'Completed',
       receiptUrl: `#receipt-${invoiceId}`
     };

@@ -30,6 +30,7 @@ import {
   Phone,
   Mail
 } from 'lucide-react';
+import { GATEWAYS, formatINR } from '../../services/paymentGateway';
 
 // ============================================================================
 // 1. CREATE TRANSPORTATION ORDER VIEW (Booking Form)
@@ -1110,24 +1111,57 @@ export const BillingInvoicesView = ({ invoices, onViewInvoice, onMakePayment }) 
 // 8. PAYMENT MANAGEMENT VIEW
 // ============================================================================
 export const PaymentManagementView = ({ payments }) => {
+  const gwPayments = payments.filter((p) => p.gatewayPaymentId);
+  const totalViaGateway = gwPayments.reduce((a, p) => a + (p.amount || 0), 0);
   return (
     <div className="dashboard-content" style={{ padding: '24px' }}>
+      {/* Payment gateways */}
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E5EAF2', padding: '20px 24px', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#14213D' }}>Payment Gateways</h2>
+          <span style={{ background: '#FEF3C7', color: '#92400E', fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6 }}>SANDBOX / TEST MODE</span>
+          <span style={{ marginLeft: 'auto', fontSize: 12.5, color: '#64748B' }}>
+            Paid online: <b style={{ color: '#14213D' }}>{formatINR(totalViaGateway)}</b> in {gwPayments.length} transaction{gwPayments.length === 1 ? '' : 's'}
+          </span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 }}>
+          {GATEWAYS.map((g) => (
+            <div key={g.id} style={{ border: `1.5px solid ${g.status === 'active' ? '#FF6B1A' : '#E5EAF2'}`, borderRadius: 10, padding: 14, background: g.status === 'active' ? '#FFF8F3' : '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <b style={{ fontSize: 14, color: '#14213D' }}><span style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: g.color, marginRight: 8 }} />{g.short}</b>
+                <span style={{ fontSize: 10.5, fontWeight: 700, padding: '2px 7px', borderRadius: 5, background: g.status === 'active' ? '#DCFCE7' : '#F1F5F9', color: g.status === 'active' ? '#166534' : '#64748B' }}>
+                  {g.status === 'active' ? 'CONNECTED' : 'EXAMPLE'}
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: '#64748B', marginTop: 8, lineHeight: 1.6 }}>
+                {g.methods.join(' · ')}<br />Fee: {g.fee}<br />Settlement: {g.settlement}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{ margin: '12px 0 0', fontSize: 12, color: '#64748B' }}>
+          Click <b>Pay</b> on any pending invoice to open the Cashfree checkout. Test UPI: <code>success@upi</code> (succeeds) / <code>failure@upi</code> (fails).
+        </p>
+      </div>
+
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #E5EAF2', overflow: 'hidden' }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #E5EAF2' }}>
           <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#14213D' }}>Payment History & Transactions</h2>
           <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#64748B' }}>
-            Confirmed corporate clearing settlements and remittance references
+            Gateway transactions and corporate clearing settlements
           </p>
         </div>
 
+        <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left' }}>
           <thead>
             <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', color: '#64748B' }}>
               <th style={{ padding: '12px 18px' }}>Transaction ID</th>
               <th style={{ padding: '12px 14px' }}>Invoice Settled</th>
               <th style={{ padding: '12px 14px' }}>Settled Date</th>
+              <th style={{ padding: '12px 14px' }}>Gateway</th>
               <th style={{ padding: '12px 14px' }}>Payment Method</th>
-              <th style={{ padding: '12px 14px' }}>Account Reference</th>
+              <th style={{ padding: '12px 14px' }}>Gateway Ref / UTR</th>
               <th style={{ padding: '12px 14px', textAlign: 'right' }}>Amount Paid</th>
               <th style={{ padding: '12px 18px', textAlign: 'center' }}>Status</th>
             </tr>
@@ -1138,13 +1172,22 @@ export const PaymentManagementView = ({ payments }) => {
                 <td style={{ padding: '14px 18px', fontWeight: 700, color: '#14213D' }}>{p.id}</td>
                 <td style={{ padding: '14px 14px', color: '#079DF2', fontWeight: 600 }}>{p.invoiceId}</td>
                 <td style={{ padding: '14px 14px', color: '#64748B' }}>{p.date}</td>
-                <td style={{ padding: '14px 14px', color: '#1E293B' }}>{p.method}</td>
-                <td style={{ padding: '14px 14px', color: '#64748B' }}>{p.account}</td>
+                <td style={{ padding: '14px 14px' }}>
+                  {p.gateway && p.gateway !== 'Manual' ? (
+                    <span style={{ background: '#F3EEFF', color: '#5E2CED', padding: '3px 9px', borderRadius: 12, fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      {p.gateway}{p.mode === 'SANDBOX' ? ' · test' : ''}
+                    </span>
+                  ) : <span style={{ color: '#94A3B8' }}>Bank transfer</span>}
+                </td>
+                <td style={{ padding: '14px 14px', color: '#1E293B' }}>{p.method}<div style={{ fontSize: 11, color: '#94A3B8' }}>{p.account}</div></td>
+                <td style={{ padding: '14px 14px', color: '#64748B', fontSize: 11.5 }}>
+                  {p.gatewayPaymentId ? <>ID {p.gatewayPaymentId}<br />UTR {p.bankReference}</> : '—'}
+                </td>
                 <td style={{ padding: '14px 14px', textAlign: 'right', fontWeight: 800, color: '#16A36A' }}>
-                  ${p.amount.toLocaleString()}
+                  {formatINR(p.amount)}
                 </td>
                 <td style={{ padding: '14px 18px', textAlign: 'center' }}>
-                  <span style={{ backgroundColor: '#DCFCE7', color: '#166534', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
+                  <span style={{ backgroundColor: '#DCFCE7', color: '#166534', padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}>
                     ✔ {p.status}
                   </span>
                 </td>
@@ -1152,6 +1195,7 @@ export const PaymentManagementView = ({ payments }) => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
