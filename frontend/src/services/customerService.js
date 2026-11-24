@@ -229,6 +229,12 @@ class CustomerService {
     this.data = this.loadData();
 
     // Subscribe to logistics service updates so customer view is always in sync with Admin/Logistics manager
+    try {
+      logisticsService.subscribe(() => {
+        this.notifySubscribers();
+      });
+    } catch (_) {}
+
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (e) => {
         if (e.key === 'ttc_logistics360_data_v1') {

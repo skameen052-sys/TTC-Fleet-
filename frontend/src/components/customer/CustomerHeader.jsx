@@ -1,5 +1,6 @@
 // frontend/src/components/customer/CustomerHeader.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { PortalSwitcher } from '../common/PortalSwitcher';
 import {
   Calendar,
   Search,
@@ -23,7 +24,8 @@ export const CustomerHeader = ({
   onMarkAllNotificationsRead,
   profile,
   onSelectTab,
-  onLogout
+  onLogout,
+  onSwitchPortal
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState('');
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -85,6 +87,11 @@ export const CustomerHeader = ({
 
       {/* Right: Date, Search, Notifications, Profile */}
       <div className="header-right-col" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Quick Portal Switcher (7 Portals) */}
+        {onSwitchPortal && (
+          <PortalSwitcher currentPortal="customer" onSwitchPortal={onSwitchPortal} />
+        )}
+
         {/* Live Date / Time Badge */}
         <div
           style={{

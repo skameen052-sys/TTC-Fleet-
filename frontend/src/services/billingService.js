@@ -392,6 +392,7 @@ const INITIAL_NOTIFICATIONS = [
 
 class BillingService {
   constructor() {
+    this.subscribers = [];
     this.data = this.loadData();
   }
 
@@ -422,6 +423,26 @@ class BillingService {
     } catch (e) {
       console.error('Error saving billing data to storage:', e);
     }
+    this.notifySubscribers();
+  }
+
+  subscribe(callback) {
+    this.subscribers.push(callback);
+    callback(this.getData());
+    return () => {
+      this.subscribers = this.subscribers.filter(cb => cb !== callback);
+    };
+  }
+
+  notifySubscribers() {
+    const data = this.getData();
+    this.subscribers.forEach(cb => {
+      try {
+        cb(data);
+      } catch (err) {
+        console.error('Error notifying billing subscriber:', err);
+      }
+    });
   }
 
   getData() {

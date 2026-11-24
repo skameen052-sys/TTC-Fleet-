@@ -1,5 +1,6 @@
 // frontend/src/services/warehouseService.js
 // Enterprise WMS Service for TTC Fleet360 - Warehouse Management System
+import { workflowService } from './workflowService';
 
 const STORAGE_KEY = 'ttc_warehouse360_data_v1';
 
@@ -872,6 +873,11 @@ class WarehouseService {
       shipment.status = 'Received & Stored';
       shipment.inspectionStatus = 'Passed (100% QA)';
       this.saveToStorage();
+      try {
+        workflowService.warehouseReceive(shipment.shipmentId || shipmentId, shipment.warehouseId || 'WH-CENTRAL-01');
+      } catch (err) {
+        console.warn('Sync to workflowService failed:', err);
+      }
       return shipment;
     }
     return null;
@@ -907,6 +913,11 @@ class WarehouseService {
       d.loadingStatus = 'Completed & Sealed';
       d.dispatchStatus = 'Dispatched (En Route)';
       this.saveToStorage();
+      try {
+        workflowService.warehouseDispatch(d.orderId || dispatchId, 'WH-CENTRAL-01', d.dockBay || 'BAY-07');
+      } catch (err) {
+        console.warn('Sync to workflowService failed:', err);
+      }
       return d;
     }
     return null;

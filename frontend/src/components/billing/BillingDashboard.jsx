@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BillingSidebar } from './BillingSidebar';
 import { BillingHeader } from './BillingHeader';
 import {
@@ -69,16 +69,26 @@ export const BillingDashboard = ({
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [selectedInvoiceForView, setSelectedInvoiceForView] = useState(null);
 
-  // Dynamic data from service with safe fallback
-  const rawData = billingService?.getData ? billingService.getData() : billingData;
-  const invoices = rawData?.invoices || [];
-  const bills = rawData?.bills || [];
-  const payments = rawData?.payments || [];
-  const expenses = rawData?.expenses || [];
-  const refunds = rawData?.refunds || [];
-  const transportCharges = rawData?.transportCharges || [];
-  const taxConfig = rawData?.taxConfig || {};
-  const notifications = rawData?.notifications || [];
+  // Dynamic data state with real-time subscription to billingService
+  const [data, setData] = useState(() => (billingService?.getData ? billingService.getData() : billingData));
+
+  useEffect(() => {
+    if (billingService?.subscribe) {
+      const unsub = billingService.subscribe((updated) => {
+        setData({ ...updated });
+      });
+      return unsub;
+    }
+  }, [billingService]);
+
+  const invoices = data?.invoices || [];
+  const bills = data?.bills || [];
+  const payments = data?.payments || [];
+  const expenses = data?.expenses || [];
+  const refunds = data?.refunds || [];
+  const transportCharges = data?.transportCharges || [];
+  const taxConfig = data?.taxConfig || {};
+  const notifications = data?.notifications || [];
 
   // Metrics from service
   const metrics = billingService?.getSummaryMetrics ? billingService.getSummaryMetrics() : {
@@ -214,6 +224,7 @@ export const BillingDashboard = ({
   const handleCreateInvoiceSubmit = (invData) => {
     if (billingService?.createInvoice) {
       billingService.createInvoice(invData);
+      setData({ ...billingService.getData() });
       if (showToast) showToast(`Invoice ${invData.invoiceNumber || 'INV-2026-NEW'} created successfully!`);
     }
   };
@@ -221,6 +232,7 @@ export const BillingDashboard = ({
   const handleRecordPaymentSubmit = (payData) => {
     if (billingService?.recordPayment) {
       billingService.recordPayment(payData);
+      setData({ ...billingService.getData() });
       if (showToast) showToast(`Payment of ₹${payData.amount.toLocaleString('en-IN')} recorded!`);
     }
   };
@@ -228,6 +240,7 @@ export const BillingDashboard = ({
   const handleAddExpenseSubmit = (expData) => {
     if (billingService?.recordExpense) {
       billingService.recordExpense(expData);
+      setData({ ...billingService.getData() });
       if (showToast) showToast(`Expense of ₹${expData.amount.toLocaleString('en-IN')} saved!`);
     }
   };
@@ -235,6 +248,7 @@ export const BillingDashboard = ({
   const handleProcessRefundAction = (refundId, action) => {
     if (billingService?.processRefund) {
       billingService.processRefund(refundId, action);
+      setData({ ...billingService.getData() });
       if (showToast) showToast(`Refund claim updated to ${action}`);
     }
   };

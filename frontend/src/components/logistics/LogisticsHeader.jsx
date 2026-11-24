@@ -1,5 +1,6 @@
 // frontend/src/components/logistics/LogisticsHeader.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { PortalSwitcher } from '../common/PortalSwitcher';
 import {
   Calendar,
   Bell,
@@ -89,6 +90,11 @@ export const LogisticsHeader = ({
 
       {/* Middle & Right Navigation Elements */}
       <div className="header-right-col" style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, justifyContent: 'flex-end', minWidth: 0 }}>
+        {/* Quick Portal Switcher (7 Portals) */}
+        {onSwitchPortal && (
+          <PortalSwitcher currentPortal="logistics" onSwitchPortal={onSwitchPortal} />
+        )}
+
         {/* Live Logistics Telemetry Pill */}
         <div
           className="driver-trip-telemetry-pill logistics-telemetry-pill"

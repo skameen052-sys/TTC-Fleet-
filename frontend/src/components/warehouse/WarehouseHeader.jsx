@@ -1,5 +1,6 @@
 // frontend/src/components/warehouse/WarehouseHeader.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { PortalSwitcher } from '../common/PortalSwitcher';
 import {
   Calendar,
   Bell,
@@ -78,6 +79,11 @@ export const WarehouseHeader = ({
 
       {/* Middle & Right Navigation Elements */}
       <div className="header-right-col">
+        {/* Quick Portal Switcher (7 Portals) */}
+        {onSwitchPortal && (
+          <PortalSwitcher currentPortal="warehouse" onSwitchPortal={onSwitchPortal} />
+        )}
+
         {/* Global Search Input */}
         <div className="header-search-wrapper">
           <Search className="header-search-icon" size={16} />

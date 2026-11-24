@@ -137,6 +137,7 @@ import { BillingHeader } from './components/billing/BillingHeader';
 import { BillingDashboard } from './components/billing/BillingDashboard';
 import { BillingLoginPage } from './components/auth/BillingLoginPage';
 import { billingService } from './services/billingService';
+import { workflowService } from './services/workflowService';
 
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
@@ -337,7 +338,7 @@ export default function App() {
   const [isLogisticsPodOpen, setIsLogisticsPodOpen] = useState(false);
   const [selectedPodDelivery, setSelectedPodDelivery] = useState(null);
 
-  // Subscribe to changes in fleetService, warehouseService, logisticsService & customerService
+  // Subscribe to changes in fleetService, warehouseService, logisticsService, customerService, billingService & workflowService
   useEffect(() => {
     const unsubscribeFleet = fleetService.subscribe((updatedData) => {
       setFleetState({ ...updatedData });
@@ -352,11 +353,24 @@ export default function App() {
     const unsubscribeCustomer = customerService.subscribe((updatedCustData) => {
       setCustomerData({ ...updatedCustData });
     });
+    const unsubscribeBilling = billingService.subscribe((updatedBillingData) => {
+      setBillingData({ ...updatedBillingData });
+    });
+    const unsubscribeWorkflow = workflowService.subscribe(() => {
+      setFleetState(fleetService.loadData());
+      setDriverPortalData(fleetService.getDriverPortalData());
+      setWarehouseData(warehouseService.getData());
+      setLogisticsData(logisticsService.getData());
+      setCustomerData(customerService.getData());
+      setBillingData(billingService.getData());
+    });
     return () => {
       unsubscribeFleet();
       unsubscribeWarehouse();
       unsubscribeLogistics();
       unsubscribeCustomer();
+      unsubscribeBilling();
+      unsubscribeWorkflow();
     };
   }, []);
 
@@ -406,12 +420,15 @@ export default function App() {
   // Fleet Manager Actions
   const handleAddVehicle = (vehicleData) => {
     const newV = fleetService.addVehicle(vehicleData);
+    setFleetState(fleetService.loadData());
     showToast(`Vehicle ${newV.regNumber} registered successfully in fleet assets!`);
   };
 
   const handleAssignVehicle = (assignmentData) => {
     try {
       const asg = fleetService.assignVehicle(assignmentData);
+      setFleetState(fleetService.loadData());
+      setDriverPortalData(fleetService.getDriverPortalData());
       showToast(`Vehicle ${asg.vehicleReg} dispatched with driver ${asg.driverName}!`);
     } catch (err) {
       alert(err.message);
@@ -420,29 +437,35 @@ export default function App() {
 
   const handleAddFuelRecord = (fuelData) => {
     const record = fleetService.addFuelRecord(fuelData);
+    setFleetState(fleetService.loadData());
     showToast(`Fuel record ${record.id} logged for ${record.vehicleReg} (${record.liters}L)!`);
   };
 
   const handleScheduleMaintenance = (maintData) => {
     const m = fleetService.scheduleMaintenance(maintData);
+    setFleetState(fleetService.loadData());
     showToast(`Maintenance work order scheduled for ${m.vehicleReg} (${m.serviceType})!`);
   };
 
   const handleRecordInspection = (inspData) => {
     const ins = fleetService.recordInspection(inspData);
+    setFleetState(fleetService.loadData());
     showToast(`Inspection ${ins.id} certified: ${ins.overallStatus} for ${ins.vehicleReg}!`);
   };
 
   const handleSimulateTick = () => {
     fleetService.simulateGpsTick();
+    setFleetState(fleetService.loadData());
   };
 
   const handleMarkNotificationRead = (id) => {
     fleetService.markNotificationRead(id);
+    setFleetState(fleetService.loadData());
   };
 
   const handleMarkAllNotificationsRead = () => {
     fleetService.markAllNotificationsRead();
+    setFleetState(fleetService.loadData());
     showToast('All notifications marked as read.');
   };
 
@@ -450,6 +473,7 @@ export default function App() {
   const handleAdvanceDriverStage = (tripId) => {
     const updatedTrip = fleetService.advanceDriverTripStage(tripId);
     setDriverPortalData(fleetService.getDriverPortalData());
+    setFleetState(fleetService.loadData());
     const stageName = updatedTrip?.stages?.[updatedTrip.currentStageIndex]?.name || 'Stage updated';
     showToast(`Trip Stage updated: ${stageName}`);
   };
@@ -457,18 +481,22 @@ export default function App() {
   const handleConfirmPickup = (tripId, notes) => {
     const updatedTrip = fleetService.confirmDriverPickup(tripId, notes);
     setDriverPortalData(fleetService.getDriverPortalData());
+    setFleetState(fleetService.loadData());
     showToast(`Pickup verified for shipment ${updatedTrip?.shipmentId || 'Freight'}! Cargo loaded.`);
   };
 
   const handleConfirmDelivery = (tripId, recipientName, podPhoto) => {
     const updatedTrip = fleetService.confirmDriverDelivery(tripId, recipientName, podPhoto);
     setDriverPortalData(fleetService.getDriverPortalData());
+    setFleetState(fleetService.loadData());
+    setBillingData(billingService.getData());
     showToast(`Delivery completed! Electronic POD certified for ${recipientName || 'Consignee'}.`);
   };
 
   const handleCancelDriverTrip = (tripId, reason) => {
     const updatedTrip = fleetService.cancelDriverTrip(tripId, reason);
     setDriverPortalData(fleetService.getDriverPortalData());
+    setFleetState(fleetService.loadData());
     showToast(`Trip ${tripId} cancelled: ${reason}. Logistics manager alerted.`);
   };
 
@@ -481,58 +509,69 @@ export default function App() {
   const handleAddDriverFuel = (fuelData) => {
     const newLog = fleetService.addDriverFuelRecord(fuelData);
     setDriverPortalData(fleetService.getDriverPortalData());
+    setFleetState(fleetService.loadData());
     showToast(`Fuel refill of ${newLog.liters}L ($${newLog.cost}) logged successfully!`);
   };
 
   const handleReportDriverIssue = (issueData) => {
     const issue = fleetService.reportDriverIssue(issueData);
     setDriverPortalData(fleetService.getDriverPortalData());
+    setFleetState(fleetService.loadData());
     showToast(`Vehicle inspection defect logged: ${issue.title} (Severity: ${issue.severity}).`);
   };
 
   // Warehouse Manager Actions
   const handleAddInventory = (itemData) => {
     const item = warehouseService.addInventoryItem(itemData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Inventory SKU ${item.sku} registered successfully!`);
   };
 
   const handleRecordStockIn = (stockData) => {
     warehouseService.recordStockIn(stockData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Stock In recorded for ${stockData.sku} (+${stockData.quantity} units)!`);
   };
 
   const handleRecordStockOut = (stockData) => {
     warehouseService.recordStockOut(stockData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Stock Out recorded for ${stockData.sku} (-${stockData.quantity} units)!`);
   };
 
   const handleConfirmReceiving = (shipmentId) => {
     const s = warehouseService.confirmReceiving(shipmentId);
+    setWarehouseData(warehouseService.getData());
     showToast(`Shipment ${s?.shipmentId || shipmentId} verified and stored into inventory!`);
   };
 
   const handleCreateDispatch = (dispatchData) => {
     const d = warehouseService.createDispatch(dispatchData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Dispatch ${d.orderId} scheduled at ${d.dockBay} for ${d.destination}!`);
   };
 
   const handleConfirmDispatch = (dispatchId) => {
     const d = warehouseService.confirmDispatch(dispatchId);
+    setWarehouseData(warehouseService.getData());
     showToast(`Dispatch ${d?.orderId || dispatchId} authorized & released for transit!`);
   };
 
   const handleTransferStock = (transferData) => {
     const t = warehouseService.transferStock(transferData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Transfer ${t.id} initiated: ${t.quantity} units to ${t.destWarehouse}!`);
   };
 
   const handleReportDamagedGoods = (damageData) => {
     const dmg = warehouseService.reportDamagedGoods(damageData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Damaged stock ${dmg.sku} (${dmg.quantity} units) moved to quarantine!`);
   };
 
   const handleAddWarehouse = (whData) => {
     const wh = warehouseService.addWarehouse(whData);
+    setWarehouseData(warehouseService.getData());
     showToast(`Warehouse facility ${wh.name} (${wh.code}) registered successfully!`);
   };
 
@@ -1074,6 +1113,8 @@ export default function App() {
             onClose={() => setIsLogisticsCreateOrderOpen(false)}
             onSubmit={(ord) => {
               logisticsService.addOrder(ord);
+              setLogisticsData(logisticsService.getData());
+              setCustomerData(customerService.getData());
               showToast(`Order created successfully for ${ord.customerName}!`);
             }}
           />
@@ -1083,6 +1124,8 @@ export default function App() {
             onClose={() => setIsLogisticsCreateShipmentOpen(false)}
             onSubmit={(shp) => {
               logisticsService.createShipment(shp);
+              setLogisticsData(logisticsService.getData());
+              setCustomerData(customerService.getData());
               showToast(`Shipment dispatched for Order #${shp.orderId}!`);
             }}
             vehicles={logisticsData.vehicles || []}
@@ -1094,6 +1137,8 @@ export default function App() {
             onClose={() => setIsLogisticsCreateTripOpen(false)}
             onSubmit={(trip) => {
               logisticsService.createTrip(trip);
+              setLogisticsData(logisticsService.getData());
+              setFleetState(fleetService.loadData());
               showToast(`Trip dispatched on ${trip.route}!`);
             }}
             vehicles={logisticsData.vehicles || []}
@@ -1105,6 +1150,8 @@ export default function App() {
             onClose={() => setIsLogisticsAssignOpen(false)}
             onSubmit={({ vehicleReg, driverId, tripRoute }) => {
               logisticsService.assignVehicleAndDriver(vehicleReg, driverId, tripRoute);
+              setLogisticsData(logisticsService.getData());
+              setFleetState(fleetService.loadData());
               showToast(`Allocated Rig ${vehicleReg} with Pilot for route ${tripRoute}!`);
             }}
             vehicles={logisticsData.vehicles || []}
@@ -1120,6 +1167,9 @@ export default function App() {
             delivery={selectedPodDelivery}
             onConfirm={(delId, recipientName) => {
               logisticsService.confirmDelivery(delId, recipientName);
+              setLogisticsData(logisticsService.getData());
+              setCustomerData(customerService.getData());
+              setBillingData(billingService.getData());
               showToast(`ePOD archived successfully with signature of ${recipientName}!`);
             }}
           />
@@ -1165,9 +1215,13 @@ export default function App() {
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               notifications={customerData.notifications || []}
-              onMarkNotificationRead={(id) => customerService.markNotificationRead(id)}
+              onMarkNotificationRead={(id) => {
+                customerService.markNotificationRead(id);
+                setCustomerData(customerService.getData());
+              }}
               onMarkAllNotificationsRead={() => {
                 customerService.markAllNotificationsRead();
+                setCustomerData(customerService.getData());
                 showToast('All notifications marked as read.');
               }}
               profile={customerData.profile}
@@ -1175,6 +1229,7 @@ export default function App() {
                 setCustomerActiveTab(tabId);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
+              onSwitchPortal={(p) => setPortal(p)}
               onLogout={handleLogout}
             />
 
@@ -1209,6 +1264,8 @@ export default function App() {
                     profile={customerData.profile}
                     onCreateOrder={(orderData) => {
                       const newOrder = customerService.createOrder(orderData);
+                      setCustomerData(customerService.getData());
+                      setLogisticsData(logisticsService.getData());
                       showToast(`Order ${newOrder.id} submitted for logistics dispatch approval!`);
                       return newOrder;
                     }}
@@ -1222,6 +1279,8 @@ export default function App() {
                     onViewDetails={(order) => setSelectedCustomerOrder(order)}
                     onCancelOrder={(orderId) => {
                       customerService.cancelOrder(orderId);
+                      setCustomerData(customerService.getData());
+                      setLogisticsData(logisticsService.getData());
                       showToast(`Order ${orderId} has been cancelled.`);
                     }}
                     onCreateNewOrder={() => setCustomerActiveTab('create-order')}
@@ -1256,6 +1315,7 @@ export default function App() {
                     profile={customerData.profile}
                     onSaveAddress={(addr) => {
                       customerService.saveShippingAddress(addr);
+                      setCustomerData(customerService.getData());
                       showToast('Facility address saved to address book.');
                     }}
                   />
@@ -1283,6 +1343,8 @@ export default function App() {
                     refunds={customerData.refunds || []}
                     onRequestRefund={(refundPayload) => {
                       customerService.requestRefund(refundPayload);
+                      setCustomerData(customerService.getData());
+                      setBillingData(billingService.getData());
                       showToast('Refund claim submitted to claims auditor.');
                     }}
                   />
@@ -1291,9 +1353,13 @@ export default function App() {
                 {customerActiveTab === 'notifications' && (
                   <CustomerNotificationsView
                     notifications={customerData.notifications || []}
-                    onMarkRead={(id) => customerService.markNotificationRead(id)}
+                    onMarkRead={(id) => {
+                      customerService.markNotificationRead(id);
+                      setCustomerData(customerService.getData());
+                    }}
                     onMarkAllRead={() => {
                       customerService.markAllNotificationsRead();
+                      setCustomerData(customerService.getData());
                       showToast('All notifications marked as read.');
                     }}
                   />
@@ -1304,6 +1370,7 @@ export default function App() {
                     tickets={customerData.tickets || []}
                     onCreateTicket={(ticketPayload) => {
                       customerService.createSupportTicket(ticketPayload);
+                      setCustomerData(customerService.getData());
                       showToast('Support ticket logged with dispatch desk.');
                     }}
                   />
@@ -1314,6 +1381,7 @@ export default function App() {
                     profile={customerData.profile}
                     onUpdateProfile={(profileData) => {
                       customerService.updateProfile(profileData);
+                      setCustomerData(customerService.getData());
                       showToast('Profile information updated.');
                     }}
                   />
@@ -1329,6 +1397,8 @@ export default function App() {
             onClose={() => setSelectedCustomerOrder(null)}
             onCancelOrder={(orderId) => {
               customerService.cancelOrder(orderId);
+              setCustomerData(customerService.getData());
+              setLogisticsData(logisticsService.getData());
               showToast(`Order ${orderId} cancelled.`);
               setSelectedCustomerOrder(null);
             }}
@@ -1358,6 +1428,8 @@ export default function App() {
             }}
             onSubmitPayment={(invId, payDetails) => {
               customerService.makePayment(invId, payDetails);
+              setCustomerData(customerService.getData());
+              setBillingData(billingService.getData());
               showToast(`Payment for ${invId} successfully authorized!`);
             }}
           />

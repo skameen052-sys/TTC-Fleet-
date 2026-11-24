@@ -58,7 +58,7 @@ async def run_verification():
         ws_url = tabs[0]["webSocketDebuggerUrl"]
         print(f"Connecting to CDP: {ws_url}")
 
-        async with websockets.connect(ws_url) as ws:
+        async with websockets.connect(ws_url, max_size=25*1024*1024) as ws:
             mid = 1
             await cdp_call(ws, "Page.enable", {}, mid); mid += 1
             await cdp_call(ws, "Runtime.enable", {}, mid); mid += 1

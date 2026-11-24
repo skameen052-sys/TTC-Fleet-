@@ -30,8 +30,11 @@ import {
 export const UserManagementView = () => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'Fleet Manager', branch: 'Hyderabad HQ' });
 
-  const usersList = [
+  const [usersList, setUsersList] = useState([
     { id: 'USR-101', name: 'Alexander Mercer', email: 'admin@ttcfleet360.com', role: 'Super Admin', branch: 'Hyderabad HQ', status: 'Active', lastLogin: '2 min ago' },
     { id: 'USR-102', name: 'Vikram Malhotra', email: 'manager@ttcfleet360.com', role: 'Fleet Manager', branch: 'Bengaluru Hub', status: 'Active', lastLogin: '12 min ago' },
     { id: 'USR-103', name: 'Marcus Vance', email: 'm.vance@fleet360.ttc.com', role: 'Commercial Driver', branch: 'Chennai Depot', status: 'Active', lastLogin: 'Just now' },
@@ -39,7 +42,37 @@ export const UserManagementView = () => {
     { id: 'USR-105', name: 'Sarah Jenkins', email: 's.jenkins@fleet360.ttc.com', role: 'Fleet Manager', branch: 'Mumbai Port Hub', status: 'Active', lastLogin: '2 hours ago' },
     { id: 'USR-106', name: 'David Miller', email: 'd.miller@fleet360.ttc.com', role: 'Commercial Driver', branch: 'Delhi NCR Hub', status: 'On Duty', lastLogin: '1 hour ago' },
     { id: 'USR-107', name: 'Priya Sharma', email: 'priya.s@ttcfleet360.com', role: 'Compliance Auditor', branch: 'Hyderabad HQ', status: 'Active', lastLogin: '4 hours ago' }
-  ];
+  ]);
+
+  const handleAddUser = (e) => {
+    e.preventDefault();
+    if (!newUser.name || !newUser.email) return;
+    const created = {
+      id: `USR-${Math.floor(108 + Math.random() * 900)}`,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      branch: newUser.branch,
+      status: 'Active',
+      lastLogin: 'Just now'
+    };
+    setUsersList([created, ...usersList]);
+    setIsAddUserOpen(false);
+    setNewUser({ name: '', email: '', role: 'Fleet Manager', branch: 'Hyderabad HQ' });
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setUsersList(usersList.map(u => u.id === editingUser.id ? editingUser : u));
+    setEditingUser(null);
+  };
+
+  const handleDeleteUser = (id) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      setUsersList(usersList.filter(u => u.id !== id));
+    }
+  };
 
   const filtered = usersList.filter(u => {
     const matchRole = roleFilter === 'ALL' || u.role.toLowerCase().includes(roleFilter.toLowerCase());
@@ -54,14 +87,84 @@ export const UserManagementView = () => {
       <div className="module-header-row">
         <div>
           <h2 className="module-title">User & Personnel Management</h2>
-          <p className="module-desc">Centralized access control, user accounts, and credentials for 120 enterprise members.</p>
+          <p className="module-desc">Centralized access control, user accounts, and credentials for enterprise members.</p>
         </div>
         <div className="module-actions-row">
-          <button className="btn-primary">
+          <button className="btn-primary" onClick={() => setIsAddUserOpen(true)}>
             <PlusCircle size={15} /> Add New User
           </button>
         </div>
       </div>
+
+      {isAddUserOpen && (
+        <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div className="modal-card" style={{ maxWidth: '440px', width: '90%', padding: '24px', background: '#131929', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ margin: '0 0 16px 0', color: '#fff', fontSize: '18px' }}>Add New Personnel</h3>
+            <form onSubmit={handleAddUser} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Full Name</label>
+                <input required className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newUser.name} onChange={e => setNewUser({ ...newUser, name: e.target.value })} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Work Email</label>
+                <input required type="email" className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newUser.email} onChange={e => setNewUser({ ...newUser, email: e.target.value })} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Role</label>
+                <select className="table-search-input" style={{ width: '100%', marginTop: '4px', background: '#0a1020', color: '#fff' }} value={newUser.role} onChange={e => setNewUser({ ...newUser, role: e.target.value })}>
+                  <option value="Fleet Manager">Fleet Manager</option>
+                  <option value="Commercial Driver">Commercial Driver</option>
+                  <option value="Dispatcher">Dispatcher</option>
+                  <option value="Super Admin">Super Admin</option>
+                  <option value="Warehouse Manager">Warehouse Manager</option>
+                  <option value="Logistics Manager">Logistics Manager</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Assigned Branch</label>
+                <input className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newUser.branch} onChange={e => setNewUser({ ...newUser, branch: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                <button type="button" onClick={() => setIsAddUserOpen(false)} style={{ padding: '8px 14px', background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ padding: '8px 16px' }}>Save User</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingUser && (
+        <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div className="modal-card" style={{ maxWidth: '440px', width: '90%', padding: '24px', background: '#131929', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ margin: '0 0 16px 0', color: '#fff', fontSize: '18px' }}>Edit User Details</h3>
+            <form onSubmit={handleSaveEdit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Full Name</label>
+                <input required className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={editingUser.name} onChange={e => setEditingUser({ ...editingUser, name: e.target.value })} />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Role</label>
+                <select className="table-search-input" style={{ width: '100%', marginTop: '4px', background: '#0a1020', color: '#fff' }} value={editingUser.role} onChange={e => setEditingUser({ ...editingUser, role: e.target.value })}>
+                  <option value="Fleet Manager">Fleet Manager</option>
+                  <option value="Commercial Driver">Commercial Driver</option>
+                  <option value="Dispatcher">Dispatcher</option>
+                  <option value="Super Admin">Super Admin</option>
+                  <option value="Warehouse Manager">Warehouse Manager</option>
+                  <option value="Logistics Manager">Logistics Manager</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Branch</label>
+                <input className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={editingUser.branch} onChange={e => setEditingUser({ ...editingUser, branch: e.target.value })} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                <button type="button" onClick={() => setEditingUser(null)} style={{ padding: '8px 14px', background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ padding: '8px 16px' }}>Update User</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="fleet-table-card">
         <div className="table-toolbar">
@@ -136,10 +239,10 @@ export const UserManagementView = () => {
                 </td>
                 <td style={{ padding: '12px 18px', color: '#94a3b8' }}>{u.lastLogin}</td>
                 <td style={{ padding: '12px 18px', textAlign: 'right' }}>
-                  <button style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', marginRight: '8px' }}>
+                  <button onClick={() => setEditingUser(u)} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', marginRight: '8px' }} title="Edit User">
                     <Edit2 size={14} />
                   </button>
-                  <button style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                  <button onClick={() => handleDeleteUser(u.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }} title="Delete User">
                     <Trash2 size={14} />
                   </button>
                 </td>
@@ -231,25 +334,81 @@ export const RolePermissionsView = () => {
 // 3. BRANCH MANAGEMENT VIEW
 // ============================================================================
 export const BranchManagementView = () => {
-  const branches = [
+  const [isAddBranchOpen, setIsAddBranchOpen] = useState(false);
+  const [newBranch, setNewBranch] = useState({ city: '', hubName: '', vehicles: '10', drivers: '8', manager: '' });
+
+  const [branches, setBranches] = useState([
     { city: 'Hyderabad', hubName: 'Central Logistics Hub (HQ)', vehicles: 48, drivers: 42, activeTrips: 18, manager: 'Alexander Mercer', share: '35%' },
     { city: 'Bengaluru', hubName: 'South Freight Distribution Center', vehicles: 36, drivers: 32, activeTrips: 14, manager: 'Vikram Malhotra', share: '30%' },
     { city: 'Chennai', hubName: 'Maritime Port Container Terminal', vehicles: 24, drivers: 20, activeTrips: 8, manager: 'Prakash Rao', share: '20%' },
     { city: 'Mumbai', hubName: 'Western Gateway Hub', vehicles: 12, drivers: 10, activeTrips: 4, manager: 'Sarah Jenkins', share: '10%' },
     { city: 'Delhi NCR', hubName: 'Northern Terminal Logistics Depot', vehicles: 8, drivers: 6, activeTrips: 3, manager: 'Karan Mehra', share: '5%' }
-  ];
+  ]);
+
+  const handleAddBranch = (e) => {
+    e.preventDefault();
+    if (!newBranch.city || !newBranch.hubName) return;
+    const created = {
+      city: newBranch.city,
+      hubName: newBranch.hubName,
+      vehicles: Number(newBranch.vehicles) || 10,
+      drivers: Number(newBranch.drivers) || 8,
+      activeTrips: 0,
+      manager: newBranch.manager || 'Regional Supervisor',
+      share: '5%'
+    };
+    setBranches([...branches, created]);
+    setIsAddBranchOpen(false);
+    setNewBranch({ city: '', hubName: '', vehicles: '10', drivers: '8', manager: '' });
+  };
 
   return (
     <div className="module-container">
       <div className="module-header-row">
         <div>
           <h2 className="module-title">Branch & Regional Hub Distribution</h2>
-          <p className="module-desc">Overview of 12 nationwide distribution depots, vehicle allocations and branch regional performance.</p>
+          <p className="module-desc">Overview of nationwide distribution depots, vehicle allocations and branch regional performance.</p>
         </div>
-        <button className="btn-primary">
+        <button className="btn-primary" onClick={() => setIsAddBranchOpen(true)}>
           <PlusCircle size={15} /> Add New Regional Branch
         </button>
       </div>
+
+      {isAddBranchOpen && (
+        <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+          <div className="modal-card" style={{ maxWidth: '440px', width: '90%', padding: '24px', background: '#131929', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ margin: '0 0 16px 0', color: '#fff', fontSize: '18px' }}>Register New Regional Hub</h3>
+            <form onSubmit={handleAddBranch} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>City</label>
+                <input required className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newBranch.city} onChange={e => setNewBranch({ ...newBranch, city: e.target.value })} placeholder="e.g. Pune, Kolkata" />
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Hub Name</label>
+                <input required className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newBranch.hubName} onChange={e => setNewBranch({ ...newBranch, hubName: e.target.value })} placeholder="e.g. Western Corridor Depot" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '12px', color: '#94a3b8' }}>Allocated Vehicles</label>
+                  <input type="number" className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newBranch.vehicles} onChange={e => setNewBranch({ ...newBranch, vehicles: e.target.value })} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '12px', color: '#94a3b8' }}>Assigned Drivers</label>
+                  <input type="number" className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newBranch.drivers} onChange={e => setNewBranch({ ...newBranch, drivers: e.target.value })} />
+                </div>
+              </div>
+              <div>
+                <label style={{ fontSize: '12px', color: '#94a3b8' }}>Hub Station Manager</label>
+                <input className="table-search-input" style={{ width: '100%', marginTop: '4px' }} value={newBranch.manager} onChange={e => setNewBranch({ ...newBranch, manager: e.target.value })} placeholder="Manager Name" />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                <button type="button" onClick={() => setIsAddBranchOpen(false)} style={{ padding: '8px 14px', background: 'transparent', border: '1px solid #334155', color: '#94a3b8', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" className="btn-primary" style={{ padding: '8px 16px' }}>Save Branch</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px' }}>
         {branches.map(b => (
