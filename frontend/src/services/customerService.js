@@ -3,6 +3,8 @@
 // Seamlessly integrated with logisticsService (localStorage: ttc_logistics360_data_v1)
 
 import { logisticsService } from './logisticsService';
+import { workflowService } from './workflowService';
+import { billingService } from './billingService';
 
 const CUSTOMER_STORAGE_KEY = 'ttc_customer360_data_v1';
 
@@ -386,6 +388,26 @@ class CustomerService {
     // Save directly to shared logisticsService!
     const newOrder = logisticsService.addOrder(orderPayload);
 
+    // Sync to centralized workflowService
+    try {
+      workflowService.createOrder({
+        orderId: newOrder.id,
+        customerId: this.data.profile.id,
+        customerName: this.data.profile.companyName,
+        customerContact: this.data.profile.phone,
+        pickupAddress: newOrder.pickupLocation,
+        deliveryAddress: newOrder.deliveryLocation,
+        pickupDate: newOrder.orderDate,
+        expectedDeliveryDate: newOrder.expectedDelivery,
+        goodsCategory: newOrder.type,
+        goodsDescription: newOrder.description,
+        packageQuantity: newOrder.itemsCount,
+        weightKg: newOrder.totalWeightKg,
+        specialInstructions: newOrder.specialInstructions,
+        amount: newOrder.amount
+      });
+    } catch (_) {}
+
     // Also generate a draft invoice for this order
     const newInvoice = {
       id: `INV-2026-${Math.floor(8900 + Math.random() * 999)}`,
@@ -489,6 +511,20 @@ class CustomerService {
       payments: [newPayment, ...this.data.payments],
       notifications: [paymentNotif, ...this.data.notifications]
     });
+
+    // Sync to centralized workflowService & billingService
+    try {
+      workflowService.payInvoice(invoiceId, paymentDetails.method || 'Corporate ACH Direct', this.data.profile.name);
+      billingService.recordPayment({
+        invoiceId,
+        customerName: this.data.profile.companyName,
+        amount: paymentAmount,
+        method: paymentDetails.method || 'Corporate ACH Direct',
+        date: new Date().toISOString().split('T')[0],
+        status: 'Completed',
+        notes: `Customer settled invoice ${invoiceId}`
+      });
+    } catch (_) {}
 
     return newPayment;
   }

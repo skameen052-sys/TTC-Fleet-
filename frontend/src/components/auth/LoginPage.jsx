@@ -30,6 +30,7 @@ export const LoginPage = ({ onLoginSuccess, initialPortal = 'admin' }) => {
     if (initialPortal === 'warehouse') return 'ethan.cole@fleet360.ttc.com';
     if (initialPortal === 'logistics') return 'elena.rostova@fleet360.ttc.com';
     if (initialPortal === 'customer') return 'customer@ttcfleet360.com';
+    if (initialPortal === 'billing') return 'finance@ttcfleet360.com';
     return 'admin@ttcfleet360.com';
   });
   const [password, setPassword] = useState('password123');

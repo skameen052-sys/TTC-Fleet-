@@ -1,6 +1,8 @@
 // frontend/src/services/logisticsService.js
 // Enterprise Transportation & Logistics Management Service for TTC Fleet360
 
+import { workflowService } from './workflowService';
+
 const STORAGE_KEY = 'ttc_logistics360_data_v1';
 
 const INITIAL_LOGISTICS_DATA = {
@@ -899,6 +901,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
     return newOrder;
   }
 
@@ -922,6 +929,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
   }
 
   // Shipment Actions
@@ -951,6 +963,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
     return newShipment;
   }
 
@@ -993,6 +1010,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
     return newTrip;
   }
 
@@ -1026,6 +1048,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
   }
 
   confirmPickup(pickupId, notes) {
@@ -1050,6 +1077,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
   }
 
   confirmDelivery(deliveryId, proofData) {
@@ -1085,6 +1117,11 @@ class LogisticsService {
       ]
     };
     this.saveData(updated);
+
+    // Sync to centralized workflowService
+    try {
+      workflowService.updateOrderStatus(orderId, newStatus, this.data.manager?.name || 'Elena Rostova');
+    } catch (_) {}
   }
 
   markNotificationRead(notifId) {

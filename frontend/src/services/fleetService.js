@@ -1,4 +1,5 @@
 import { initialFleetData } from '../data/initialFleetData';
+import { workflowService } from './workflowService';
 
 const STORAGE_KEY = 'ttc_fleet360_data_v1';
 
@@ -222,6 +223,20 @@ class FleetService {
     }
 
     this.saveData();
+
+    // Sync to centralized workflowService
+    try {
+      const pendingAlloc = workflowService.getState().allocations?.find(a => a.status === 'Pending');
+      const reqId = pendingAlloc ? pendingAlloc.requestId : 'REQ-3019';
+      workflowService.confirmAllocation(reqId, {
+        vehicleReg: vehicle.regNumber,
+        driverId: driver.id,
+        driverName: driver.fullName,
+        driverPhone: driver.phone,
+        actor: 'Vikram Malhotra'
+      });
+    } catch (_) {}
+
     return newAssignment;
   }
 
@@ -535,6 +550,13 @@ class FleetService {
         portal.metrics.pendingDeliveries = 0;
       }
       this.saveData();
+
+      // Sync to centralized workflowService
+      try {
+        const activeWfTrip = workflowService.getState().trips?.[0];
+        const wfTripId = activeWfTrip ? activeWfTrip.tripId : 'TRP-4501';
+        workflowService.updateTripStatus(wfTripId, trip.status, 'Marcus Vance', `Stage advanced to ${trip.status}`);
+      } catch (_) {}
     }
     return trip;
   }
@@ -568,6 +590,19 @@ class FleetService {
     trip.currentStageIndex = 7;
     trip.status = 'Goods Delivered';
     this.saveData();
+
+    // Sync to centralized workflowService & complete trip + submit POD
+    try {
+      const activeWfTrip = workflowService.getState().trips?.[0];
+      const wfTripId = activeWfTrip ? activeWfTrip.tripId : 'TRP-4501';
+      workflowService.submitPod(wfTripId, {
+        receiverName: receiverSignature || 'Arthur Vance (Authorized Receiving Lead)',
+        signatureSvg: 'data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=',
+        photoUrl: podPhoto || '/assets/fleet-manager-trucks.jpg',
+        actor: 'Marcus Vance'
+      });
+    } catch (_) {}
+
     return trip;
   }
 

@@ -61,7 +61,8 @@ public class SecurityConfig {
                                 "/api/maintenance/**",
                                 "/api/assignments/**",
                                 "/api/inspections/**",
-                                "/api/documents/**"
+                                "/api/documents/**",
+                                "/api/workflow/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 );

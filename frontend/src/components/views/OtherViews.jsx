@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { workflowService } from '../../services/workflowService';
 import {
   Truck,
   PlusCircle,
@@ -213,52 +214,135 @@ export const VehicleCategoriesView = ({ vehicles = [] }) => {
 };
 
 // 4. Vehicle Allocation View
-export const VehicleAllocationView = ({ vehicles = [], assignments = [], onAssignVehicle }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-    <div className="content-card">
-      <div className="section-header">
-        <div>
-          <h2 className="section-title">
-            <span>Vehicle Allocation & Dispatch Board</span>
-          </h2>
-          <p className="section-subtitle">Active freight corridor allocations, schedules and return expectations</p>
+export const VehicleAllocationView = ({ vehicles = [], assignments = [], onAssignVehicle }) => {
+  const [wfState, setWfState] = useState(() => workflowService.getState());
+
+  useEffect(() => {
+    return workflowService.subscribe((newState) => setWfState(newState));
+  }, []);
+
+  const pendingAllocations = wfState.allocations?.filter(a => a.status === 'Pending') || [];
+
+  const handleQuickConfirm = (req) => {
+    const availableVehicle = vehicles.find(v => v.status === 'Available') || { regNumber: 'TTC-8492-HD' };
+    workflowService.confirmAllocation(req.requestId, {
+      vehicleReg: availableVehicle.regNumber,
+      driverId: 'D-01',
+      driverName: 'Marcus Vance',
+      driverPhone: '+1 (555) 019-2834',
+      actor: 'Vikram Malhotra'
+    });
+    if (onAssignVehicle) {
+      onAssignVehicle({
+        vehicleReg: availableVehicle.regNumber,
+        driverId: 'D-01',
+        routeName: req.route,
+        expectedReturn: 'Tomorrow 18:00'
+      });
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Pending Allocation Requests Inbox */}
+      <div className="content-card" style={{ border: pendingAllocations.length > 0 ? '1px solid #fed7aa' : '1px solid #e2e8f0', backgroundColor: pendingAllocations.length > 0 ? '#fffaf5' : '#ffffff' }}>
+        <div className="section-header">
+          <div>
+            <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', backgroundColor: pendingAllocations.length > 0 ? '#ea580c' : '#16a34a' }} />
+              <span>Pending Allocation Requests (from Logistics Control)</span>
+              {pendingAllocations.length > 0 && (
+                <span style={{ fontSize: '12px', fontWeight: 700, backgroundColor: '#ea580c', color: '#ffffff', padding: '2px 8px', borderRadius: 12 }}>
+                  {pendingAllocations.length} Pending
+                </span>
+              )}
+            </h2>
+            <p className="section-subtitle">
+              Customer orders authorized by Logistics Manager requiring commercial asset and CDL driver assignment
+            </p>
+          </div>
         </div>
-        <button className="btn btn-primary" onClick={onAssignVehicle}>
-          <PlusCircle size={15} /> Allocate Vehicle
-        </button>
+
+        {pendingAllocations.length === 0 ? (
+          <div style={{ padding: '20px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>
+            <CheckCircle2 size={24} color="#16a34a" style={{ margin: '0 auto 6px' }} />
+            <div>All allocation requests fulfilled. Fleet resources currently balanced.</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {pendingAllocations.map(req => (
+              <div key={req.requestId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: 8, border: '1px solid #fed7aa', backgroundColor: '#ffffff' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontWeight: 800, color: '#c2410c', fontSize: '13.5px' }}>{req.requestId}</span>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>Shipment: <strong>{req.shipmentId}</strong> | Order: <strong>{req.orderId}</strong></span>
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#1e293b' }}>
+                    {req.route}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b', marginTop: 2 }}>
+                    Asset Type: <strong style={{ color: '#0f172a' }}>{req.requestedVehicleType}</strong> &bull; Capacity: <strong style={{ color: '#0f172a' }}>{req.requiredCapacityKg} kg</strong>
+                  </div>
+                </div>
+                <button
+                  className="btn btn-primary"
+                  style={{ backgroundColor: '#ea580c', borderColor: '#ea580c', padding: '8px 16px', fontSize: '12.5px', fontWeight: 700 }}
+                  onClick={() => handleQuickConfirm(req)}
+                >
+                  <UserCheck size={14} /> Allocate Vehicle & Driver
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="table-responsive">
-        <table className="enterprise-table">
-          <thead>
-            <tr>
-              <th>Allocation ID</th>
-              <th>Vehicle Asset</th>
-              <th>Assigned Operator</th>
-              <th>Route Corridor</th>
-              <th>Assigned Date</th>
-              <th>Expected Return</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {assignments.map(asg => (
-              <tr key={asg.id}>
-                <td style={{ fontWeight: '700', color: '#2563eb' }}>{asg.id}</td>
-                <td style={{ fontWeight: '700', color: '#0f172a' }}>{asg.vehicleReg}</td>
-                <td style={{ fontWeight: '600', color: '#1e293b' }}>{asg.driverName}</td>
-                <td>{asg.routeName}</td>
-                <td style={{ fontSize: '12px', color: '#64748b' }}>{asg.assignedDate}</td>
-                <td style={{ fontSize: '12px', color: '#64748b' }}>{asg.expectedReturn}</td>
-                <td><span className="status-pill status-ontrip">{asg.status}</span></td>
+      {/* Active Vehicle Allocation Board */}
+      <div className="content-card">
+        <div className="section-header">
+          <div>
+            <h2 className="section-title">
+              <span>Vehicle Allocation & Dispatch Board</span>
+            </h2>
+            <p className="section-subtitle">Active freight corridor allocations, schedules and return expectations</p>
+          </div>
+          <button className="btn btn-primary" onClick={onAssignVehicle}>
+            <PlusCircle size={15} /> Allocate Vehicle
+          </button>
+        </div>
+
+        <div className="table-responsive">
+          <table className="enterprise-table">
+            <thead>
+              <tr>
+                <th>Allocation ID</th>
+                <th>Vehicle Asset</th>
+                <th>Assigned Operator</th>
+                <th>Route Corridor</th>
+                <th>Assigned Date</th>
+                <th>Expected Return</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {assignments.map(asg => (
+                <tr key={asg.id}>
+                  <td style={{ fontWeight: '700', color: '#2563eb' }}>{asg.id}</td>
+                  <td style={{ fontWeight: '700', color: '#0f172a' }}>{asg.vehicleReg}</td>
+                  <td style={{ fontWeight: '600', color: '#1e293b' }}>{asg.driverName}</td>
+                  <td>{asg.routeName}</td>
+                  <td style={{ fontSize: '12px', color: '#64748b' }}>{asg.assignedDate}</td>
+                  <td style={{ fontSize: '12px', color: '#64748b' }}>{asg.expectedReturn}</td>
+                  <td><span className="status-pill status-ontrip">{asg.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 // 5. Vehicle Availability View
 export const VehicleAvailabilityView = ({ vehicles = [], onAssignVehicle }) => {

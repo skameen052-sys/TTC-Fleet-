@@ -35,6 +35,7 @@ target/
 .DS_Store
 Thumbs.db
 *.log
+scratch/chrome_profile/
 
 # Environment variables
 .env

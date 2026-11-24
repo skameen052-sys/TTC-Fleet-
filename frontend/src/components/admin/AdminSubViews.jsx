@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { workflowService } from '../../services/workflowService';
 import {
   Users,
   ShieldCheck,
@@ -348,12 +349,17 @@ export const SubscriptionManagementView = () => {
 // 5. AUDIT LOGS & SETTINGS VIEWS
 // ============================================================================
 export const AuditLogsView = () => {
-  const logs = [
-    { time: '17:04:12', user: 'admin@ttcfleet360.com', action: 'ADMIN_SESSION_START', ip: '192.168.1.104', status: 'SUCCESS' },
-    { time: '16:58:30', user: 'manager@ttcfleet360.com', action: 'DISPATCH_VEHICLE_TTC-8492', ip: '192.168.1.118', status: 'SUCCESS' },
-    { time: '16:42:15', user: 'm.vance@fleet360.ttc.com', action: 'DRIVER_CONFIRM_PICKUP', ip: '10.0.4.52', status: 'SUCCESS' },
-    { time: '16:15:00', user: 'system_scheduler', action: 'GPS_TELEMETRY_SYNC', ip: 'internal', status: 'SUCCESS' },
-    { time: '15:30:22', user: 'alexander.m', action: 'UPDATE_BRANCH_CONFIG', ip: '192.168.1.104', status: 'SUCCESS' }
+  const [wfLogs, setWfLogs] = useState(() => workflowService.getState().auditLogs || []);
+
+  useEffect(() => {
+    return workflowService.subscribe((state) => {
+      if (state.auditLogs) setWfLogs(state.auditLogs);
+    });
+  }, []);
+
+  const displayLogs = wfLogs.length > 0 ? wfLogs : [
+    { timestamp: '17:04:12', actorUsername: 'admin@ttcfleet360.com', action: 'ADMIN_SESSION_START', details: 'Session authenticated', entityType: 'SYSTEM' },
+    { timestamp: '16:58:30', actorUsername: 'manager@ttcfleet360.com', action: 'DISPATCH_VEHICLE_TTC-8492', details: 'Assigned driver Marcus Vance', entityType: 'ALLOCATION' }
   ];
 
   return (
@@ -361,7 +367,7 @@ export const AuditLogsView = () => {
       <div className="module-header-row">
         <div>
           <h2 className="module-title">Security & System Audit Trail</h2>
-          <p className="module-desc">Immutable audit logs recording authentication events, dispatch authorizations, and system changes.</p>
+          <p className="module-desc">Immutable audit logs recording real-time operations across Customer, Logistics, Fleet, Driver, Warehouse, and Finance portals.</p>
         </div>
       </div>
 
@@ -370,20 +376,22 @@ export const AuditLogsView = () => {
           <thead>
             <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8' }}>
               <th style={{ padding: '12px 18px' }}>Timestamp</th>
-              <th style={{ padding: '12px 18px' }}>Principal User</th>
+              <th style={{ padding: '12px 18px' }}>Actor Principal</th>
+              <th style={{ padding: '12px 18px' }}>Role</th>
               <th style={{ padding: '12px 18px' }}>Action Logged</th>
-              <th style={{ padding: '12px 18px' }}>IP / Source</th>
-              <th style={{ padding: '12px 18px' }}>Result</th>
+              <th style={{ padding: '12px 18px' }}>Entity</th>
+              <th style={{ padding: '12px 18px' }}>Operational Details</th>
             </tr>
           </thead>
           <tbody>
-            {logs.map((l, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                <td style={{ padding: '12px 18px', color: '#94a3b8' }}>{l.time}</td>
-                <td style={{ padding: '12px 18px', color: '#fff', fontWeight: 600 }}>{l.user}</td>
-                <td style={{ padding: '12px 18px', color: '#FF9E4A', fontFamily: 'monospace' }}>{l.action}</td>
-                <td style={{ padding: '12px 18px', color: '#cbd5e1' }}>{l.ip}</td>
-                <td style={{ padding: '12px 18px', color: '#10b981', fontWeight: 700 }}>{l.status}</td>
+            {displayLogs.map((l, i) => (
+              <tr key={l.id || i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <td style={{ padding: '12px 18px', color: '#94a3b8', whiteSpace: 'nowrap' }}>{l.timestamp || l.time}</td>
+                <td style={{ padding: '12px 18px', color: '#fff', fontWeight: 600 }}>{l.actorUsername || l.user}</td>
+                <td style={{ padding: '12px 18px', color: '#94a3b8', textTransform: 'uppercase', fontSize: '11px', fontWeight: 700 }}>{l.actorRole || 'SYSTEM'}</td>
+                <td style={{ padding: '12px 18px', color: '#FF9E4A', fontFamily: 'monospace', fontWeight: 600 }}>{l.action}</td>
+                <td style={{ padding: '12px 18px', color: '#38bdf8' }}>{l.entityType || 'SYSTEM'}</td>
+                <td style={{ padding: '12px 18px', color: '#cbd5e1', fontSize: '12.5px' }}>{l.details || 'Completed successfully'}</td>
               </tr>
             ))}
           </tbody>
