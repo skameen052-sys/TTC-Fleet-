@@ -33,7 +33,7 @@ export const MaintenanceOverview = ({ maintenanceData, onOpenScheduleModal }) =>
       </div>
 
       {/* 5 Maintenance KPI Badges */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))', gap: 10, marginBottom: 20 }}>
         <div style={{ padding: '10px 12px', backgroundColor: '#fef3c7', borderRadius: '8px', border: '1px solid #fde68a' }}>
           <div style={{ fontSize: '11px', color: '#b45309', fontWeight: '600' }}>Due for Service</div>
           <div style={{ fontSize: '20px', fontWeight: '800', color: '#92400e', marginTop: 2 }}>{dueForServiceCount}</div>
@@ -68,7 +68,7 @@ export const MaintenanceOverview = ({ maintenanceData, onOpenScheduleModal }) =>
       </div>
 
       {/* Grid: Active Work Orders + Expiring Vehicle Documents */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
         {/* Active & Scheduled Work Orders */}
         <div>
           <div style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>

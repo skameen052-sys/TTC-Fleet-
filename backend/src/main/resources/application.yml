@@ -56,6 +56,17 @@ aws:
     access-key: ${AWS_ACCESS_KEY_ID:AKIA_SIMULATED_FLEET360}
     secret-key: ${AWS_SECRET_ACCESS_KEY:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY}
 
+# Cashfree Payment Gateway (Customer Portal payments)
+# Get sandbox keys from https://merchant.cashfree.com -> Developers -> API Keys (Test mode).
+# Never commit real keys: set them as environment variables.
+cashfree:
+  client-id: ${CASHFREE_CLIENT_ID:}
+  client-secret: ${CASHFREE_CLIENT_SECRET:}
+  environment: ${CASHFREE_ENV:sandbox}          # sandbox | production
+  api-version: ${CASHFREE_API_VERSION:2025-01-01}
+  return-url: ${CASHFREE_RETURN_URL:http://localhost:3000/}
+  notify-url: ${CASHFREE_NOTIFY_URL:}           # public URL of /api/payments/cashfree/webhook
+
 # OpenAPI / Swagger
 springdoc:
   api-docs:

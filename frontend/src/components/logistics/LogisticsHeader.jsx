@@ -16,6 +16,7 @@ import {
   User,
   PackageCheck
 } from 'lucide-react';
+import GlobalSearchDropdown from '../common/GlobalSearchDropdown';
 
 export const LogisticsHeader = ({
   activeTabTitle = 'Logistics Manager Dashboard',
@@ -23,6 +24,8 @@ export const LogisticsHeader = ({
   notifications = [],
   searchQuery,
   onSearchChange,
+  searchResults,
+  onSearchSelect,
   onSelectTab,
   onLogout,
   onSwitchPortal
@@ -124,8 +127,10 @@ export const LogisticsHeader = ({
             placeholder="Search orders, shipments..."
             value={searchQuery || ''}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && searchResults && searchResults[0] && onSearchSelect) onSearchSelect(searchResults[0]); if (e.key === 'Escape' && onSearchChange) onSearchChange(''); }}
             style={{ fontSize: '12px' }}
           />
+          <GlobalSearchDropdown query={searchQuery} results={searchResults} onSelect={onSearchSelect} />
           <kbd className="header-search-kbd">/</kbd>
         </div>
 

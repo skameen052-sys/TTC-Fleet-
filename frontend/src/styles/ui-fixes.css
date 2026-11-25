@@ -1,0 +1,119 @@
+/* ==========================================================================
+   UI alignment fixes (review notes, 25 Nov 2026). Loaded last in main.jsx.
+   ========================================================================== */
+
+/* ---------- 1. Top headers: page title must never be covered ----------
+   On 1366px screens the right side (portal switcher, telemetry pill, search,
+   date, bell, profile) was wider than the space left, so it slid over the
+   page title ("Vehicle Categories", "Pending Orders"). The title column now
+   keeps its width and the optional pills hide on narrower screens. */
+.fleet-header {
+  gap: 16px;
+}
+.fleet-header .header-left-col {
+  flex-shrink: 0 !important;
+  min-width: max-content !important;
+  overflow: visible !important;
+}
+.fleet-header .header-right-col,
+.fleet-header > div:last-child {
+  min-width: 0;
+}
+.fleet-header .header-search-wrapper {
+  min-width: 150px;
+}
+@media (max-width: 1520px) {
+  .fleet-header .driver-trip-telemetry-pill {
+    display: none !important;
+  }
+}
+@media (max-width: 1180px) {
+  .fleet-header .header-datetime-pill {
+    display: none !important;
+  }
+}
+
+/* ---------- 2. Logistics order table: Actions always visible ---------- */
+.logistics-orders-table th:last-child,
+.logistics-orders-table td:last-child {
+  position: sticky;
+  right: 0;
+  z-index: 1;
+  background: #FFFFFF;
+  box-shadow: -8px 0 12px -10px rgba(15, 23, 42, 0.25);
+}
+.logistics-orders-table thead th:last-child {
+  background: #F8FAFC;
+}
+
+/* ---------- 3. Fleet Manager dashboard grids: no overflow ---------- */
+.dashboard-grid-2col {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.dashboard-grid-2col > * {
+  min-width: 0;
+}
+@media (max-width: 1024px) {
+  .dashboard-grid-2col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- 4. Search box inside Live Fleet Tracking ---------- */
+.global-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.global-search-container .search-icon-left {
+  position: absolute;
+  left: 12px;
+  color: #94A3B8;
+  pointer-events: none;
+}
+.global-search-container .search-input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  background: #F8FAFC;
+  color: #1E293B;
+  outline: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+.global-search-container .search-input:focus {
+  border-color: #FF7A1A;
+  background: #FFFFFF;
+}
+
+/* ---------- 5. Driver & Fleet KPI cards (light theme) ---------- */
+.driver-kpi-grid .kpi-stat-card,
+.summary-cards-grid .kpi-stat-card {
+  min-width: 0;
+}
+.driver-kpi-grid .kpi-card-info {
+  min-width: 0;
+}
+.driver-kpi-grid .kpi-card-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 6. Fleet dashboard section headers: wrap instead of squeezing ---------- */
+.dashboard-grid-2col .section-header {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.dashboard-grid-2col .section-header > div:first-child {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.dashboard-grid-2col .section-header .btn {
+  white-space: nowrap;
+}
+.dashboard-grid-2col .table-responsive {
+  overflow-x: auto;
+}

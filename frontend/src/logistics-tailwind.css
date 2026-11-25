@@ -1,0 +1,13 @@
+/* Tailwind utilities for the Logistics Manager portal only (see tailwind.config.js). */
+/* With preflight disabled, `base` only adds Tailwind's CSS variables (needed for gradients, shadows, rings). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Minimal resets that Tailwind's preflight would normally provide, limited to Logistics pages */
+.logistics-tw *, .logistics-tw *::before, .logistics-tw *::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
+.logistics-tw button { background: transparent; cursor: pointer; font: inherit; color: inherit; }
+.logistics-tw input, .logistics-tw select, .logistics-tw textarea { font: inherit; color: inherit; }
+.logistics-tw h1, .logistics-tw h2, .logistics-tw h3, .logistics-tw h4, .logistics-tw p { margin: 0; }
+.logistics-tw table { border-collapse: collapse; }
+.logistics-tw svg { display: inline-block; vertical-align: middle; }

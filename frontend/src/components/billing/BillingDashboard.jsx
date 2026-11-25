@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { searchRecords } from '../../utils/globalSearch';
 import { BillingSidebar } from './BillingSidebar';
 import { BillingHeader } from './BillingHeader';
 import {
@@ -268,6 +269,14 @@ export const BillingDashboard = ({
         {/* Fixed Header */}
         <BillingHeader
           searchQuery={searchQuery}
+          searchResults={searchRecords(searchQuery, [
+            { label: 'Invoice', tab: 'invoice-management', rows: data?.invoices },
+            { label: 'Payment', tab: 'customer-payments', rows: data?.payments },
+            { label: 'Refund', tab: 'refund-management', rows: data?.refunds },
+            { label: 'Bill', tab: 'billing-management', rows: data?.bills },
+            { label: 'Expense', tab: 'expense-management', rows: data?.expenses }
+          ])}
+          onSearchSelect={(r) => { setActiveTab(r.tab); setSearchQuery(''); }}
           onSearchChange={setSearchQuery}
           currentUser={currentUser}
           onLogout={onLogout}

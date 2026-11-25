@@ -611,9 +611,10 @@ export const OrderManagementView = ({
       >
         <div style={{ overflowX: 'auto', width: '100%' }}>
           <table
+            className="logistics-orders-table"
             style={{
               width: '100%',
-              minWidth: '1000px',
+              minWidth: '960px',
               tableLayout: 'fixed',
               borderCollapse: 'separate',
               borderSpacing: 0,
@@ -622,15 +623,15 @@ export const OrderManagementView = ({
             }}
           >
             <colgroup>
-              <col style={{ width: '125px' }} /> {/* Order ID & Date */}
-              <col style={{ width: '160px' }} /> {/* Customer */}
-              <col style={{ width: '180px' }} /> {/* Origin / Pickup */}
-              <col style={{ width: '180px' }} /> {/* Destination */}
-              <col style={{ width: '110px' }} /> {/* Freight Specs */}
-              <col style={{ width: '90px' }} />  {/* Priority */}
-              <col style={{ width: '100px' }} /> {/* Amount */}
-              <col style={{ width: '100px' }} /> {/* Status */}
-              <col style={{ width: '115px' }} /> {/* Actions */}
+              <col style={{ width: '112px' }} /> {/* Order ID & Date */}
+              <col style={{ width: '145px' }} /> {/* Customer */}
+              <col style={{ width: '145px' }} /> {/* Origin / Pickup */}
+              <col style={{ width: '145px' }} /> {/* Destination */}
+              <col style={{ width: '100px' }} /> {/* Freight Specs */}
+              <col style={{ width: '84px' }} />  {/* Priority */}
+              <col style={{ width: '96px' }} /> {/* Amount */}
+              <col style={{ width: '104px' }} /> {/* Status */}
+              <col style={{ width: '118px' }} /> {/* Actions */}
             </colgroup>
             <thead>
               <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1.5px solid #E2E8F0' }}>
