@@ -139,6 +139,7 @@ import { BillingLoginPage } from './components/auth/BillingLoginPage';
 import { billingService } from './services/billingService';
 import { workflowService } from './services/workflowService';
 
+import { searchRecords } from './utils/globalSearch';
 import { fleetService } from './services/fleetService';
 import { CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -374,6 +375,43 @@ export default function App() {
     };
   }, []);
 
+  // ---------------- Global header search (all portals) ----------------
+  const fleetSearchResults = searchRecords(searchQuery, [
+    { label: 'Vehicle', tab: 'vehicles', rows: fleetState?.vehicles },
+    { label: 'Driver', tab: 'driver-assignment', rows: fleetState?.drivers },
+    { label: 'Assignment', tab: 'allocation', rows: fleetState?.assignments },
+    { label: 'Inspection', tab: 'inspection', rows: fleetState?.inspections }
+  ]);
+  const warehouseSearchResults = searchRecords(searchQuery, [
+    { label: 'Inventory', tab: 'all-inventory', rows: warehouseData?.inventory },
+    { label: 'Warehouse', tab: 'all-warehouses', rows: warehouseData?.warehouses },
+    { label: 'Incoming', tab: 'incoming-goods', rows: warehouseData?.incomingGoods },
+    { label: 'Outgoing', tab: 'outgoing-goods', rows: warehouseData?.outgoingGoods },
+    { label: 'Transfer', tab: 'stock-transfers', rows: warehouseData?.stockTransfers }
+  ]);
+  const logisticsSearchResults = searchRecords(searchQuery, [
+    { label: 'Order', tab: 'all-orders', rows: logisticsData?.orders },
+    { label: 'Shipment', tab: 'all-shipments', rows: logisticsData?.shipments },
+    { label: 'Trip', tab: 'all-trips', rows: logisticsData?.trips },
+    { label: 'Vehicle', tab: 'available-vehicles', rows: logisticsData?.vehicles },
+    { label: 'Driver', tab: 'available-drivers', rows: logisticsData?.drivers },
+    { label: 'Route', tab: 'route-planning', rows: logisticsData?.routes },
+    { label: 'Request', tab: 'customer-requests', rows: logisticsData?.customerRequests }
+  ]);
+  const customerSearchResults = searchRecords(searchQuery, [
+    { label: 'Order', tab: 'orders', rows: customerData?.orders },
+    { label: 'Shipment', tab: 'shipments', rows: customerData?.shipments },
+    { label: 'Invoice', tab: 'billing', rows: customerData?.invoices },
+    { label: 'Payment', tab: 'payments', rows: customerData?.payments },
+    { label: 'Refund', tab: 'refunds', rows: customerData?.refunds },
+    { label: 'Ticket', tab: 'support', rows: customerData?.tickets }
+  ]);
+  const openSearchResult = (setTab) => (result) => {
+    setTab(result.tab);
+    setSearchQuery('');
+    showToast(`Opened ${result.label.toLowerCase()} ${result.title}`);
+  };
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -514,10 +552,10 @@ export default function App() {
   };
 
   const handleReportDriverIssue = (issueData) => {
-    const issue = fleetService.reportDriverIssue(issueData);
-    setDriverPortalData(fleetService.getDriverPortalData());
+    const ticket = fleetService.reportDriverIssue(issueData);
+    setDriverPortalData({ ...fleetService.getDriverPortalData() });
     setFleetState(fleetService.loadData());
-    showToast(`Vehicle inspection defect logged: ${issue.title} (Severity: ${issue.severity}).`);
+    showToast(`Ticket ${ticket.id} submitted: ${ticket.title} (${ticket.severity} severity). Maintenance team notified.`);
   };
 
   // Warehouse Manager Actions
@@ -738,6 +776,8 @@ export default function App() {
               onSwitchPortal={(p) => setPortal(p)}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              searchResults={warehouseSearchResults}
+              onSearchSelect={openSearchResult(setWarehouseActiveTab)}
             />
 
             {/* Dynamic Warehouse Page Views */}
@@ -985,6 +1025,8 @@ export default function App() {
               onSwitchPortal={(p) => setPortal(p)}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              searchResults={logisticsSearchResults}
+              onSearchSelect={openSearchResult(setLogisticsActiveTab)}
             />
 
             {/* Dynamic Logistics Page Views (sub-pages use scoped Tailwind: .logistics-tw) */}
@@ -1220,6 +1262,8 @@ export default function App() {
               activeTabTitle={customerPageTitle}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              searchResults={customerSearchResults}
+              onSearchSelect={openSearchResult(setCustomerActiveTab)}
               notifications={customerData.notifications || []}
               onMarkNotificationRead={(id) => {
                 customerService.markNotificationRead(id);
@@ -1566,6 +1610,7 @@ export default function App() {
               {driverActiveTab === 'my-vehicle' && (
                 <MyVehicleView
                   vehicle={driverPortalData.vehicle}
+                  tickets={driverPortalData.issueTickets || []}
                   onReportIssue={() => setIsDriverIssueOpen(true)}
                 />
               )}
@@ -1623,6 +1668,9 @@ export default function App() {
               {driverActiveTab === 'notifications' && (
                 <DriverNotificationsView
                   notifications={driverPortalData.driverNotifications}
+                  onMarkRead={(id) => { fleetService.markDriverNotificationRead(id); setDriverPortalData({ ...fleetService.getDriverPortalData() }); }}
+                  onMarkAllRead={() => { fleetService.markAllDriverNotificationsRead(); setDriverPortalData({ ...fleetService.getDriverPortalData() }); showToast('All notifications marked as read.'); }}
+                  onDismiss={(id) => { fleetService.dismissDriverNotification(id); setDriverPortalData({ ...fleetService.getDriverPortalData() }); }}
                 />
               )}
 
@@ -1701,6 +1749,8 @@ export default function App() {
             pageTitle={managerPageTitle}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            searchResults={fleetSearchResults}
+            onSearchSelect={openSearchResult(setActiveTab)}
             notifications={notifications}
             onMarkNotificationRead={handleMarkNotificationRead}
             onMarkAllNotificationsRead={handleMarkAllNotificationsRead}

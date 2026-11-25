@@ -16,11 +16,14 @@ import {
   Wrench,
   Package
 } from 'lucide-react';
+import GlobalSearchDropdown from './GlobalSearchDropdown';
 
 export const Header = ({
   pageTitle = 'Fleet Manager Dashboard',
   searchQuery,
   onSearchChange,
+  searchResults,
+  onSearchSelect,
   notifications = [],
   onMarkNotificationRead,
   onMarkAllNotificationsRead,
@@ -131,7 +134,9 @@ export const Header = ({
             placeholder="Search vehicles, drivers, trips..."
             value={searchQuery || ''}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && searchResults && searchResults[0] && onSearchSelect) onSearchSelect(searchResults[0]); if (e.key === 'Escape' && onSearchChange) onSearchChange(''); }}
           />
+          <GlobalSearchDropdown query={searchQuery} results={searchResults} onSelect={onSearchSelect} />
           <kbd className="header-search-kbd">/</kbd>
         </div>
 

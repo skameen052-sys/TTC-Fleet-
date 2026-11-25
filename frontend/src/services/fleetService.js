@@ -643,19 +643,51 @@ class FleetService {
     return newRecord;
   }
 
-  // Report Vehicle Issue
+  // Report Vehicle Issue -> creates a maintenance ticket and returns it
   reportDriverIssue(issue) {
     const portal = this.getDriverPortalData();
+    if (!portal.issueTickets) portal.issueTickets = [];
+    const ticket = {
+      id: `TKT-${String(Date.now()).slice(-6)}`,
+      title: (issue.title || '').trim(),
+      severity: issue.severity || 'Medium',
+      description: (issue.description || '').trim(),
+      vehicleReg: portal.vehicle?.regNumber,
+      status: 'Open',
+      assignedTo: 'Maintenance Team',
+      createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+    };
+    portal.issueTickets.unshift(ticket);
     portal.vehicle.inspectionStatus = 'Issue Reported';
-    portal.vehicle.maintenanceAlert = `Driver Report: ${issue.title} - Assigned to Maintenance Team`;
+    portal.vehicle.maintenanceAlert = `Ticket ${ticket.id}: ${ticket.title} (${ticket.severity}) - assigned to Maintenance Team`;
     portal.driverNotifications.unshift({
       id: `DN-${Date.now()}`,
-      title: `Maintenance Ticket Logged: ${issue.title}`,
-      message: issue.description || 'Inspection issue report dispatched to service department.',
+      title: `Maintenance Ticket ${ticket.id} Logged: ${ticket.title}`,
+      message: ticket.description || 'Vehicle issue report sent to the service department.',
       time: 'Just now',
       type: 'warning',
       read: false
     });
+    this.saveData();
+    return ticket;
+  }
+
+  // Driver notifications
+  markDriverNotificationRead(id) {
+    const portal = this.getDriverPortalData();
+    portal.driverNotifications = portal.driverNotifications.map(n => (n.id === id ? { ...n, read: true } : n));
+    this.saveData();
+  }
+
+  markAllDriverNotificationsRead() {
+    const portal = this.getDriverPortalData();
+    portal.driverNotifications = portal.driverNotifications.map(n => ({ ...n, read: true }));
+    this.saveData();
+  }
+
+  dismissDriverNotification(id) {
+    const portal = this.getDriverPortalData();
+    portal.driverNotifications = portal.driverNotifications.filter(n => n.id !== id);
     this.saveData();
   }
 

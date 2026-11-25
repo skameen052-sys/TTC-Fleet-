@@ -14,11 +14,14 @@ import {
   Shield,
   FileText
 } from 'lucide-react';
+import GlobalSearchDropdown from '../common/GlobalSearchDropdown';
 
 export const CustomerHeader = ({
   activeTabTitle = 'Customer Dashboard',
   searchQuery,
   onSearchChange,
+  searchResults,
+  onSearchSelect,
   notifications = [],
   onMarkNotificationRead,
   onMarkAllNotificationsRead,
@@ -123,6 +126,7 @@ export const CustomerHeader = ({
             placeholder="Search orders, shipments..."
             value={searchQuery || ''}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && searchResults && searchResults[0] && onSearchSelect) onSearchSelect(searchResults[0]); if (e.key === 'Escape' && onSearchChange) onSearchChange(''); }}
             style={{
               width: '100%',
               padding: '6px 10px 6px 30px',
@@ -134,6 +138,7 @@ export const CustomerHeader = ({
               color: '#1E293B'
             }}
           />
+          <GlobalSearchDropdown query={searchQuery} results={searchResults} onSelect={onSearchSelect} />
         </div>
 
         {/* Notifications Popover */}

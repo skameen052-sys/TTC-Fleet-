@@ -22,7 +22,8 @@ import {
   ArrowRight,
   ChevronRight,
   Compass,
-  AlertCircle
+  AlertCircle,
+  Wrench
 } from 'lucide-react';
 
 /* =========================================================================
@@ -188,7 +189,7 @@ export const TripHistoryView = ({ trips = [] }) => {
 /* =========================================================================
    4. MY VEHICLE VIEW
    ========================================================================= */
-export const MyVehicleView = ({ vehicle, onReportIssue }) => {
+export const MyVehicleView = ({ vehicle, onReportIssue, tickets = [] }) => {
   return (
     <div className="driver-subview-container">
       <div className="subview-header">
@@ -215,7 +216,7 @@ export const MyVehicleView = ({ vehicle, onReportIssue }) => {
             <div className="v-spec-row"><span className="v-key">Max Payload:</span><span className="v-val">{vehicle?.maxCapacity}</span></div>
             <div className="v-spec-row"><span className="v-key">Odometer:</span><span className="v-val highlight">{vehicle?.odometerKm?.toLocaleString()} km</span></div>
             <div className="v-spec-row"><span className="v-key">Fuel Level:</span><span className="v-val">{vehicle?.fuelLevel}</span></div>
-            <div className="v-spec-row"><span className="v-key">Inspection:</span><span className="v-val" style={{ color: '#16A36A', fontWeight: 700 }}>✓ {vehicle?.inspectionStatus}</span></div>
+            <div className="v-spec-row"><span className="v-key">Inspection:</span><span className="v-val" style={{ color: vehicle?.inspectionStatus === 'Issue Reported' ? '#DC2626' : '#16A36A', fontWeight: 700 }}>{vehicle?.inspectionStatus === 'Issue Reported' ? '⚠' : '✓'} {vehicle?.inspectionStatus}</span></div>
           </div>
         </div>
 
@@ -223,6 +224,31 @@ export const MyVehicleView = ({ vehicle, onReportIssue }) => {
           <Wrench size={16} color="#7955E8" />
           <span>{vehicle?.maintenanceAlert}</span>
         </div>
+      </div>
+
+      <div className="content-card" style={{ marginTop: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
+          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: '#14213D' }}>My Vehicle Issue Tickets</h3>
+          <span style={{ fontSize: 12, color: '#64748B' }}>{tickets.length} ticket{tickets.length === 1 ? '' : 's'}</span>
+        </div>
+        {tickets.length === 0 ? (
+          <div style={{ padding: '18px 0', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>
+            No issues reported. Use <b>Report Vehicle Issue</b> if something is wrong with the truck.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {tickets.map(t => (
+              <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', border: '1px solid #E2E8F0', borderRadius: 10 }}>
+                <AlertTriangle size={16} color={t.severity === 'High' ? '#DC2626' : t.severity === 'Medium' ? '#D97706' : '#64748B'} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#14213D' }}>{t.id} · {t.title}</div>
+                  <div style={{ fontSize: 11.5, color: '#64748B' }}>{t.createdAt} · {t.severity} severity · {t.assignedTo}</div>
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 12, background: '#FEF3C7', color: '#92400E' }}>{t.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -471,33 +497,77 @@ export const VehicleInspectionView = ({ onReportIssue }) => {
    11. DOCUMENTS VIEW
    ========================================================================= */
 export const DocumentsView = ({ documents = [] }) => {
+  const [openDoc, setOpenDoc] = useState(null);
+  const today = new Date();
+  const daysLeft = (d) => Math.ceil((new Date(d) - today) / 86400000);
+  const statusOf = (doc) => {
+    const left = daysLeft(doc.expiry);
+    if (left < 0) return { label: 'Expired', bg: '#FEE2E2', fg: '#991B1B' };
+    if (left <= 60) return { label: `Expires in ${left} days`, bg: '#FEF3C7', fg: '#92400E' };
+    return { label: doc.status || 'Valid', bg: '#DCFCE7', fg: '#166534' };
+  };
+
   return (
     <div className="driver-subview-container">
       <div className="subview-header">
         <div>
           <h2 className="subview-title">Driver & Vehicle Documents</h2>
-          <p className="subview-subtitle">Active Commercial Driver License, DOT Medical Card, and Insurance Certificates</p>
+          <p className="subview-subtitle">Commercial Driver License, DOT Medical Card, registration and insurance certificates</p>
         </div>
       </div>
 
       <div className="documents-cards-grid">
-        {documents.map(doc => (
-          <div key={doc.id} className="doc-item-card">
-            <div className="doc-icon-box">
-              <FileText size={24} color="#3478F6" />
-            </div>
-            <div className="doc-info">
-              <span className="doc-title">{doc.name}</span>
-              <span className="doc-number">{doc.number}</span>
-              <span className="doc-issuer">Issuer: {doc.issuer}</span>
-              <div className="doc-bottom-row">
-                <span className="doc-expiry">Expires: {doc.expiry}</span>
-                <span className="status-pill status-available">{doc.status}</span>
+        {documents.map(doc => {
+          const st = statusOf(doc);
+          return (
+            <div key={doc.id} className="doc-item-card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                <div className="doc-icon-box">
+                  <FileText size={24} color="#3478F6" />
+                </div>
+                <div className="doc-info" style={{ flex: 1, minWidth: 0 }}>
+                  <span className="doc-title">{doc.name}</span>
+                  <span className="doc-number">{doc.number}</span>
+                  <span className="doc-issuer">Issuer: {doc.issuer}</span>
+                </div>
               </div>
+              <div className="doc-bottom-row" style={{ marginTop: 'auto' }}>
+                <span className="doc-expiry">Expires: {doc.expiry}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 12, background: st.bg, color: st.fg, whiteSpace: 'nowrap' }}>{st.label}</span>
+              </div>
+              <button className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setOpenDoc(doc)}>
+                View Details
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {openDoc && (
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setOpenDoc(null)}>
+          <div className="modal-card">
+            <div className="modal-header">
+              <h4 className="modal-title">{openDoc.name}</h4>
+              <button className="modal-close-btn" onClick={() => setOpenDoc(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="pickup-details-list">
+                <div className="detail-row"><span className="detail-key">Document No.</span><span className="detail-val">{openDoc.number}</span></div>
+                <div className="detail-row"><span className="detail-key">Issued by</span><span className="detail-val">{openDoc.issuer}</span></div>
+                <div className="detail-row"><span className="detail-key">Expiry date</span><span className="detail-val">{openDoc.expiry}</span></div>
+                <div className="detail-row"><span className="detail-key">Days remaining</span><span className="detail-val">{daysLeft(openDoc.expiry)} days</span></div>
+                <div className="detail-row"><span className="detail-key">Status</span><span className="detail-val">{statusOf(openDoc).label}</span></div>
+              </div>
+              <p style={{ fontSize: 12, color: '#64748B', marginTop: 14 }}>
+                Renewals are uploaded by the Fleet Manager in Vehicle Documents. You will get a notification 60 days before expiry.
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-primary" onClick={() => setOpenDoc(null)}>Close</button>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -505,29 +575,54 @@ export const DocumentsView = ({ documents = [] }) => {
 /* =========================================================================
    12. NOTIFICATIONS VIEW
    ========================================================================= */
-export const NotificationsView = ({ notifications = [] }) => {
+export const NotificationsView = ({ notifications = [], onMarkRead, onMarkAllRead, onDismiss }) => {
+  const [filter, setFilter] = useState('All');
+  const unread = notifications.filter(n => !n.read).length;
+  const list = notifications.filter(n => filter === 'All' || (filter === 'Unread' ? !n.read : n.type === 'emergency' || n.type === 'warning'));
+
   return (
     <div className="driver-subview-container">
       <div className="subview-header">
         <div>
           <h2 className="subview-title">Driver Notifications & Dispatch Alerts</h2>
-          <p className="subview-subtitle">Live bulletin board for route advisories, assignments, and weather alerts</p>
+          <p className="subview-subtitle">Route advisories, assignments, maintenance tickets and weather alerts · {unread} unread</p>
         </div>
+        <button className="btn btn-secondary" onClick={onMarkAllRead} disabled={unread === 0} style={{ opacity: unread === 0 ? 0.5 : 1 }}>
+          <CheckCircle2 size={15} color="#16A36A" /> Mark all as read
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        {['All', 'Unread', 'Alerts'].map(f => (
+          <button key={f} onClick={() => setFilter(f)} className="btn"
+            style={{ padding: '6px 14px', borderRadius: 20, fontSize: 12.5, background: filter === f ? '#14213D' : '#FFFFFF', color: filter === f ? '#FFFFFF' : '#334155', border: '1px solid #E2E8F0' }}>
+            {f}{f === 'Unread' && unread ? ` (${unread})` : ''}
+          </button>
+        ))}
       </div>
 
       <div className="driver-notifications-list content-card">
-        {notifications.map(n => (
-          <div key={n.id} className={`driver-notif-item ${n.type}`}>
+        {list.length === 0 && (
+          <div style={{ padding: '24px 0', textAlign: 'center', color: '#94A3B8', fontSize: 13 }}>No notifications here.</div>
+        )}
+        {list.map(n => (
+          <div key={n.id} className={`driver-notif-item ${n.type}`} style={{ opacity: n.read ? 0.78 : 1, cursor: n.read ? 'default' : 'pointer' }}
+            onClick={() => !n.read && onMarkRead && onMarkRead(n.id)}>
             <div className="notif-icon-bubble">
-              {n.type === 'emergency' ? <AlertCircle size={18} color="#EF5350" /> : <Bell size={18} color="#3478F6" />}
+              {n.type === 'emergency' || n.type === 'warning' ? <AlertCircle size={18} color="#EF5350" /> : <Bell size={18} color="#3478F6" />}
             </div>
-            <div className="notif-body">
+            <div className="notif-body" style={{ flex: 1, minWidth: 0 }}>
               <div className="notif-title-row">
-                <span className="notif-title">{n.title}</span>
+                <span className="notif-title">
+                  {!n.read && <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#FF7A1A', marginRight: 8, verticalAlign: 1 }} />}
+                  {n.title}
+                </span>
                 <span className="notif-time">{n.time}</span>
               </div>
               <p className="notif-message">{n.message}</p>
             </div>
+            <button title="Dismiss" onClick={(e) => { e.stopPropagation(); onDismiss && onDismiss(n.id); }}
+              style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#94A3B8', fontSize: 18, lineHeight: 1, padding: '0 4px', alignSelf: 'flex-start' }}>×</button>
           </div>
         ))}
       </div>
@@ -634,20 +729,29 @@ export const DriverModals = {
     const [title, setTitle] = useState('');
     const [severity, setSeverity] = useState('Medium');
     const [description, setDescription] = useState('');
+    const [error, setError] = useState('');
 
     if (!isOpen) return null;
+
+    const close = () => { setTitle(''); setSeverity('Medium'); setDescription(''); setError(''); onClose(); };
+    const submit = () => {
+      if (title.trim().length < 5) { setError('Please describe the issue in at least 5 characters.'); return; }
+      onSubmit({ title: title.trim(), severity, description: description.trim() });
+      close();
+    };
 
     return (
       <div className="modal-overlay">
         <div className="modal-card">
           <div className="modal-header">
             <h4 className="modal-title" style={{ color: '#EF5350' }}>Report Vehicle Issue</h4>
-            <button className="modal-close-btn" onClick={onClose}>×</button>
+            <button className="modal-close-btn" onClick={close}>×</button>
           </div>
           <div className="modal-body">
             <div className="form-group">
               <label className="form-label">Issue Summary</label>
-              <input type="text" className="form-input" placeholder="e.g. Low air pressure in right trailer tire" value={title} onChange={e => setTitle(e.target.value)} required />
+              <input type="text" className="form-input" placeholder="e.g. Low air pressure in right trailer tire" value={title} onChange={e => { setTitle(e.target.value); setError(''); }} required style={error ? { borderColor: '#EF5350' } : undefined} />
+              {error && <div style={{ color: '#DC2626', fontSize: 12, marginTop: 4 }}>{error}</div>}
             </div>
             <div className="form-group">
               <label className="form-label">Severity Level</label>
@@ -663,8 +767,8 @@ export const DriverModals = {
             </div>
           </div>
           <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
-            <button className="btn" style={{ backgroundColor: '#EF5350', color: 'white' }} onClick={() => { onSubmit({ title, severity, description }); onClose(); }}>
+            <button className="btn btn-secondary" onClick={close}>Cancel</button>
+            <button className="btn" style={{ backgroundColor: '#EF5350', color: 'white' }} onClick={submit}>
               Submit Issue Ticket
             </button>
           </div>

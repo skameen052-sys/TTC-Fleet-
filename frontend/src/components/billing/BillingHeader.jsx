@@ -18,10 +18,13 @@ import {
   Clock,
   ArrowRight
 } from 'lucide-react';
+import GlobalSearchDropdown from '../common/GlobalSearchDropdown';
 
 export const BillingHeader = ({
   searchQuery,
   onSearchChange,
+  searchResults,
+  onSearchSelect,
   currentUser,
   onLogout,
   onSwitchPortal,
@@ -85,7 +88,8 @@ export const BillingHeader = ({
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '20px',
           padding: '6px 14px',
-          width: '380px'
+          width: '380px',
+          position: 'relative'
         }}
       >
         <Search size={16} color="#64748b" />
@@ -94,6 +98,7 @@ export const BillingHeader = ({
           placeholder="Search invoices, payments, bills, customers, GSTIN..."
           value={searchQuery || ''}
           onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && searchResults && searchResults[0] && onSearchSelect) onSearchSelect(searchResults[0]); if (e.key === 'Escape' && onSearchChange) onSearchChange(''); }}
           style={{
             background: 'transparent',
             border: 'none',
@@ -103,6 +108,7 @@ export const BillingHeader = ({
             width: '100%'
           }}
         />
+        <GlobalSearchDropdown query={searchQuery} results={searchResults} onSelect={onSearchSelect} dark align="left" />
       </div>
 
       {/* 2. Right Action Controls */}

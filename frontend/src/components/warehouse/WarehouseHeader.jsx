@@ -16,6 +16,7 @@ import {
   Boxes,
   Truck
 } from 'lucide-react';
+import GlobalSearchDropdown from '../common/GlobalSearchDropdown';
 
 export const WarehouseHeader = ({
   activeTabTitle = 'Warehouse Manager Dashboard',
@@ -27,7 +28,9 @@ export const WarehouseHeader = ({
   onSwitchToDriver,
   onSwitchPortal,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  searchResults,
+  onSearchSelect
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState('');
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
@@ -93,7 +96,9 @@ export const WarehouseHeader = ({
             placeholder="Search SKUs, shipments, bays, warehouses..."
             value={searchQuery || ''}
             onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && searchResults && searchResults[0] && onSearchSelect) onSearchSelect(searchResults[0]); if (e.key === 'Escape' && onSearchChange) onSearchChange(''); }}
           />
+          <GlobalSearchDropdown query={searchQuery} results={searchResults} onSelect={onSearchSelect} />
           <kbd className="header-search-kbd">/</kbd>
         </div>
 
