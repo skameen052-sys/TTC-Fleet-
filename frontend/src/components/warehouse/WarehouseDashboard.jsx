@@ -233,130 +233,146 @@ export const WarehouseDashboard = ({
           3. NINE (9) SUMMARY KPI CARDS
           =================================================================== */}
       <section className="summary-cards-section">
-        <div className="driver-kpi-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+        <div className="summary-cards-grid driver-kpi-grid warehouse-kpi-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '12px' }}>
           {/* Card 1: Total Warehouses */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('warehouses')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#EBF3FF' }}>
-                <Warehouse size={22} color="#3478F6" />
-              </div>
-              <span className="kpi-card-label">Total Warehouses</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
+              <Warehouse size={22} color="#3478F6" />
             </div>
-            <div className="kpi-metric-val">{metrics?.totalWarehouses || 6}</div>
-            <div className="kpi-footer-note" style={{ color: '#16A36A' }}>
-              <span>✓ All 6 Regional Hubs Online</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Total Warehouses">Total Warehouses</span>
+              <span className="kpi-card-value">{metrics?.totalWarehouses || 6}</span>
+              <span className="kpi-sub-text" style={{ color: '#16A36A', fontWeight: 600 }}>
+                ✓ All 6 Regional Hubs Online
+              </span>
             </div>
           </div>
 
           {/* Card 2: Total Inventory Items */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('inventory')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#FFF0E5' }}>
-                <Boxes size={22} color="#FF7A1A" />
-              </div>
-              <span className="kpi-card-label">Total Inventory Items</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#FFF0E5' }}>
+              <Boxes size={22} color="#FF7A1A" />
             </div>
-            <div className="kpi-metric-val">{metrics?.totalInventoryItems || 10} <span style={{ fontSize: 13, color: '#718096' }}>SKUs</span></div>
-            <div className="kpi-footer-note">
-              <span>Across 5 distinct product categories</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Total Inventory Items">Total Inventory Items</span>
+              <span className="kpi-card-value">
+                {metrics?.totalInventoryItems || 10} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>SKUs</span>
+              </span>
+              <span className="kpi-sub-text" title="Across 5 distinct product categories">
+                Across 5 distinct product categories
+              </span>
             </div>
           </div>
 
           {/* Card 3: Total Stock Quantity */}
           <div className="kpi-stat-card">
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#E8F8F0' }}>
-                <Layers size={22} color="#16A36A" />
-              </div>
-              <span className="kpi-card-label">Total Stock Quantity</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
+              <Layers size={22} color="#16A36A" />
             </div>
-            <div className="kpi-metric-val">{(metrics?.totalStockQuantity || totalStock).toLocaleString()} <span style={{ fontSize: 13, color: '#718096' }}>Units</span></div>
-            <div className="kpi-footer-note" style={{ color: '#16A36A' }}>
-              <span>Valuation: $1,420,500</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Total Stock Quantity">Total Stock Quantity</span>
+              <span className="kpi-card-value">
+                {(metrics?.totalStockQuantity || totalStock).toLocaleString()} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>Units</span>
+              </span>
+              <span className="kpi-sub-text" style={{ color: '#16A36A', fontWeight: 600 }}>
+                Valuation: $1,420,500
+              </span>
             </div>
           </div>
 
           {/* Card 4: Incoming Shipments */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('incoming-goods')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#EBF3FF' }}>
-                <ArrowDownToLine size={22} color="#3478F6" />
-              </div>
-              <span className="kpi-card-label">Incoming Shipments</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#EBF3FF' }}>
+              <ArrowDownToLine size={22} color="#3478F6" />
             </div>
-            <div className="kpi-metric-val">{metrics?.incomingShipments || 4} <span style={{ fontSize: 13, color: '#718096' }}>Scheduled</span></div>
-            <div className="kpi-footer-note">
-              <span>Expected today at receiving bays</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Incoming Shipments">Incoming Shipments</span>
+              <span className="kpi-card-value">
+                {metrics?.incomingShipments || 4} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>Scheduled</span>
+              </span>
+              <span className="kpi-sub-text" title="Expected today at receiving bays">
+                Expected today at receiving bays
+              </span>
             </div>
           </div>
 
           {/* Card 5: Outgoing Shipments */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('outgoing-goods')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#FFF0E5' }}>
-                <ArrowUpFromLine size={22} color="#FF7A1A" />
-              </div>
-              <span className="kpi-card-label">Outgoing Shipments</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#FFF0E5' }}>
+              <ArrowUpFromLine size={22} color="#FF7A1A" />
             </div>
-            <div className="kpi-metric-val">{metrics?.outgoingShipments || 5} <span style={{ fontSize: 13, color: '#718096' }}>Orders</span></div>
-            <div className="kpi-footer-note">
-              <span>Fulfillment velocity on schedule</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Outgoing Shipments">Outgoing Shipments</span>
+              <span className="kpi-card-value">
+                {metrics?.outgoingShipments || 5} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>Orders</span>
+              </span>
+              <span className="kpi-sub-text" title="Fulfillment velocity on schedule">
+                Fulfillment velocity on schedule
+              </span>
             </div>
           </div>
 
           {/* Card 6: Pending Receipts */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('receiving-confirmation')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#E8F8F0' }}>
-                <Clock size={22} color="#16A36A" />
-              </div>
-              <span className="kpi-card-label">Pending Receipts</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#E8F8F0' }}>
+              <Clock size={22} color="#16A36A" />
             </div>
-            <div className="kpi-metric-val">{metrics?.pendingReceipts || 3} <span style={{ fontSize: 13, color: '#718096' }}>at Gate/Transit</span></div>
-            <div className="kpi-footer-note" style={{ color: '#3478F6' }}>
-              <span>Dock unloader crews assigned</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Pending Receipts">Pending Receipts</span>
+              <span className="kpi-card-value">
+                {metrics?.pendingReceipts || 3} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>at Gate/Transit</span>
+              </span>
+              <span className="kpi-sub-text" style={{ color: '#3478F6', fontWeight: 600 }} title="Dock unloader crews assigned">
+                Dock unloader crews assigned
+              </span>
             </div>
           </div>
 
           {/* Card 7: Pending Dispatches */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('outgoing-goods')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#FFF5EB' }}>
-                <Truck size={22} color="#FF7A1A" />
-              </div>
-              <span className="kpi-card-label">Pending Dispatches</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#FFF5EB' }}>
+              <Truck size={22} color="#FF7A1A" />
             </div>
-            <div className="kpi-metric-val">{metrics?.pendingDispatches || 4} <span style={{ fontSize: 13, color: '#718096' }}>Ready at Bay</span></div>
-            <div className="kpi-footer-note" style={{ color: '#FF7A1A' }}>
-              <span>Awaiting driver seal verification</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Pending Dispatches">Pending Dispatches</span>
+              <span className="kpi-card-value">
+                {metrics?.pendingDispatches || 4} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>Ready at Bay</span>
+              </span>
+              <span className="kpi-sub-text" style={{ color: '#FF7A1A', fontWeight: 600 }} title="Awaiting driver seal verification">
+                Awaiting driver seal verification
+              </span>
             </div>
           </div>
 
           {/* Card 8: Low Stock Items */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('low-stock-alerts')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#FEECEC' }}>
-                <AlertTriangle size={22} color="#EF5350" />
-              </div>
-              <span className="kpi-card-label">Low Stock Items</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#FEECEC' }}>
+              <AlertTriangle size={22} color="#EF5350" />
             </div>
-            <div className="kpi-metric-val" style={{ color: '#EF5350' }}>{metrics?.lowStockItems || 2} <span style={{ fontSize: 13, color: '#718096' }}>SKUs Alert</span></div>
-            <div className="kpi-footer-note" style={{ color: '#EF5350' }}>
-              <span>Auto-reorder triggers sent</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Low Stock Items">Low Stock Items</span>
+              <span className="kpi-card-value" style={{ color: '#EF5350' }}>
+                {metrics?.lowStockItems || 2} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>SKUs Alert</span>
+              </span>
+              <span className="kpi-sub-text" style={{ color: '#EF5350', fontWeight: 600 }} title="Auto-reorder triggers sent">
+                Auto-reorder triggers sent
+              </span>
             </div>
           </div>
 
           {/* Card 9: Damaged Items */}
           <div className="kpi-stat-card" onClick={() => onSelectTab('damaged-goods')} style={{ cursor: 'pointer' }}>
-            <div className="kpi-card-header">
-              <div className="kpi-icon-container" style={{ backgroundColor: '#F3EEFF' }}>
-                <AlertCircle size={22} color="#7955E8" />
-              </div>
-              <span className="kpi-card-label">Damaged Items</span>
+            <div className="kpi-card-icon-box" style={{ backgroundColor: '#F3EEFF' }}>
+              <AlertCircle size={22} color="#7955E8" />
             </div>
-            <div className="kpi-metric-val">{metrics?.damagedItems || 5} <span style={{ fontSize: 13, color: '#718096' }}>Quarantine</span></div>
-            <div className="kpi-footer-note">
-              <span>Isolated in Hazmat Cage Q-01</span>
+            <div className="kpi-card-info" style={{ minWidth: 0, flex: 1 }}>
+              <span className="kpi-card-label" title="Damaged Items">Damaged Items</span>
+              <span className="kpi-card-value">
+                {metrics?.damagedItems || 5} <span style={{ fontSize: 13, fontWeight: 500, color: '#718096' }}>Quarantine</span>
+              </span>
+              <span className="kpi-sub-text" title="Isolated in Hazmat Cage Q-01">
+                Isolated in Hazmat Cage Q-01
+              </span>
             </div>
           </div>
         </div>

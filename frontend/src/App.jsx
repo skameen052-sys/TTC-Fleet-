@@ -1158,12 +1158,21 @@ export default function App() {
           {/* Logistics Modals */}
           <CreateOrderModal
             isOpen={isLogisticsCreateOrderOpen}
-            onClose={() => setIsLogisticsCreateOrderOpen(false)}
+            onClose={() => {
+              setIsLogisticsCreateOrderOpen(false);
+              if (logisticsActiveTab === 'create-order') {
+                setLogisticsActiveTab('all-orders');
+              }
+            }}
             onSubmit={(ord) => {
               logisticsService.addOrder(ord);
               setLogisticsData(logisticsService.getData());
               setCustomerData(customerService.getData());
               showToast(`Order created successfully for ${ord.customerName}!`);
+              setIsLogisticsCreateOrderOpen(false);
+              if (logisticsActiveTab === 'create-order') {
+                setLogisticsActiveTab('all-orders');
+              }
             }}
           />
 

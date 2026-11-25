@@ -133,7 +133,13 @@ export const CreateOrderModal = ({ isOpen, onClose, onSubmit }) => {
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }}
+            aria-label="Close modal"
+            title="Close"
             style={{
               background: '#F1F5F9',
               border: 'none',
@@ -144,7 +150,8 @@ export const CreateOrderModal = ({ isOpen, onClose, onSubmit }) => {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: '#64748B'
+              color: '#64748B',
+              zIndex: 10
             }}
           >
             <X size={18} />

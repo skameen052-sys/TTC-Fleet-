@@ -101,11 +101,13 @@ export const OrderManagementView = ({
     if (activeSubTab) {
       if (activeSubTab === 'create-order') {
         if (onOpenCreateOrder) onOpenCreateOrder();
+        setCurrentSubTab('all-orders');
+        if (onSelectTab) onSelectTab('all-orders');
       } else {
         setCurrentSubTab(activeSubTab);
       }
     }
-  }, [activeSubTab, onOpenCreateOrder]);
+  }, [activeSubTab]);
 
   // Tab counts
   const counts = useMemo(() => {
