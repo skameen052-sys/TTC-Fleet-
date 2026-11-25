@@ -987,8 +987,8 @@ export default function App() {
               onSearchChange={setSearchQuery}
             />
 
-            {/* Dynamic Logistics Page Views */}
-            <main className="dashboard-content">
+            {/* Dynamic Logistics Page Views (sub-pages use scoped Tailwind: .logistics-tw) */}
+            <main className={`dashboard-content${logisticsActiveTab !== 'dashboard' ? ' logistics-tw' : ''}`}>
               <ErrorBoundary>
                 {logisticsActiveTab === 'dashboard' && (
                   <LogisticsDashboard
